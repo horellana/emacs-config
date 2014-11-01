@@ -1,17 +1,20 @@
 (use-package flycheck
-	:config (progn
-						(add-hook 'emacs-lisp-mode-hook
-											(lambda () (flycheck-mode)))))
+						 :ensure t
+						 :config (progn
+											 (add-hook 'emacs-lisp-mode-hook
+																 (lambda () (flycheck-mode)))))
 
 (use-package eldoc
-	:config (progn
-						(add-hook 'emacs-lisp-mode-hook
-											(lambda () (eldoc-mode)))))
+						 :ensure t
+						 :config (progn
+											 (add-hook 'emacs-lisp-mode-hook
+																 (lambda () (eldoc-mode)))))
 
 (use-package paredit
-	:config (progn
-						(add-hook 'emacs-lisp-mode-hook
-											(lambda () (paredit-mode)))))
+						 :ensure t
+						 :config (progn
+											 (add-hook 'emacs-lisp-mode-hook
+																 (lambda () (paredit-mode)))))
 
 (add-hook 'emacs-lisp-mode-hook
 					(lambda () (add-hook 'local-write-file-hooks 'check-parens)))
@@ -57,7 +60,8 @@
 (add-hook 'emacs-lisp-mode-hook
 					(lambda ()
 						(use-package company
-								:config (progn
-													(company-mode)))))
+												 :ensure t
+												 :config (progn
+																	 (company-mode)))))
 
 (provide 'elisp-config)

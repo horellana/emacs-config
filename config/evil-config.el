@@ -7,7 +7,6 @@
   (define-key minibuffer-local-must-match-map [escape] 'minibuffer-keyboard-quit)
   (define-key minibuffer-local-isearch-map [escape] 'minibuffer-keyboard-quit))
 
-
 (use-package evil
 						 :ensure t
 						 :config (progn

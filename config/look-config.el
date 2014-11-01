@@ -19,14 +19,18 @@
 																	:config (powerline-evil-vim-color-theme)))
 																	
 (use-package diminish
-	     :ensure t
-	     :config (cl-loop for mode in '(helm-mode
-					    auto-complete-mode
-					    undo-tree-mode
-					    company-mode
-					    eldoc-mode
-					    paredit-mode
-					    flycheck-mode)
-			      do (ignore-errors (diminish mode))))
+						 :defer t
+						 :ensure t
+						 :config (cl-loop for mode in '(helm-mode
+																						auto-complete-mode
+																						undo-tree-mode
+																						company-mode
+																						eldoc-mode
+																						paredit-mode
+																						projectile-mode
+																						company-mode
+																						whitespace-mode
+																						flycheck-mode)
+															do (ignore-errors (diminish mode))))
 
 (provide 'look-config)

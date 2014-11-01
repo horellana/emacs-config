@@ -1,6 +1,4 @@
 (use-package aggressive-indent
-						 :ensure t
-						 :config (progn
-											 (global-aggressive-indent-mode)))
+  :ensure t)
 
 (provide 'aggresive-indent-config)
