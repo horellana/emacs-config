@@ -16,34 +16,20 @@
 											 (add-hook 'emacs-lisp-mode-hook
 																 (lambda () (paredit-mode)))))
 
+(use-package aggressive-indent
+						 :ensure t
+						 :config (progn
+											 (add-hook 'emacs-lisp-mode-hook 
+																 'aggressive-indent-mode)))
+
+(use-package company
+						 :ensure t
+						 :config (progn
+											 (add-hook 'emacs-lisp-mode-hook 'company-mode)
+											 (add-hook 'inferior-emacs-lisp-mode-hook 'company-mode)))
+
 (add-hook 'emacs-lisp-mode-hook
 					(lambda () (add-hook 'local-write-file-hooks 'check-parens)))
-
-(add-hook 'emacs-lisp-mode-hook
-					(lambda ()
-						(make-local-variable 'ac-sources)
-						(setq-local ac-sources
-												'(ac-source-variables
-													ac-source-words-in-same-mode-buffers
-													ac-source-words-in-buffer
-													ac-source-functions
-													ac-source-features
-													ac-source-abbrev
-													ac-source-symbols))))
-
-(add-hook 'inferior-emacs-lisp-mode-hook
-					(lambda ()
-						(make-local-variable 'ac-sources)
-						(setq-local ac-sources
-												'(ac-source-variables
-													ac-source-words-in-same-mode-buffers
-													ac-source-words-in-buffer
-													ac-source-functions
-													ac-source-features
-													ac-source-abbrev
-													ac-source-symbols))))
-
-(add-hook 'inferior-emacs-lisp-mode 'company-mode)
 
 (add-hook 'emacs-lisp-mode-hook
 					(lambda ()
@@ -56,12 +42,5 @@
 					(lambda ()
 						(electric-pair-mode)
 						(show-paren-mode)))
-
-(add-hook 'emacs-lisp-mode-hook
-					(lambda ()
-						(use-package company
-												 :ensure t
-												 :config (progn
-																	 (company-mode)))))
 
 (provide 'elisp-config)
