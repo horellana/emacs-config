@@ -43,6 +43,8 @@
 													(ac-complete-with-helm)))
 
 											 (loop for mode in '(haskell-interactive-mode
+																					 erc-mode
+																					 comint-mode
 																					 slime-repl-mode)
 														 do (evil-set-initial-state mode 'emacs))
 											 

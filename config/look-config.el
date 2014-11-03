@@ -4,7 +4,7 @@
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
 
-(add-to-list 'default-frame-alist '(font . "Terminus-9"))
+(add-to-list 'default-frame-alist '(font . "Droid Sans Mono-10"))
 
 (use-package color-theme
 						 :ensure t
