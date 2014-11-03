@@ -6,10 +6,20 @@
 
 (add-to-list 'default-frame-alist '(font . "Droid Sans Mono-10"))
 
+(use-package leuven-theme
+						 :ensure t
+						 :config (progn
+											 (load-theme 'leuven t)
+											 (custom-theme-set-faces
+												'leuven
+												`(vertical-border ((t :foreground "#ffffff" :background "#ffffff"))))))
+
 (use-package color-theme
+						 :disabled t
 						 :ensure t
 						 :config (progn
 											 (load "/home/juiko/git/color-theme-mac-classic/color-theme-mac-classic.el")
+
 											 (color-theme-mac-classic)))
 
 (use-package powerline
