@@ -16,6 +16,10 @@
 																"#lobby"
 																"#help")
 															 ("perl.org"
-																"#p5p")))))
+																"#p5p")))
+
+											 (defun start-erc ()
+												 (interactive)
+												 (erc :nick "juiko" :password "caballovolado"))))
 
 (provide 'erc-config)
