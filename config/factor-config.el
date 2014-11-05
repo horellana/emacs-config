@@ -1,19 +1,36 @@
 (use-package factor-mode
-  :commands (factor-mode fuel-mode)
-  :config (progn
-            (custom-set-variables '(factor-indent-level 2))
-            (use-package auto-complete :config (progn
-                                                 (add-hook 'factor-mode-hook
-                                                           (lambda ()
-                                                             (make-local-variable 'ac-sources)
-                                                             (setq-local ac-sources '(ac-source-words-in-buffer
-                                                                                      ac-source-words-in-same-mode-buffers))
-                                                             (auto-complete-mode)))))
+						 :commands (factor-mode fuel-mode)
+						 :init (progn
+										 (add-to-list 'load-path
+																	"/home/juiko/git/factor/misc/fuel/"))
+						 :config (progn
+											 (let ((root-dir "/home/juiko/git/factor"))
+												 (setf factor-root-dir root-dir
+															 fuel-listener-factor-binary (concat factor-root-dir
+																																	 "/"
+																																	 "factor")
+															 
+															 fuel-listener-factor-image (concat factor-root-dir
+																																	"/"
+																																	"factor.image")
 
-            (setq factor-root-dir "/home/juiko/git/factor/")
-            (setq fuel-listener-factor-binary (concat factor-root-dir "factor"))
-            (setq fuel-listener-factor-image (concat factor-root-dir "factor.image"))
-            (add-hook 'factor-mode-hook (lambda () (fuel-mode)))
-            (add-hook 'factor-mode-hook (lambda () (show-paren-mode)))))
+															 factor-indent-level 2))
+
+											 (use-package company
+																		:ensure t
+																		:config (progn 
+																							(add-hook 'factor-mode-hook 
+																												'company-mode)))
+											 (use-package fuel-mode
+																		:config (progn
+																							(add-hook 'factor-mode-hook 
+																												'fuel-mode)))
+											 
+											 (add-hook 'factor-mode-hook 'show-paren-mode)))
+(use-package evil
+						 :commands (factor-mode fuel-mode run-factor)
+						 :ensure t
+						 :config (progn
+											 (evil-set-initial-state 'fuel-listener-mode 'emacs)))
 
 (provide 'factor-config)
