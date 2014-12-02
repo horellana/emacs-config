@@ -1,5 +1,8 @@
 (setq inferior-lisp-program "sbcl")
-(setq slime-contribs '(slime-fancy))
+(setq slime-contribs '(slime-fancy slime-company))
+
+(use-package slime-company
+	:ensure t)
 
 (use-package slime
 	:ensure t)
@@ -8,15 +11,6 @@
 	:ensure t
 	:config (progn
 						(add-hook 'lisp-mode-hook 'aggressive-indent-mode)))
-
-(use-package ac-slime
-	:ensure t
-	:config (progn
-						(loop for m in '(slime-mode-hook
-														 slime-repl-mode-hook)
-									do (add-hook m (lambda ()
-																	 (set-up-slime-ac)
-																	 (auto-complete-mode))))))
 
 (use-package evil-leader
 	:ensure t
