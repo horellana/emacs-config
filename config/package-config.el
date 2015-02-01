@@ -1,3 +1,5 @@
+(require 'package)
+
 (defvar package-sources '(("marmalade" . "http://marmalade-repo.org/packages/")
 													("melpa" . "http://melpa.milkbox.net/packages/"))) 
 

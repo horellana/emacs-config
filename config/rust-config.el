@@ -20,8 +20,8 @@
 
 (progn
 	(add-to-list 'load-path "/home/juiko/git/racer/editors")
+	(setenv "RUST_SRC_PATH" "/home/juiko/git/rust/src/")
 	(use-package racer
-		:commands rust-mode
 		:config (setq racer-rust-src-path "/home/juiko/git/rust/src/"
 									racer-cmd "/home/juiko/git/racer/target/release/racer")))
 

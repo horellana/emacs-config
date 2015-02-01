@@ -40,7 +40,6 @@
 
 (add-hook 'emacs-lisp-mode-hook
 					(lambda ()
-						(electric-pair-mode)
 						(show-paren-mode)))
 
 (provide 'elisp-config)

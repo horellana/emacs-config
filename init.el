@@ -1,11 +1,12 @@
 ;;; The order in this matters
+(ignore-errors 
+ (load "/home/juiko/.emacs.d/config/cedet-config.el"))
+
+(load "/home/juiko/.emacs.d/config/package-config.el")
+
 (ignore-errors (package-initialize))
 
 (require 'use-package)
-
-(ignore-errors 
- (load "/home/juiko/.emacs.d/config/semantic-config.el")
- (load "/home/juiko/.emacs.d/config/package-config.el"))
 
 (progn
   (add-to-list 'load-path "/home/juiko/.emacs.d/plugins/utilities")
@@ -22,7 +23,7 @@
 				  (f-files "/home/juiko/.emacs.d/config/"))
 	   do (funcall action f)))
 
-(do-on-config 'load)
+(do-on-config (lambda (f) (load f)))
 
 ;;;;;;;;;;;;;; Personal configuration ;;;;;;;;;;;;;;;;;;;;
 
@@ -39,6 +40,8 @@
 (run-with-idle-timer 10
                      t
                      (lambda () (ignore-errors (kill-buffer "*Buffer List*"))))
+
+(use-package mpd)
 
 (progn
   (setq-default indent-tabs-mode t)
@@ -97,3 +100,28 @@
    version-control t))
 
 (put 'downcase-region 'disabled nil)
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(ac-auto-start 3)
+ '(ac-candidate-limit 250)
+ '(ac-delay 0.5)
+ '(ac-dwim t)
+ '(ac-use-fuzzy t)
+ '(ansi-color-faces-vector
+	 [default default default italic underline success warning error])
+ '(ansi-color-names-vector
+	 ["#212526" "#ff4b4b" "#b4fa70" "#fce94f" "#729fcf" "#e090d7" "#8cc4ff" "#eeeeec"])
+ '(custom-safe-themes
+	 (quote
+		("b3775ba758e7d31f3bb849e7c9e48ff60929a792961a2d536edec8f68c671ca5" "3d5ef3d7ed58c9ad321f05360ad8a6b24585b9c49abcee67bdcbb0fe583a6950" default)))
+ '(flycheck-display-errors-function (function flycheck-pos-tip-error-messages))
+ '(paradox-automatically-star t))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(default ((t (:background nil)))))

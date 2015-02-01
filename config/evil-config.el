@@ -8,48 +8,44 @@
   (define-key minibuffer-local-isearch-map [escape] 'minibuffer-keyboard-quit))
 
 (use-package evil
-						 :ensure t
-						 :config (progn
-											 (define-key evil-visual-state-map (kbd "TAB") 'indent-region)
-											 (define-key evil-normal-state-map (kbd "C-TAB") 'indent-whole-buffer)
+	:ensure t
+	:config (progn
+						(define-key evil-visual-state-map (kbd "TAB") 'indent-region)
+						(define-key evil-normal-state-map (kbd "C-TAB") 'indent-whole-buffer)
 
-											 (evil-escape-works)
+						(evil-escape-works)
 
-											 (define-key evil-normal-state-map [return]
-												 (lambda ()
-													 (interactive)
-													 (save-excursion
-														(newline))))
+						(define-key evil-normal-state-map [return]
+							(lambda ()
+								(interactive)
+								(save-excursion
+									(newline))))
 
-											 (define-key evil-normal-state-map (kbd "-")
-												 (lambda ()
-													 (interactive)
-													 (end-of-line)
-													 (ac-complete-with-helm)))
+						(define-key evil-visual-state-map (kbd ";") 'comment-dwim)
 
-											 (define-key evil-visual-state-map (kbd ";") 'comment-dwim)
+						(defadvice eval-last-sexp (around evil)
+							"Last sexp ends at point."
+							(when (evil-normal-state-p)
+								(save-excursion
+									(unless (or (eobp) (eolp)) (forward-char))
+									ad-do-it)))
 
-											 (defadvice eval-last-sexp (around evil)
-												 "Last sexp ends at point."
-												 (when (evil-normal-state-p)
-													 (save-excursion
-														(unless (or (eobp) (eolp)) (forward-char))
-														ad-do-it)))
+						(defun evil-ac-helm ()
+							(interactive)
+							(save-excursion
+								(forward-char)
+								(ac-complete-with-helm)))
 
-											 (defun evil-ac-helm ()
-												 (interactive)
-												 (save-excursion
-													(forward-char)
-													(ac-complete-with-helm)))
-
-											 (loop for mode in '(haskell-interactive-mode
-																					 erc-mode
-																					 comint-mode
-																					 slime-repl-mode)
-														 do (evil-set-initial-state mode 'emacs))
-											 
-											 (setf evil-move-cursor-back nil)
-											 (evil-mode)))
+						(loop for mode in '(haskell-interactive-mode
+																inferior-emacs-lisp-mode
+																erc-mode
+																parparadox-menu-mode
+																comint-mode
+																slime-repl-mode)
+									do (evil-set-initial-state mode 'emacs))
+						
+						(setf evil-move-cursor-back nil)
+						(evil-mode)))
 
 (use-package god-mode
 						 :ensure t
@@ -83,20 +79,21 @@
 											 (define-key evil-normal-state-map (kbd "L") 'evil-lisp-state)))
 
 (use-package evil-leader
-						 :ensure t
-						 :config (progn
-											 (setq evil-leader/leader ",") 
-											 (evil-leader/set-key
-												"f" 'find-file
-												"b" 'switch-to-buffer
-												"g" 'execute-extended-command
-												"k" 'kill-buffer
-												"," 'evil-execute-in-god-state
-												"p" 'helm-projectile
-												";" 'comment-dwim
-												"e" 'eval-last-sexp
-												"." 'ggtags-find-tag-dwim)
-											 (global-evil-leader-mode)))
+	:ensure t
+	:config (progn
+						(setq evil-leader/leader ",") 
+						(evil-leader/set-key
+							"f" 'find-file
+							"b" 'switch-to-buffer
+							"g" 'execute-extended-command
+							"k" 'kill-buffer
+							"," 'evil-execute-in-god-state
+							"p" 'helm-projectile
+							";" 'comment-dwim
+							"e" 'eval-last-sexp
+							"w" 'save-buffer
+							"." 'ggtags-find-tag-dwim)
+						(global-evil-leader-mode)))
 
 (use-package evil-matchit
 						 :ensure t)

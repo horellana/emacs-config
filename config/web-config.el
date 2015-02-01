@@ -2,6 +2,7 @@
 	:ensure t
 	:commands (web-mode)
 	:config (progn
+						(defalias 'html-mode 'web-mode)
 						(add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
 						(add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
 						(add-to-list 'auto-mode-alist '("\\.[gj]sp\\'" . web-mode))
@@ -9,11 +10,11 @@
 						(add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
 						(add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
 						(add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
+						(add-to-list 'auto-mode-alist '("\\.html" . web-mode))
 
-						;; (use-package ac-html
-						;; 							:config (progn
-						;; 												(add-to-list ac-sources ac-html-completion)))
-						
+						(setq web-mode-ac-sources-alist
+									'(("css" . (ac-source-css-property))
+										("html" . (ac-source-words-in-buffer ac-source-abbrev))))
 						(add-hook 'web-mode-hook 'auto-complete-mode)))
 
 
@@ -33,5 +34,10 @@
 						(add-hook 'web-mode-hook 'rainbow-mode)
 						(add-hook 'html-mode-hook 'rainbow-mode)
 						(add-hook 'css-mode-hook 'rainbow-mode)))
+
+(use-package aggressive-indent
+	:ensure t
+	:config (progn
+						(add-hook 'web-mode-hook 'aggressive-indent-mode)))
 
 (provide 'web-config)

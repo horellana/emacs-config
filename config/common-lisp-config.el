@@ -1,5 +1,14 @@
 (setq inferior-lisp-program "/home/juiko/git/sbcl/run-sbcl.sh")
-(setq slime-contribs '(slime-fancy slime-company))
+
+(setq slime-contribs '(slime-fancy 
+											 slime-company 
+											 slime-highlight-edits 
+											 inferior-slime))
+
+(use-package evil
+	:ensure t
+	:config (progn
+						(evil-set-initial-state 'slime-trace-dialog-mode 'emacs)))
 
 (use-package evil-leader
 	:ensure t
