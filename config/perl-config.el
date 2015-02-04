@@ -3,6 +3,7 @@
 (use-package cperl-mode
 	:commands cperl-mode
 	:config (progn
+						(add-to-list 'auto-mode-alist '("\\.t\\'" . cperl-mode))
 						(add-hook 'cperl-mode-hook
 											(lambda ()
 												(cperl-set-style "K&R")
