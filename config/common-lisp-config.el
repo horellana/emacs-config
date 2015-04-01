@@ -13,26 +13,28 @@
 (use-package evil-leader
   :ensure t
   :config (progn
-	    (add-hook 'lisp-mode-hook 'evil-leader-mode)
-	    (evil-leader/set-key-for-mode 'lisp-mode "cl" 'slime-load-file)
-	    (evil-leader/set-key-for-mode 'lisp-mode "e" 'slime-eval-last-expression)
-	    (evil-leader/set-key-for-mode 'lisp-mode "me" 'slime-macroexpand-1)
-	    (evil-leader/set-key-for-mode 'lisp-mode "ma" 'slime-macroexpand-all)))
+						(add-hook 'lisp-mode-hook 'evil-leader-mode)
+						(evil-leader/set-key-for-mode 'lisp-mode "cl" 'slime-load-file)
+						(evil-leader/set-key-for-mode 'lisp-mode "e" 'slime-eval-last-expression)
+						(evil-leader/set-key-for-mode 'lisp-mode "me" 'slime-macroexpand-1)
+						(evil-leader/set-key-for-mode 'lisp-mode "ma" 'slime-macroexpand-all)
+						(evil-leader/set-key-for-mode 'lisp-mode "sds" 'slime-disassemble-symbol)
+						(evil-leader/set-key-for-mode 'lisp-mode "sdd" 'slime-disassemble-definition)))
 
 (use-package aggressive-indent
   :ensure t
   :config (progn (add-hook 'lisp-mode-hook 
-			   (lambda () (aggressive-indent-mode t)))))
+													 (lambda () (aggressive-indent-mode t)))))
 
 (use-package paredit
   :ensure t
   :config (progn (add-hook 'lisp-mode-hook 
-			   (lambda () (paredit-mode t)))))
+													 (lambda () (paredit-mode t)))))
 
 (use-package evil-paredit
   :ensure t
   :config (progn (add-hook 'lisp-mode-hook 
-			   (lambda () (evil-paredit-mode t)))))
+													 (lambda () (evil-paredit-mode t)))))
 
 (use-package evil-lisp-state
   :ensure t)
@@ -44,6 +46,7 @@
 											(lambda ()
 												(unless (slime-connected-p)
 													(save-excursion (slime)))))
+						
 						(add-hook 'lisp-mode-hook (lambda ()
 																				(slime-mode t)))
 
