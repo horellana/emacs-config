@@ -8,8 +8,8 @@
   (define-key minibuffer-local-isearch-map [escape] 'minibuffer-keyboard-quit))
 
 (use-package evil
-	:ensure t
-	:config (progn
+  :ensure t
+  :config (progn
 						(define-key evil-visual-state-map (kbd "TAB") 'indent-region)
 						(define-key evil-normal-state-map (kbd "C-TAB") 'indent-whole-buffer)
 
@@ -37,10 +37,13 @@
 								(ac-complete-with-helm)))
 
 						(loop for mode in '(haskell-interactive-mode
+																haskell-presentation-mode
+																haskell-error-mode
 																inferior-emacs-lisp-mode
 																erc-mode
 																parparadox-menu-mode
 																comint-mode
+																eshell-mode
 																slime-repl-mode)
 									do (evil-set-initial-state mode 'emacs))
 						
@@ -48,39 +51,39 @@
 						(evil-mode)))
 
 (use-package god-mode
-						 :ensure t
-						 :config (progn
-											 (use-package evil-god-state
-																		:ensure t
-																		:config (progn
-																							(define-key evil-god-state-map [escape] 'evil-normal-state)
-																							(global-set-key (kbd "C-x C-1") 'delete-other-windows)
-																							(global-set-key (kbd "C-x C-2") 'split-window-below)
-																							(global-set-key (kbd "C-x C-3") 'split-window-right)
-																							(global-set-key (kbd "C-x C-0") 'delete-window)))))
+  :ensure t
+  :config (progn
+						(use-package evil-god-state
+							:ensure t
+							:config (progn
+												(define-key evil-god-state-map [escape] 'evil-normal-state)
+												(global-set-key (kbd "C-x C-1") 'delete-other-windows)
+												(global-set-key (kbd "C-x C-2") 'split-window-below)
+												(global-set-key (kbd "C-x C-3") 'split-window-right)
+												(global-set-key (kbd "C-x C-0") 'delete-window)))))
 
 
 (use-package evil-paredit
-						 :disabled t
-						 :ensure t
-						 :config (progn
-											 (add-hook 'lisp-mode-hook 'evil-paredit-mode)
-											 (add-hook 'emacs-lisp-mode-hook 'evil-paredit-mode)))
+  :disabled t
+  :ensure t
+  :config (progn
+						(add-hook 'lisp-mode-hook 'evil-paredit-mode)
+						(add-hook 'emacs-lisp-mode-hook 'evil-paredit-mode)))
 
 (use-package evil-surround
-						 :ensure t
-						 :config (progn
-											 (global-evil-surround-mode)
-											 (global-subword-mode t)))
+  :ensure t
+  :config (progn
+						(global-evil-surround-mode)
+						(global-subword-mode t)))
 
 (use-package evil-lisp-state
-						 :ensure t
-						 :config (progn
-											 (define-key evil-normal-state-map (kbd "L") 'evil-lisp-state)))
+  :ensure t
+  :config (progn
+						(define-key evil-normal-state-map (kbd "L") 'evil-lisp-state)))
 
 (use-package evil-leader
-	:ensure t
-	:config (progn
+  :ensure t
+  :config (progn
 						(setq evil-leader/leader ",") 
 						(evil-leader/set-key
 							"f" 'find-file
@@ -92,18 +95,20 @@
 							";" 'comment-dwim
 							"e" 'eval-last-sexp
 							"w" 'save-buffer
-							"." 'ggtags-find-tag-dwim)
+							"." 'ggtags-find-tag-dwim
+							"hs" 'helm-swoop
+							"ha" 'helm-ag)
 						(global-evil-leader-mode)))
 
 (use-package evil-matchit
-						 :ensure t)
+  :ensure t)
 
 (use-package evil-nerd-commenter
-						 :ensure t
-						 :config (progn
-											 (evilnc-default-hotkeys)))
+  :ensure t
+  :config (progn
+						(evilnc-default-hotkeys)))
 
 (use-package evil-jumper
-						 :ensure t)
+  :ensure t)
 
 (provide 'evil-config)
