@@ -18,11 +18,20 @@
 
 (use-package emacs-rust-helpers)
 
-(progn
-	(add-to-list 'load-path "/home/juiko/git/racer/editors")
-	(setenv "RUST_SRC_PATH" "/home/juiko/git/rust/src/")
-	(use-package racer
-		:config (setq racer-rust-src-path "/home/juiko/git/rust/src/"
-									racer-cmd "/home/juiko/git/racer/target/release/racer")))
+(eval-after-load "rust-mode"
+	(progn (add-to-list 'load-path "/home/juiko/git/racer/editors")
+				 (use-package racer
+					 :config (progn
+										 (setq racer-rust-src-path "/home/juiko/git/rust/src/"
+													 racer-cmd "/home/juiko/git/racer/target/release/racer")))))
+
+(eval-after-load "flycheck"
+	(progn
+		(use-package flycheck-rust
+			:ensure t
+			:defer t
+			:config (progn
+								(add-hook 'flycheck-mode-hook 'flycheck-rust-setup)))))
+
 
 (provide 'rust-config)
