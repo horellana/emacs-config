@@ -9,3 +9,4 @@
 						 :commands (flychek-mode)
 						 :ensure t)
 						 
+(provide 'flycheck-config)

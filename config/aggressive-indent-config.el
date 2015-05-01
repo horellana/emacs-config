@@ -1,4 +1,4 @@
 (use-package aggressive-indent
   :ensure t)
 
-(provide 'aggresive-indent-config)
+(provide 'aggressive-indent-config)

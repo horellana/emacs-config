@@ -26,3 +26,5 @@
 	:ensure t
 	:config (progn
 						(add-hook 'enh-ruby-mode-hook 'ruby-end-mode)))
+
+(provide 'ruby-config)
