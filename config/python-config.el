@@ -1,17 +1,18 @@
-(use-package anaconda-mode 
+(use-package elpy
 	:ensure t
 	:config (progn
-						(add-hook 'python-mode-hook 'anaconda-mode)
-						(add-hook 'python-mode-hook 'eldoc-mode)))
-
-(use-package company-anaconda
-	:ensure t
-	:config (progn
-						(add-to-list 'company-backends 'company-anaconda)
-						(add-hook 'python-mode-hook 'company-mode)))
+						(elpy-enable)))
 
 (use-package flycheck
 	:ensure t
+	:defer t
 	:config (progn (add-hook 'python-mode-hook 'flycheck-mode)))
+
+(use-package virtualenvwrapper
+	:ensure t
+	:defer t
+	:config (progn
+						(venv-initialize-interactive-shells)
+						(venv-initialize-eshell)))
 
 (provide 'python-config)

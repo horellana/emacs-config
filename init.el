@@ -1,47 +1,52 @@
 ;;; The order in this matters
+
+
 (ignore-errors 
- (load "/home/juiko/.emacs.d/config/cedet-config.el"))
+  (package-initialize))
 
-(load "/home/juiko/.emacs.d/config/package-config.el")
-
-(ignore-errors (package-initialize))
-
-(require 'use-package)
+(eval-when-compile
+  (require 'use-package)
+  (require 'cl))
 
 (progn
   (add-to-list 'load-path "/home/juiko/.emacs.d/plugins/utilities")
   (cl-loop for d in (directory-files "~/.emacs.d/plugins")
-	   do (add-to-list 'load-path (concat "/home/juiko/.emacs.d/plugins/" d)))
+					 do (add-to-list 'load-path (concat "/home/juiko/.emacs.d/plugins/" d)))
   (use-package utilities))
 
 (require 'cl-lib)
-(use-package f
-  :ensure t)
+(use-package f :ensure t)
 
-(defun do-on-config (action &optional filter)
-  (cl-loop for f in (cl-remove-if (lambda (f) (when filter (funcall filter f)))
-				  (f-files "/home/juiko/.emacs.d/config/"))
-	   do (funcall action f)))
+(use-package package
+  :config (progn
+						(add-to-list 'package-archives
+												 '("marmalade" . "https://marmalade-repo.org/packages/"))
+						(add-to-list 'package-archives
+												 '("melpa" . "http://melpa.org/packages/"))))
 
-(do-on-config (lambda (f) (load f)))
+(cl-loop
+ for file in (cl-remove-if-not (lambda (f) (string-match ".el" f)) 
+															 (f-files "/home/juiko/.emacs.d/config"))
+ do (load file))
 
 ;;;;;;;;;;;;;; Personal configuration ;;;;;;;;;;;;;;;;;;;;
 
 (add-hook 'highlight-parentheses-mode-hook
           '(lambda ()
-	     (setq autopair-handle-action-fns
-		   (append
-		    (if autopair-handle-action-fns
-			autopair-handle-action-fns
-		      '(autopair-default-handle-action))
-		    '((lambda (action pair pos-before)
-			(hl-paren-color-update)))))))
+						 (setq autopair-handle-action-fns
+									 (append
+										(if autopair-handle-action-fns
+												autopair-handle-action-fns
+											'(autopair-default-handle-action))
+										'((lambda (action pair pos-before)
+												(hl-paren-color-update)))))))
 
 (run-with-idle-timer 10
                      t
                      (lambda () (ignore-errors (kill-buffer "*Buffer List*"))))
 
-(use-package mpd)
+(use-package mpd
+	:defer t)
 
 (progn
   (setq-default indent-tabs-mode t)
@@ -111,12 +116,12 @@
  '(ac-dwim t)
  '(ac-use-fuzzy t)
  '(ansi-color-faces-vector
-	 [default default default italic underline success warning error])
+   [default default default italic underline success warning error])
  '(ansi-color-names-vector
-	 ["#212526" "#ff4b4b" "#b4fa70" "#fce94f" "#729fcf" "#e090d7" "#8cc4ff" "#eeeeec"])
+   ["#212526" "#ff4b4b" "#b4fa70" "#fce94f" "#729fcf" "#e090d7" "#8cc4ff" "#eeeeec"])
  '(custom-safe-themes
-	 (quote
-		("b3775ba758e7d31f3bb849e7c9e48ff60929a792961a2d536edec8f68c671ca5" "3d5ef3d7ed58c9ad321f05360ad8a6b24585b9c49abcee67bdcbb0fe583a6950" default)))
+   (quote
+    ("b3775ba758e7d31f3bb849e7c9e48ff60929a792961a2d536edec8f68c671ca5" "3d5ef3d7ed58c9ad321f05360ad8a6b24585b9c49abcee67bdcbb0fe583a6950" default)))
  '(flycheck-display-errors-function (function flycheck-pos-tip-error-messages))
  '(paradox-automatically-star t))
 (custom-set-faces

@@ -1,9 +1,12 @@
 (require 'package)
 
-(defvar package-sources '(("marmalade" . "http://marmalade-repo.org/packages/")
-													("melpa" . "http://melpa.milkbox.net/packages/"))) 
+(add-to-list 'package-archives
+	     '("marmalade" . "https://marmalade-repo.org/packages/"))
 
-(dolist (source package-sources)
-  (add-to-list 'package-archives source))
+(add-to-list 'package-archives
+	     '("melpa" . "http://melpa.org/packages/"))
+
+(add-to-list 'package-archives
+						 '("elpy" "http://jorgenschaefer.github.io/packages/"))
 
 (provide 'package-config)

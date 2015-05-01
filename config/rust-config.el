@@ -28,8 +28,6 @@
 (eval-after-load "flycheck"
 	(progn
 		(use-package flycheck-rust
-			:ensure t
-			:defer t
 			:config (progn
 								(add-hook 'flycheck-mode-hook 'flycheck-rust-setup)))))
 

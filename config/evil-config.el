@@ -97,7 +97,8 @@
 							"w" 'save-buffer
 							"." 'ggtags-find-tag-dwim
 							"hs" 'helm-swoop
-							"ha" 'helm-ag)
+							"ha" 'helm-ag
+							"hi" 'helm-semantic-or-imenu)
 						(global-evil-leader-mode)))
 
 (use-package evil-matchit

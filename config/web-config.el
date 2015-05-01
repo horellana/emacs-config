@@ -30,6 +30,7 @@
 												(add-hook 'js2-mode-hook 'rainbow-mode)))))														
 (use-package rainbow-mode
 	:ensure t
+	:commands rainbow-mode
 	:config (progn
 						(add-hook 'web-mode-hook 'rainbow-mode)
 						(add-hook 'html-mode-hook 'rainbow-mode)
@@ -37,6 +38,7 @@
 
 (use-package aggressive-indent
 	:ensure t
+	:defer t
 	:config (progn
 						(add-hook 'web-mode-hook 'aggressive-indent-mode)))
 
