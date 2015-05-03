@@ -1,4 +1,6 @@
 (use-package jde
+	:disabled t
+	:ensure t
   :commands java-mode
   :config (progn
             (use-package imenu)

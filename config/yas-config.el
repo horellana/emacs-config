@@ -1,0 +1,1 @@
+(provide 'yas-config)

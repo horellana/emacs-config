@@ -80,7 +80,7 @@
   (tool-bar-mode -1)
   (scroll-bar-mode -1)
 
-  (add-to-list 'default-frame-alist '(font . "Droid Sans Mono-10"))
+  (add-to-list 'default-frame-alist '(font . "Droid Sans Mono-9"))
   (add-to-list 'default-frame-alist '(cursor-color . "Gray"))
 
   (set-display-table-slot standard-display-table 

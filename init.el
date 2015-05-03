@@ -1,12 +1,10 @@
 ;;; The order in this matters
-
-
 (ignore-errors 
   (package-initialize))
 
 (eval-when-compile
-  (require 'use-package)
-  (require 'cl))
+  (require 'cl)
+  (require 'use-package))
 
 (progn
   (add-to-list 'load-path "/home/juiko/.emacs.d/plugins/utilities")
@@ -14,7 +12,6 @@
 					 do (add-to-list 'load-path (concat "/home/juiko/.emacs.d/plugins/" d)))
   (use-package utilities))
 
-(require 'cl-lib)
 (use-package f :ensure t)
 
 (use-package package
@@ -27,47 +24,47 @@
 (add-to-list 'load-path "/home/juiko/.emacs.d/config/")
 
 (require 'ace-jump-config)
-(require 'myac-config)
 (require 'agda-config)
-(require 'package-config)
 (require 'aggressive-indent-config)
-;; (require 'paradox-config)
 (require 'ascope-config)
-(require 'paredit-config)
 (require 'cedet-config)
-(require 'perl-config)
 (require 'clojure-config)
-(require 'projectile-config)
 (require 'common-lisp-config)
-(require 'proxy-config)
 (require 'company-config)
-(require 'python-config)
 (require 'cpp-config)
-(require 're-builder-config)
-(require 'ruby-config)
 (require 'elisp-config)
-(require 'rust-config)
 (require 'erc-config)
-(require 'scheme-config)
 (require 'evil-config)
 (require 'factor-config)
-(require 'sml-config)
 (require 'flycheck-config)
-(require 'smooth-scrolling-config)
 (require 'ggtags-config)
-(require 'tramp-config)
-(require 'undo-tree-config)
-(require 'w3m-config)
+(require 'haskell-config)
 (require 'hippie-expand-config)
-(require 'web-config)
 (require 'ido-config)
-(require 'whitespace-config)
 (require 'java-config)
 (require 'look-config)
-(require 'ycmd-config)
 (require 'magit-config)
 (require 'my-helm-config)
-
+(require 'myac-config)
+(require 'package-config)
+(require 'paredit-config)
+(require 'perl-config)
+(require 'projectile-config)
+(require 'proxy-config)
+(require 'python-config)
+(require 're-builder-config)
+(require 'ruby-config)
+(require 'rust-config)
+(require 'scheme-config)
+(require 'shell-config)
+(require 'sml-config)
+(require 'smooth-scrolling-config)
+(require 'tramp-config)
+(require 'undo-tree-config)
+(require 'web-config)
+(require 'whitespace-config)
+(require 'yas-config)
+(require 'ycmd-config)
 
 ;;;;;;;;;;;;;; Personal configuration ;;;;;;;;;;;;;;;;;;;;
 
