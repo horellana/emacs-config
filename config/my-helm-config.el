@@ -20,6 +20,11 @@
 							:ensure t
 							:commands ac-helm
 							:init (ignore-errors
-											(define-key ac-mode-map (kbd "C--") 'ac-complete-with-helm)))))
+											(define-key ac-mode-map (kbd "C--") 'ac-complete-with-helm)))
+						(add-to-list 'display-buffer-alist
+												 `(,(rx bos "*helm" (* not-newline) "*" eos)
+													 (display-buffer-in-side-window)
+													 (inhibit-same-window . t)
+													 (window-height . 0.4)))))
 
 (provide 'my-helm-config)
