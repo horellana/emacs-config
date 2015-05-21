@@ -1,6 +1,5 @@
 (require 'cl)
 
-
 (defun my-tango-theme ()
 	(load-theme 'tango-dark t)
 	(set-face-attribute 'fringe
@@ -74,6 +73,11 @@
 																 2e3436space-mode
 																 flycheck-mode)
 									 do (ignore-errors (diminish mode))))
+
+(use-package focus
+	:ensure t
+	:config (progn
+						(focus-mode t)))
 
 (progn
 	(blink-cursor-mode -1)
