@@ -656,12 +656,6 @@
 										'((lambda (action pair pos-before)
 												(hl-paren-color-update)))))))
 
-(run-with-idle-timer 10
-                     t
-                     (lambda () (ignore-errors (kill-buffer "*Buffer List*"))))
-
-
-
 (progn
   (setq tramp-default-method "ssh")
   (show-paren-mode)
@@ -680,11 +674,18 @@
 
   (setq inhibit-startup-message t)
   (global-set-key (kbd "C-<tab>") 'indent-whole-buffer)
-  (global-set-key (kbd "M-_") 'hippie-expand)
+  (global-set-key (kbd "M--") 'hippie-expand)
   (global-set-key (kbd "C-.") 'clear-screen)
   (global-set-key (kbd "C-;") 'comment-dwim)
 
-  (global-set-key (kbd "M-g M-g") 'goto-line-with-feedback)
+  (global-set-key (kbd "M-g M-g") 
+									'(lambda ()
+										 (interactive)
+										 (unwind-protect
+												 (progn
+													 (linum-mode t)
+													 (call-interactively 'goto-line))
+											 (linum-mode -1))))
 
   (global-set-key (kbd "M-<left>") 'enlarge-window-horizontally)
   (global-set-key (kbd "M-<down>") 'enlarge-window-vertically)
