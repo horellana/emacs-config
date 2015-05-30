@@ -23,17 +23,27 @@
 
 (require 'req-package)
 
-(req-package auctex
+(req-package tex
 	:commands (tex-mode)
 	:config (progn
 						(setq TeX-auto-save t)
 						(setq TeX-parse-self t)
-						(setq-default TeX-master nil)))
+						(setq TeX-PDF-mode t)
+						(setq-default TeX-master nil)
+						(setq TeX-view-program-selection
+									'((output-pdf "PDF Viewer")))
+						(setq TeX-view-program-list
+									'(("PDF Viewer" "okular --unique %o#src:%n%b")))))
 
 (req-package company-auctex
-	:require (auctex company)
+	:require (company)
 	:config (progn
-						(company-auctex-init)))
+						(add-hook 'TeX-mode-hook
+											(lambda ()
+												(make-variable-buffer-local 'company-backends)
+												(company-auctex-init)
+												(company-mode))
+											)))
 
 (req-package emacs-eclim
 	:config (progn
@@ -465,6 +475,7 @@
 (req-package yasnippet
 	:commands (yas-minor-mode)
 	:init (progn
+					(add-hook 'TeX-mode-hook 'yas-minor-mode)
 					(add-hook 'cperl-mode-hook 'yas-minor-mode)))
 
 (req-package projectile
