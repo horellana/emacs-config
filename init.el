@@ -5,15 +5,18 @@
 
 (progn
 	(setq package-enable-at-startup nil)
+
+	(add-to-list 'package-archives 
+							 '("marmalade" . "http://marmalade-repo.org/packages/"))
 	
 	(add-to-list 'package-archives
-							 '("marmalade" . "https://marmalade-repo.org/packages/"))
+							 '("melpa-stable" . "http://stable.melpa.org/packages/") t)
 
 	(add-to-list 'package-archives
-							 '("melpa" . "http://melpa.org/packages/"))
+							 '("melpa" . "http://melpa.org/packages/") t)
 
 	(add-to-list 'package-archives
-							 '("elpy" . "http://jorgenschaefer.github.io/packages/"))
+							 '("elpy" . "http://jorgenschaefer.github.io/packages/") t)
 
 	(package-initialize)
 
@@ -71,6 +74,8 @@
 						 '(flycheck-display-errors-function 
 							 #'flycheck-pos-tip-error-messages))
 						
+						(add-hook 'clojure-mode-hook 'flycheck-mode)
+						(add-hook 'TeX-mode-hook 'flycheck-mode)
 						(add-hook 'rust-mode-hook 'flycheck-mode)
 						(add-hook 'enh-ruby-mode-hook 'flycheck-mode)
 						(add-hook 'python-hook 'flycheck-mode)
@@ -223,6 +228,7 @@
 																	 slime-repl-mode
 																	 slime-macroexpansion-minor-mode-hook
 																	 geiser-repl-mode
+																	 cider-repl-mode
 																	 )
 										 do (evil-set-initial-state mode 'emacs))
 						
@@ -255,6 +261,7 @@
 						(evil-leader/set-key-for-mode 'lisp-mode "ma" 'slime-macroexpand-all)
 						(evil-leader/set-key-for-mode 'lisp-mode "sds" 'slime-disassemble-symbol)
 						(evil-leader/set-key-for-mode 'lisp-mode "sdd" 'slime-disassemble-definition)
+						(evil-leader/set-key-for-mode 'cider-mode "e" 'cider-eval-last-sexp)
 						(evil-leader/set-key-for-mode 'projectile-mode (kbd "p")'helm-projectile)))
 
 (req-package evil-god-state
@@ -264,6 +271,9 @@
 
 (req-package company
 	:config (progn
+						(add-hook 'inferior-emacs-lisp-mode-hook 'company-mode)
+						(add-hook 'cider-repl-mode-hook 'company-mode)
+						(add-hook 'cider-mode-hook 'company-mode)
 						(add-hook 'rust-mode-hook 'company-mode)
 						(add-hook 'c-mode-common-hook 'company-mode)
 						(add-hook 'emacs-lisp-mode-hook 'company-mode)
@@ -627,6 +637,12 @@
 						(add-hook 'smartparens-mode-hook #'evil-smartparens-mode)
 						(evil-sp-override)))
 
+(req-package evil-commentary
+	:require (evil)
+	:config (progn
+						(evil-commentary-mode)
+						(evil-commentary-default-setup)))
+
 (req-package auto-complete
 	:config (progn
 						(add-hook 'web-mode-hook 'auto-complete-mode)
@@ -642,7 +658,20 @@
 																 ac-source-plsense-variable
 																 ac-source-plsense-word))))))
 
+(req-package cider
+	:config (progn
+						(add-hook 'cider-mode-hook 'eldoc-mode)
+						(setq cider-repl-pop-to-buffer-on-connect nil)))
 
+
+(req-package cider-decompile
+	:require (cider))
+
+(req-package flycheck-clojure
+	:require (cider flycheck)
+	:config (progn
+						(add-hook 'clojure-mode-hook 'flycheck-clojure-setup)
+						(add-hook 'clojure-mode-hook 'flycheck-mode)))
 
 ;;;;;;;;;;;;;; Personal configuration ;;;;;;;;;;;;;;;;;;;;
 
@@ -655,6 +684,94 @@
 											'(autopair-default-handle-action))
 										'((lambda (action pair pos-before)
 												(hl-paren-color-update)))))))
+
+(defun compile-everything (list)
+  (dolist (folder list) (byte-recompile-directory folder 0)))
+
+(defun compile-load-path ()
+  (interactive)
+  (compile-everything load-path))
+
+(defun clear-screen ()
+  (interactive)
+  (let ((inhibit-read-only t))
+    (delete-region (point-min) (point-max))))
+
+(defun buffer-empty-p ()
+  (<= (point-max) 1))
+
+(defun indent-whole-buffer ()
+  (interactive)
+  (delete-trailing-whitespace)
+  (indent-region (point-min) (point-max))
+  (untabify (point-min) (point-max)))
+
+(defun byte-compile-user-init-file ()
+  (let ((byte-compile-warnings '(unresolved)))
+    (when (file-exists-p (concat user-init-file ".elc"))
+      (delete-file (concat user-init-file ".elc")))
+    (byte-compile-file user-init-file)
+    (message "%s compiled" user-init-file)))
+
+(defun remove-files (files)
+  (dolist (f files)
+    (delete-file f)))
+
+(defun safe-load-path ()
+  (remove-if-not (lambda (x) (string-match (expand-file-name "~") x))
+                 load-path))
+
+(defun get-compiled-files (files)
+  (remove-if-not (lambda (x) (string-match "\\(\\.elc\\)" x)) files))
+
+(defun remove-compiled-files (files)
+  (remove-files (get-compiled-files files)))
+
+(defun directory-files-full-path (directory)
+  (mapcar (lambda (x) (concat directory "/" x)) (directory-files directory)))
+
+(defun decompile-load-path ()
+  (dolist (dir load-path)
+    (remove-compiled-files (directory-files-full-path dir))))
+
+(defun kill-buffer-match-regexp (pattern)
+  (interactive "sRegex: ")
+  (dolist (buffer (buffer-list))
+    (when (string-match pattern (buffer-name buffer))
+      (kill-buffer buffer))))
+
+(defun git-etags-create-command (tags-file &optional lang)
+  (format "git ls-files | xargs %s"
+          (if lang
+              (format "etags --output=%s --language=%s" tags-file lang)
+              (format "etags --output=%s" tags-file))))
+
+(defun git-etags-find-tags-file ()
+  (format "%s/.TAGS"
+          (substring
+           (shell-command-to-string "git rev-parse --show-toplevel")
+           0 -1)))
+
+(defun git-etags-create (&optional lang)
+  (interactive)
+  (ignore-errors
+   (let ((tags-file (git-etags-find-tags-file))
+         (output-buffer "*git-etags-create-OUTPUT*")
+         (error-buffer "*git-etags-create-ERROR*"))
+     (shell-command
+      (git-etags-create-command tags-file lang)
+      output-buffer error-buffer)
+     tags-file)))
+
+(defun proc (name &optional args)
+  (let ((process-connection-type nil))
+    (if args
+        (start-process name (format "%s-buffer" name) name args)
+        (start-process name (format "%s-buffer" name) name))))
+
+
+(defun intersperce (n l)
+	(cl-reduce (lambda (a b) (concat a n b)) l))
 
 (progn
   (setq tramp-default-method "ssh")
