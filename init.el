@@ -186,6 +186,10 @@
 						(add-hook 'slime-interactive-mode-hook 
 											'cl-config/configure-company-slime)))
 
+(req-package common-lisp-snippets
+	:require (yasnippet)
+	:commands (lisp-mode))
+
 (req-package evil-lisp-state
 	:require (evil)
 	:config (progn
@@ -485,6 +489,7 @@
 (req-package yasnippet
 	:commands (yas-minor-mode)
 	:init (progn
+					(add-hook 'lisp-mode-hook 'yas-minor-mode)
 					(add-hook 'TeX-mode-hook 'yas-minor-mode)
 					(add-hook 'cperl-mode-hook 'yas-minor-mode)))
 
@@ -493,8 +498,6 @@
 						(setq projectile-indexing-method 'alien)
 						(setq projectile-enable-caching t)
 						(projectile-global-mode)))
-
-
 
 (req-package socks
 	:defer t
@@ -718,11 +721,11 @@
     (delete-file f)))
 
 (defun safe-load-path ()
-  (remove-if-not (lambda (x) (string-match (expand-file-name "~") x))
-                 load-path))
+  (cl-remove-if-not (lambda (x) (string-match (expand-file-name "~") x))
+										load-path))
 
 (defun get-compiled-files (files)
-  (remove-if-not (lambda (x) (string-match "\\(\\.elc\\)" x)) files))
+  (cl-remove-if-not (lambda (x) (string-match "\\(\\.elc\\)" x)) files))
 
 (defun remove-compiled-files (files)
   (remove-files (get-compiled-files files)))
