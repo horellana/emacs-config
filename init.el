@@ -26,6 +26,10 @@
 
 (require 'req-package)
 
+(req-package multiple-cursors)
+
+(req-package rx)
+
 (req-package tex
 	:commands (tex-mode)
 	:config (progn
@@ -158,20 +162,14 @@
 	:commands (slime lisp-mode)
 	:init (progn
 					(setq inferior-lisp-program "sbcl")
-					(setq slime-contribs '(slime-fancy 
-																 slime-company 
-																 slime-highlight-edits 
-																 inferior-slime)))
+					(setq slime-contrib '(slime-fancy
+																slime-company)))
 	:config (progn
 						(add-hook 'lisp-mode-hook
 											(lambda ()
 												(unless (slime-connected-p)
 													(save-excursion (slime)))))
-						
-						(add-hook 'lisp-mode-hook (lambda ()
-																				(slime-mode t)))
-
-						))
+						(slime-setup '(slime-fancy slime-company))))
 
 (defun cl-config/configure-company-slime ()
   (make-variable-buffer-local 'company-backends)
@@ -438,6 +436,13 @@
 	:config (progn
 						(bind-key "C-h a" 'helm-apropos)
 						(bind-key "C-x C-b" 'switch-to-buffer)
+
+						(add-to-list 'display-buffer-alist
+												 `(,(rx bos "*helm" (* not-newline) "*" eos)
+													 (display-buffer-in-side-window)
+													 (inhibit-same-window . t)
+													 (window-height . 0.4)))
+
 						(helm-mode t)))
 
 (req-package helm-ag
@@ -747,7 +752,7 @@
   (format "git ls-files | xargs %s"
           (if lang
               (format "etags --output=%s --language=%s" tags-file lang)
-              (format "etags --output=%s" tags-file))))
+            (format "etags --output=%s" tags-file))))
 
 (defun git-etags-find-tags-file ()
   (format "%s/.TAGS"
@@ -758,19 +763,19 @@
 (defun git-etags-create (&optional lang)
   (interactive)
   (ignore-errors
-   (let ((tags-file (git-etags-find-tags-file))
-         (output-buffer "*git-etags-create-OUTPUT*")
-         (error-buffer "*git-etags-create-ERROR*"))
-     (shell-command
-      (git-etags-create-command tags-file lang)
-      output-buffer error-buffer)
-     tags-file)))
+    (let ((tags-file (git-etags-find-tags-file))
+          (output-buffer "*git-etags-create-OUTPUT*")
+          (error-buffer "*git-etags-create-ERROR*"))
+      (shell-command
+       (git-etags-create-command tags-file lang)
+       output-buffer error-buffer)
+      tags-file)))
 
 (defun proc (name &optional args)
   (let ((process-connection-type nil))
     (if args
         (start-process name (format "%s-buffer" name) name args)
-        (start-process name (format "%s-buffer" name) name))))
+      (start-process name (format "%s-buffer" name) name))))
 
 
 (defun intersperce (n l)
@@ -779,7 +784,7 @@
 (progn
   (setq tramp-default-method "ssh")
   (show-paren-mode)
-  (setq-default indent-tabs-mode t)
+  (setq-default indent-tabs-mode nil)
   (setq-default tab-width 2)
   (setq-default standard-indent 2)
   (setq-default lisp-body-indent 2)
