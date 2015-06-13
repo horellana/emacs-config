@@ -390,16 +390,13 @@
   (scroll-bar-mode -1)
 
   (add-to-list 'default-frame-alist '(font . "Droid Sans Mono-9"))
-  (add-to-list 'default-frame-alist '(cursor-color . "Gray"))
-
-  (set-display-table-slot standard-display-table 
-                          'vertical-border 
-                          (make-glyph-code 8203)))
+  (add-to-list 'default-frame-alist '(cursor-color . "Gray")))
 
 (req-package monokai-theme
   :config (progn
             (load-theme 'monokai t)
             (juiko/look-config)))
+            
 
 (req-package leuven-theme
   :disabled t
