@@ -70,6 +70,7 @@
 
 (req-package eldoc
 	:config (progn
+            (add-hook 'ielm-mode-hook 'eldoc-mode)
 						(add-hook 'emacs-lisp-mode-hook 'eldoc-mode)))
 
 (req-package flycheck
@@ -159,17 +160,18 @@
 								 "Data.Ord")))))
 
 (req-package slime
-	:commands (slime lisp-mode)
 	:init (progn
 					(setq inferior-lisp-program "sbcl")
 					(setq slime-contrib '(slime-fancy
-																slime-company)))
-	:config (progn
-						(add-hook 'lisp-mode-hook
-											(lambda ()
-												(unless (slime-connected-p)
-													(save-excursion (slime)))))
-						(slime-setup '(slime-fancy slime-company))))
+																slime-company))
+          (setq slime-sbcl-manual-root "/usr/local/share/info/sbcl.info")
+          (add-hook 'lisp-mode-hook
+                    (lambda ()
+                      (unless (slime-connected-p)
+                        (save-excursion (slime))))))
+  :config (progn
+            (slime-setup '(slime-fancy slime-company)))
+  )
 
 (defun cl-config/configure-company-slime ()
   (make-variable-buffer-local 'company-backends)
@@ -210,8 +212,6 @@
 								(save-excursion
 									(newline))))
 
-						(define-key evil-visual-state-map (kbd ";") 'comment-dwim)
-
 						(defadvice eval-last-sexp (around evil)
 							"Last sexp ends at point."
 							(when (evil-normal-state-p)
@@ -246,7 +246,7 @@
 							"b" 'switch-to-buffer
 							"g" 'execute-extended-command
 							"k" 'kill-buffer
-							"," 'evil-execute-in-god-state
+							"," 'evil-execute-in-emacs-state
 							"p" 'helm-projectile
 							";" 'comment-dwim
 							"e" 'eval-last-sexp
@@ -273,7 +273,7 @@
 
 (req-package company
 	:config (progn
-						(add-hook 'inferior-emacs-lisp-mode-hook 'company-mode)
+						(add-hook 'ielm-mode-hook 'company-mode)
 						(add-hook 'cider-repl-mode-hook 'company-mode)
 						(add-hook 'cider-mode-hook 'company-mode)
 						(add-hook 'rust-mode-hook 'company-mode)
@@ -323,6 +323,7 @@
 
 (req-package aggressive-indent
 	:config (progn
+            (add-hook 'lisp-mode-hook 'aggressive-indent-mode)
 						(add-hook 'web-mode-hook 'aggressive-indent-mode)
 						(add-hook 'js2-mode-hook 'aggressive-indent-mode)
 						(add-hook 'cperl-mode-hook 'aggressive-indent-mode)
@@ -382,24 +383,33 @@
 	:config (progn
 						(add-hook 'factor-mode-hook 'fuel-mode)))
 
+(defun juiko/look-config ()
+  (blink-cursor-mode -1)
+  (menu-bar-mode -1)
+  (tool-bar-mode -1)
+  (scroll-bar-mode -1)
+
+  (add-to-list 'default-frame-alist '(font . "Droid Sans Mono-9"))
+  (add-to-list 'default-frame-alist '(cursor-color . "Gray"))
+
+  (set-display-table-slot standard-display-table 
+                          'vertical-border 
+                          (make-glyph-code 8203)))
+
+(req-package monokai-theme
+  :config (progn
+            (load-theme 'monokai t)
+            (juiko/look-config)))
+
 (req-package leuven-theme
+  :disabled t
 	:config (progn
 						(load-theme 'leuven t)
 						(set-face-attribute 'fringe
 																nil
 																:background "2e3436"
 																:foreground "2e3436")
-						(blink-cursor-mode -1)
-						(menu-bar-mode -1)
-						(tool-bar-mode -1)
-						(scroll-bar-mode -1)
-
-						(add-to-list 'default-frame-alist '(font . "Droid Sans Mono-9"))
-						(add-to-list 'default-frame-alist '(cursor-color . "Gray"))
-
-						(set-display-table-slot standard-display-table 
-																		'vertical-border 
-																		(make-glyph-code 8203))))
+						(juiko/look-config)))
 
 (req-package helm-descbinds
 	:require (helm-config)
@@ -587,6 +597,7 @@
 	:commands (web-mode auto-complete)
 	:init (progn
 					(defalias 'html-mode 'web-mode)
+          (add-to-list 'auto-mode-alist '("\\.php\\'" . web-mode))
 					(add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
 					(add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
 					(add-to-list 'auto-mode-alist '("\\.[gj]sp\\'" . web-mode))
@@ -782,6 +793,7 @@
 	(cl-reduce (lambda (a b) (concat a n b)) l))
 
 (progn
+  (setq-default lexical-binding t)
   (setq tramp-default-method "ssh")
   (show-paren-mode)
   (setq-default indent-tabs-mode nil)
