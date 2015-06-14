@@ -175,7 +175,7 @@
 
 (defun cl-config/configure-company-slime ()
   (make-variable-buffer-local 'company-backends)
-  (setq company-backends '()))
+  (setq-local company-backends '()))
 
 (req-package slime-company
 	:require (slime company)
@@ -393,10 +393,14 @@
   (add-to-list 'default-frame-alist '(cursor-color . "Gray")))
 
 (req-package monokai-theme
+  :disabled t
   :config (progn
             (load-theme 'monokai t)
             (juiko/look-config)))
-            
+
+(req-package material-theme
+  :config (progn
+            (juiko/look-config)))
 
 (req-package leuven-theme
   :disabled t
