@@ -1,25 +1,31 @@
+;; -*- lexical-binding: t -*-
+
 (eval-when-compile
   (require 'cl))
 
 (require 'package)
 
 (progn
-	(setq package-enable-at-startup nil)
+  (setq package-enable-at-startup nil)
 
-	(add-to-list 'package-archives 
-							 '("marmalade" . "http://marmalade-repo.org/packages/"))
-	
-	(add-to-list 'package-archives
-							 '("melpa" . "http://melpa.org/packages/") t)
+  (add-to-list 'package-archives 
+               '("marmalade" . "http://marmalade-repo.org/packages/"))
+  
+  (add-to-list 'package-archives
+               '("melpa" . "http://melpa.org/packages/") t)
 
-	(add-to-list 'package-archives
-							 '("elpy" . "http://jorgenschaefer.github.io/packages/") t)
+  (add-to-list 'package-archives
+               '("melpa-stable" . "http://stable.melpa.org/packages/") t)
+  )
 
-	(package-initialize)
+(package-initialize)
 
-	(unless (package-installed-p 'req-package)
-		(package-refresh-contents)
-		(package-install 'req-package)))
+(cl-defun define-company-sources (mode-hook backend)
+  (add-hook mode-hook
+            (lambda ()
+              (make-variable-buffer-local 'company-backends)
+              (setq-local company-backends backend))))
+
 
 (require 'req-package)
 
@@ -28,10 +34,8 @@
 (req-package company-go
   :require (go-mode company)
   :config (progn
-            (add-hook 'go-mode-hook 
-                      (lambda ()
-                        (make-variable-buffer-local 'company-backends)
-                        (setq-local company-backends '(company-go))))
+            (define-company-sources 'go-mode-hook
+              (list 'company-go))
             (add-hook 'go-mode-hook 'company-mode)))
 
 (req-package multiple-cursors)
@@ -39,47 +43,47 @@
 (req-package rx)
 
 (req-package tex
-	:commands (tex-mode)
-	:config (progn
-						(setq TeX-auto-save t)
-						(setq TeX-parse-self t)
-						(setq TeX-PDF-mode t)
-						(setq-default TeX-master nil)
-						(setq TeX-view-program-selection
-									'((output-pdf "PDF Viewer")))
-						(setq TeX-view-program-list
-									'(("PDF Viewer" "okular --unique %o#src:%n%b")))))
+  :commands (tex-mode)
+  :config (progn
+            (setq TeX-auto-save t)
+            (setq TeX-parse-self t)
+            (setq TeX-PDF-mode t)
+            (setq-default TeX-master nil)
+            (setq TeX-view-program-selection
+                  '((output-pdf "PDF Viewer")))
+            (setq TeX-view-program-list
+                  '(("PDF Viewer" "okular --unique %o#src:%n%b")))))
 
 (req-package company-auctex
-	:require (company)
-	:config (progn
-						(add-hook 'TeX-mode-hook
-											(lambda ()
-												(make-variable-buffer-local 'company-backends)
-												(company-auctex-init)
-												(company-mode)))))
+  :require (company)
+  :config (progn
+            (add-hook 'TeX-mode-hook
+                      (lambda ()
+                        (make-variable-buffer-local 'company-backends)
+                        (company-auctex-init)
+                        (company-mode)))))
 
 (req-package emacs-eclim
   :disabled t
-	:config (progn
-						(eval-after-load "company" (company-emacs-eclim-setup))
-						(global-eclim-mode)))
+  :config (progn
+            (eval-after-load "company" (company-emacs-eclim-setup))
+            (global-eclim-mode)))
 
 (req-package disaster
-	:commands (disaster)
-	:bind (("C-c d" . disaster)))
+  :commands (disaster)
+  :bind (("C-c d" . disaster)))
 
 (req-package focus
-	:disabled t
-	:config (progn
-						(add-hook 'lisp-mode-hook 'focus-mode)
-						;; (add-hook 'emacs-lisp-mode-hook 'focus-mode)
-						))
+  :disabled t
+  :config (progn
+            (add-hook 'lisp-mode-hook 'focus-mode)
+            ;; (add-hook 'emacs-lisp-mode-hook 'focus-mode)
+            ))
 
 (req-package eldoc
-	:config (progn
+  :config (progn
             (add-hook 'ielm-mode-hook 'eldoc-mode)
-						(add-hook 'emacs-lisp-mode-hook 'eldoc-mode)
+            (add-hook 'emacs-lisp-mode-hook 'eldoc-mode)
             ))
 
 (req-package flycheck
@@ -101,62 +105,71 @@
                      do (add-hook hook 'flycheck-mode))))
 
 (req-package flycheck-pos-tip
-	:require (flycheck)
-	:commands (flycheck-mode))
+  :require (flycheck)
+  :commands (flycheck-mode))
 
 (req-package flycheck-package
-	:require (flycheck)
-	:commands (flycheck-mode)
-	:config (progn
-						(flycheck-package-setup)))
+  :require (flycheck)
+  :commands (flycheck-mode)
+  :config (progn
+            (flycheck-package-setup)))
 
 (req-package flycheck-haskell
-	:require (haskell-mode flycheck)
-	:config (progn
-						(add-hook 'haskell-mode-hook 'flycheck-mode)
-						(add-hook 'flycheck-mode-hook 'flycheck-haskell-configure)))
+  :require (haskell-mode flycheck)
+  :config (progn
+            (add-hook 'haskell-mode-hook 'flycheck-mode)
+            (add-hook 'flycheck-mode-hook 'flycheck-haskell-configure)))
 
-(defun haskell-config/setup-company ()
-  (interactive)
-  (make-variable-buffer-local 'company-backends)
-  (setq-local company-backends '(company-ghci))
-  (company-mode t))
-
-(req-package company-ghc
-  :disabled t
-  :require (company)
+(req-package ghc
+  :load-path "/home/juiko/git/ghc-mod/elisp"
   :config (progn
             (autoload 'ghc-init "ghc" nil t)
-            (autoload 'ghc-debug "ghc" nil t)))
+            (autoload 'ghc-debug "ghc" nil t)
+            (add-hook 'haskell-mode-hook 'ghc-init)))
+
+(req-package company-ghc
+  :require (ghc)
+  )
 
 (req-package company-ghci
   :require (company))
 
 (req-package haskell-mode
-	:commands haskell-mode
+  :commands haskell-mode
   :require (company company-ghci company-ghc)
-	:config (progn
-            (add-hook 'haskell-mode-hook 
-											'haskell-config/setup-company)
-						(add-hook 'haskell-interactive-mode-hook 
-											'haskell-config/setup-company)
+  :config (progn
+            (define-company-sources 'haskell-mode-hook
+              (list 'company-ghc 
+                    'company-ghci))
             
-						(bind-key "C-c C-l" 'haskell-process-load-or-reload haskell-mode-map)
-						(add-hook 'haskell-mode-hook 'turn-on-haskell-doc)
-						(add-hook 'haskell-mode-hook 'haskell-indentation-mode)
+            (define-company-sources 'haskell-interative-mode-hook
+              (list 'company-ghc
+                    'company-ghci))
+
+            (add-hook 'haskell-mode-hook 'company-mode)
+            (add-hook 'haskell-interactive-mode-hook 'company-mode)
+            
+            ;; (add-hook 'haskell-mode-hook 
+            ;;           'haskell-config/setup-company)
+            ;; (add-hook 'haskell-interactive-mode-hook 
+            ;;           'haskell-config/setup-company)
+            
+            (bind-key "C-c C-l" 'haskell-process-load-or-reload haskell-mode-map)
+            (add-hook 'haskell-mode-hook 'turn-on-haskell-doc)
+            (add-hook 'haskell-mode-hook 'haskell-indentation-mode)
             (add-hook 'haskell-mode-hook 'interactive-haskell-mode)
-						(add-hook 'haskell-mode-hook 'turn-on-haskell-decl-scan)
-						(custom-set-variables
-             '(haskell-process-type . ghci)
-             '(haskell-proces-path-ghci . "stack")
-             '(haskell-process-args-ghci . ("ghci")))))
+            (add-hook 'haskell-mode-hook 'turn-on-haskell-decl-scan)
+            (setq haskell-process-type 'stack-ghci)
+            (setq haskell-process-path-ghci "stack")
+            (setq haskell-process-args-ghci "ghci")
+            ))
 
 (req-package slime
-	:init (progn
-          ;; (setq inferior-lisp-program "/home/juiko/git/sbcl/run-sbcl.sh")
-					(setq inferior-lisp-program "sbcl")
-					(setq slime-contrib '(slime-fancy
-																slime-company))
+  :init (progn
+          (setq inferior-lisp-program "/home/juiko/git/sbcl/run-sbcl.sh")
+          ;; (setq inferior-lisp-program "sbcl")
+          (setq slime-contrib '(slime-fancy
+                                slime-company))
           (setq slime-sbcl-manual-root "/usr/local/share/info/sbcl.info")
           (add-hook 'lisp-mode-hook
                     (lambda ()
@@ -170,217 +183,219 @@
   (setq-local company-backends '()))
 
 (req-package slime-company
-	:require (slime company)
-	:commands (slime slime-mode slime-repl-mode)
-	:config (progn
-						(add-hook 'slime-mode-hook 
-											'cl-config/configure-company-slime)
-						(add-hook 'slime-interactive-mode-hook 
-											'cl-config/configure-company-slime)))
+  :require (slime company)
+  :commands (slime slime-mode slime-repl-mode)
+  :config (progn
+            (add-hook 'slime-mode-hook 
+                      'cl-config/configure-company-slime)
+            (add-hook 'slime-interactive-mode-hook 
+                      'cl-config/configure-company-slime)))
 
 (req-package common-lisp-snippets
-	:require (yasnippet)
-	:commands (lisp-mode))
+  :require (yasnippet)
+  :commands (lisp-mode))
 
 (req-package evil-lisp-state
-	:require (evil)
-	:config (progn
-						(define-key evil-normal-state-map (kbd "L") 'evil-lisp-state)))
+  :require (evil)
+  :config (progn
+            (define-key evil-normal-state-map (kbd "L") 'evil-lisp-state)))
 
 (req-package evil
-	:config (progn
-						(define-key evil-normal-state-map [escape] 'keyboard-quit)
-						(define-key evil-visual-state-map [escape] 'keyboard-quit)
-						(define-key minibuffer-local-map [escape] 'minibuffer-keyboard-quit)
-						(define-key minibuffer-local-ns-map [escape] 'minibuffer-keyboard-quit)
-						(define-key minibuffer-local-completion-map [escape] 'minibuffer-keyboard-quit)
-						(define-key minibuffer-local-must-match-map [escape] 'minibuffer-keyboard-quit)
-						(define-key minibuffer-local-isearch-map [escape] 'minibuffer-keyboard-quit)
-						(define-key evil-visual-state-map (kbd "TAB") 'indent-region)
-						(define-key evil-normal-state-map (kbd "C-TAB") 'indent-whole-buffer)
-						(define-key evil-normal-state-map [return]
-							(lambda ()
-								(interactive)
-								(save-excursion
-									(newline))))
+  :config (progn
+            (define-key evil-normal-state-map [escape] 'keyboard-quit)
+            (define-key evil-visual-state-map [escape] 'keyboard-quit)
+            (define-key minibuffer-local-map [escape] 'minibuffer-keyboard-quit)
+            (define-key minibuffer-local-ns-map [escape] 'minibuffer-keyboard-quit)
+            (define-key minibuffer-local-completion-map [escape] 'minibuffer-keyboard-quit)
+            (define-key minibuffer-local-must-match-map [escape] 'minibuffer-keyboard-quit)
+            (define-key minibuffer-local-isearch-map [escape] 'minibuffer-keyboard-quit)
+            (define-key evil-visual-state-map (kbd "TAB") 'indent-region)
+            (define-key evil-normal-state-map (kbd "C-TAB") 'indent-whole-buffer)
+            (define-key evil-normal-state-map [return]
+              (lambda ()
+                (interactive)
+                (save-excursion
+                  (newline))))
 
-						(defadvice eval-last-sexp (around evil)
-							"Last sexp ends at point."
-							(when (evil-normal-state-p)
-								(save-excursion
-									(unless (or (eobp) (eolp)) (forward-char))
-									ad-do-it)))
+            (defadvice eval-last-sexp (around evil)
+              "Last sexp ends at point."
+              (when (evil-normal-state-p)
+                (save-excursion
+                  (unless (or (eobp) (eolp)) (forward-char))
+                  ad-do-it)))
 
-						(cl-loop for mode in '(haskell-interactive-mode
-																	 haskell-presentation-mode
-																	 haskell-error-mode
-																	 inferior-emacs-lisp-mode
-																	 erc-mode
-																	 parparadox-menu-mode
-																	 comint-mode
-																	 eshell-mode
-																	 slime-repl-mode
-																	 slime-macroexpansion-minor-mode-hook
-																	 geiser-repl-mode
-																	 cider-repl-mode
-																	 inferior-python-mode)
-										 do (evil-set-initial-state mode 'emacs))
-						
-						(setf evil-move-cursor-back nil)
-						(evil-mode t)))
+            (cl-loop for mode in '(haskell-interactive-mode
+                                   haskell-presentation-mode
+                                   haskell-error-mode
+                                   sql-interactive-mode
+                                   inferior-emacs-lisp-mode
+                                   erc-mode
+                                   parparadox-menu-mode
+                                   comint-mode
+                                   eshell-mode
+                                   slime-repl-mode
+                                   slime-macroexpansion-minor-mode-hook
+                                   geiser-repl-mode
+                                   cider-repl-mode
+                                   inferior-python-mode)
+                     do (evil-set-initial-state mode 'emacs))
+            
+            (setf evil-move-cursor-back nil)
+            (evil-mode t)))
 
 (req-package evil-leader
-	:require (evil)
-	:config (progn
-						(setq evil-leader/leader ",") 
-						(evil-leader/set-key
-             "f" 'find-file
-             "b" 'switch-to-buffer
-             "g" 'execute-extended-command
-             "k" 'kill-buffer
-             "," 'evil-execute-in-emacs-state
-             "p" 'helm-projectile
-             ";" 'comment-dwim
-             "e" 'eval-last-sexp
-             "w" 'save-buffer
-             "." 'ggtags-find-tag-dwim
-             "hs" 'helm-swoop
-             "ha" 'helm-ag
-             "hi" 'helm-semantic-or-imenu)
-						(global-evil-leader-mode)
-						
-						(evil-leader/set-key-for-mode 'lisp-mode "cl" 'slime-load-file)
-						(evil-leader/set-key-for-mode 'lisp-mode "e" 'slime-eval-last-expression)
-						(evil-leader/set-key-for-mode 'lisp-mode "me" 'slime-macroexpand-1)
-						(evil-leader/set-key-for-mode 'lisp-mode "ma" 'slime-macroexpand-all)
-						(evil-leader/set-key-for-mode 'lisp-mode "sds" 'slime-disassemble-symbol)
-						(evil-leader/set-key-for-mode 'lisp-mode "sdd" 'slime-disassemble-definition)
-						(evil-leader/set-key-for-mode 'cider-mode "e" 'cider-eval-last-sexp)
-						(evil-leader/set-key-for-mode 'projectile-mode (kbd "p")'helm-projectile)))
+  :require (evil)
+  :config (progn
+            (setq evil-leader/leader ",") 
+            (evil-leader/set-key
+              "f" 'find-file
+              "b" 'switch-to-buffer
+              "g" 'execute-extended-command
+              "k" 'kill-buffer
+              "," 'evil-execute-in-emacs-state
+              "p" 'helm-projectile
+              ";" 'comment-dwim
+              "e" 'eval-last-sexp
+              "w" 'save-buffer
+              "." 'ggtags-find-tag-dwim
+              "hs" 'helm-swoop
+              "ha" 'helm-ag
+              "hi" 'helm-semantic-or-imenu)
+            (global-evil-leader-mode)
+            
+            (evil-leader/set-key-for-mode 'lisp-mode "cl" 'slime-load-file)
+            (evil-leader/set-key-for-mode 'lisp-mode "e" 'slime-eval-last-expression)
+            (evil-leader/set-key-for-mode 'lisp-mode "me" 'slime-macroexpand-1)
+            (evil-leader/set-key-for-mode 'lisp-mode "ma" 'slime-macroexpand-all)
+            (evil-leader/set-key-for-mode 'lisp-mode "sds" 'slime-disassemble-symbol)
+            (evil-leader/set-key-for-mode 'lisp-mode "sdd" 'slime-disassemble-definition)
+            (evil-leader/set-key-for-mode 'cider-mode "e" 'cider-eval-last-sexp)
+            (evil-leader/set-key-for-mode 'projectile-mode (kbd "p")'helm-projectile)))
 
 (req-package evil-god-state
-	:require (evil god-mode)
-	:config (progn
-						(bind-key "ESC" 'evil-normal-state evil-god-state-map)))
+  :require (evil god-mode)
+  :config (progn
+            (bind-key "ESC" 'evil-normal-state evil-god-state-map)))
 
 (req-package company
-	:config (progn
+  :config (progn
             (add-hook 'php-mode-hook 'company-mode)
-						(add-hook 'ielm-mode-hook 'company-mode)
-						(add-hook 'cider-repl-mode-hook 'company-mode)
-						(add-hook 'cider-mode-hook 'company-mode)
-						(add-hook 'rust-mode-hook 'company-mode)
-						(add-hook 'c-mode-common-hook 'company-mode)
-						(add-hook 'emacs-lisp-mode-hook 'company-mode)
-						(add-hook 'inferior-emacs-lisp-mode-hook 'company-mode)
-						(add-hook 'python-hook 'company-mode)
-						(setq company-idle-delay 0.5)))
+            (add-hook 'ielm-mode-hook 'company-mode)
+            (add-hook 'cider-repl-mode-hook 'company-mode)
+            (add-hook 'cider-mode-hook 'company-mode)
+            (add-hook 'rust-mode-hook 'company-mode)
+            (add-hook 'c-mode-common-hook 'company-mode)
+            (add-hook 'emacs-lisp-mode-hook 'company-mode)
+            (add-hook 'inferior-emacs-lisp-mode-hook 'company-mode)
+            (add-hook 'python-hook 'company-mode)
+            (setq company-idle-delay 0.5)))
 
 
 (req-package irony
   :disabled t
-	:config (progn
-						(add-hook 'c-mode-hook 'irony-mode)
+  :config (progn
+            (add-hook 'c-mode-hook 'irony-mode)
             (add-hook 'c++-mode-hook 'irony-mode)
-						(defun my-irony-mode-hook ()
-							(define-key irony-mode-map [remap completion-at-point]
-								'irony-completion-at-point-async)
-							(define-key irony-mode-map [remap complete-symbol]
-								'irony-completion-at-point-async))
-						(add-hook 'irony-mode-hook 'my-irony-mode-hook)
-						(add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)))
+            (defun my-irony-mode-hook ()
+              (define-key irony-mode-map [remap completion-at-point]
+                'irony-completion-at-point-async)
+              (define-key irony-mode-map [remap complete-symbol]
+                'irony-completion-at-point-async))
+            (add-hook 'irony-mode-hook 'my-irony-mode-hook)
+            (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)))
 
 (req-package company-irony
-	:require (company irony)
-	:config (progn
-						(add-hook 'c++-mode-hook 
-											(lambda ()
-												(make-variable-buffer-local 'company-backends)
-												(setq company-backends '(company-irony))))
+  :require (company irony)
+  :config (progn
+            (add-hook 'c++-mode-hook 
+                      (lambda ()
+                        (make-variable-buffer-local 'company-backends)
+                        (setq company-backends '(company-irony))))
             (add-hook 'c-mode-hook 
-											(lambda ()
-												(make-variable-buffer-local 'company-backends)
-												(setq company-backends '(company-irony))))
-						(add-hook 'irony-mode-hook 'company-irony-setup-begin-commands)))
+                      (lambda ()
+                        (make-variable-buffer-local 'company-backends)
+                        (setq company-backends '(company-irony))))
+            (add-hook 'irony-mode-hook 'company-irony-setup-begin-commands)))
 
 (req-package irony-eldoc
-	:require (irony eldoc)
-	:config (progn
-						(add-hook 'irony-mode-hook 'eldoc-mode)
-						(add-hook 'irony-mode-hook 'irony-eldoc)))
+  :require (irony eldoc)
+  :config (progn
+            (add-hook 'irony-mode-hook 'eldoc-mode)
+            (add-hook 'irony-mode-hook 'irony-eldoc)))
 
 (req-package flycheck-irony
-	:require (flycheck irony)
-	:config (progn
-						(add-hook 'irony-mode-hook 'flycheck-irony-setup)))
+  :require (flycheck irony)
+  :config (progn
+            (add-hook 'irony-mode-hook 'flycheck-irony-setup)))
 
 (req-package ggtags
-	:requires (cperl-mode)
-	:commands (c++-mode c-mode cperl-mode)
-	:config (progn
-						(add-hook 'c-mode-common-hook 'ggtags-mode)))
+  :requires (cperl-mode)
+  :commands (c++-mode c-mode cperl-mode)
+  :config (progn
+            (add-hook 'c-mode-common-hook 'ggtags-mode)))
 
 (req-package aggressive-indent
-	:config (progn
+  :config (progn
             (add-hook 'lisp-mode-hook 'aggressive-indent-mode)
-						(add-hook 'web-mode-hook 'aggressive-indent-mode)
-						(add-hook 'js2-mode-hook 'aggressive-indent-mode)
-						(add-hook 'cperl-mode-hook 'aggressive-indent-mode)
-						(add-hook 'emacs-lisp-mode-hook 'aggressive-indent-mode)
-						(add-hook 'c-mode-common-hook 'aggressive-indent-mode)))
+            (add-hook 'web-mode-hook 'aggressive-indent-mode)
+            (add-hook 'js2-mode-hook 'aggressive-indent-mode)
+            (add-hook 'cperl-mode-hook 'aggressive-indent-mode)
+            (add-hook 'emacs-lisp-mode-hook 'aggressive-indent-mode)
+            (add-hook 'c-mode-common-hook 'aggressive-indent-mode)))
 
 (req-package company-c-header
-	:require (company)
-	:commands (company-mode))
+  :require (company)
+  :commands (company-mode))
 
 (req-package erc
-	:commands (erc start-erc)
-	:config (progn
-						(erc-autojoin-mode 1)
-						
-						(setq erc-autojoin-channels-alist
-									'(("freenode.net"
-										 "#emacs"
-										 "#gentoo"
-										 "#stumpwm"
-										 "#haskell"
-										 "#concatenative"
-										 "#perl"
-										 "#lisp"
-										 "#archlinux")
-										("torncity.com"
-										 "#lobby"
-										 "#help")
-										("perl.org"
-										 "#p5p")
-										("rizon.io"
-										 "#/r/syriancivilwar")))
+  :commands (erc start-erc)
+  :config (progn
+            (erc-autojoin-mode 1)
+            
+            (setq erc-autojoin-channels-alist
+                  '(("freenode.net"
+                     "#emacs"
+                     "#gentoo"
+                     "#stumpwm"
+                     "#haskell"
+                     "#concatenative"
+                     "#perl"
+                     "#lisp"
+                     "#programadoreschile"
+                     "#archlinux")
+                    ("torncity.com"
+                     "#lobby"
+                     "#help")
+                    ("perl.org"
+                     "#p5p")
+                    ("rizon.io"
+                     "#/r/syriancivilwar")))
 
-						(defun start-erc ()
-							(interactive)
-							(erc :nick "juiko" :password "caballovolado"))
-						))
+            (defun start-erc ()
+              (interactive)
+              (erc :nick "juiko" :password "caballovolado"))
+            ))
 
 (req-package factor-mode
-	:load-path "/home/juiko/git/factor/misc/fuel"
-	:require (fuel-mode)
-	:config (progn
-						(let ((root-dir "/home/juiko/git/factor"))
-							(setf factor-root-dir root-dir
-										fuel-listener-factor-binary (concat factor-root-dir
-																												"/"
-																												"factor")
-										
-										fuel-listener-factor-image (concat factor-root-dir
-																											 "/"
-																											 "factor.image")
+  :load-path "/home/juiko/git/factor/misc/fuel"
+  :require (fuel-mode)
+  :config (progn
+            (let ((root-dir "/home/juiko/git/factor"))
+              (setf factor-root-dir root-dir
+                    fuel-listener-factor-binary (concat factor-root-dir
+                                                        "/"
+                                                        "factor")
+                    
+                    fuel-listener-factor-image (concat factor-root-dir
+                                                       "/"
+                                                       "factor.image")
 
-										factor-indent-level 2))))
+                    factor-indent-level 2))))
 
 (req-package fuel-mode
-	:load-path "/home/juiko/git/factor/misc/fuel"
-	:config (progn
-						(add-hook 'factor-mode-hook 'fuel-mode)))
+  :load-path "/home/juiko/git/factor/misc/fuel"
+  :config (progn
+            (add-hook 'factor-mode-hook 'fuel-mode)))
 
 (defun juiko/look-config ()
   (blink-cursor-mode -1)
@@ -398,6 +413,7 @@
             (juiko/look-config)))
 
 (req-package material-light-theme
+  :disabled t
   :config (progn
             (set-face-attribute 'fringe
                                 nil
@@ -407,90 +423,89 @@
             (juiko/look-config)))
 
 (req-package leuven-theme
-  :disabled t
-	:config (progn
-						(load-theme 'leuven t)
-						(set-face-attribute 'fringe
-																nil
-																:background "2e3436"
-																:foreground "2e3436")
-						(juiko/look-config)))
+  :config (progn
+            (load-theme 'leuven t)
+            (set-face-attribute 'fringe
+                                nil
+                                :background "2e3436"
+                                :foreground "2e3436")
+            (juiko/look-config)))
 
 (req-package helm-descbinds
-	:require (helm-config)
-	:bind (("C-h b" . helm-descbinds)
-				 ("C-h w" . helm-descbinds)))
+  :require (helm-config)
+  :bind (("C-h b" . helm-descbinds)
+         ("C-h w" . helm-descbinds)))
 
 (req-package helm-projectile
-	:require (helm-config projectile)
-	:config (progn
-						(helm-projectile-on)))
+  :require (helm-config projectile)
+  :config (progn
+            (helm-projectile-on)))
 
 (req-package helm-company
-	:require (helm-config company)
-	:commands (company-mode)
-	:config (progn
-						(bind-key "C--" 'helm-company company-mode-map)
-						(bind-key "C--" 'helm-companycompany-active-map)))
+  :require (helm-config company)
+  :commands (company-mode)
+  :config (progn
+            (bind-key "C--" 'helm-company company-mode-map)
+            (bind-key "C--" 'helm-companycompany-active-map)))
 
 
 (req-package helm-gtags
-	:require (helm-config)
-	:commands (helm-gtags)
-	:config (progn
-						(setq
-						 helm-gtags-ignore-case t
-						 helm-gtags-auto-update t
-						 helm-gtags-use-input-at-cursor t
-						 helm-gtags-pulse-at-cursor t
-						 helm-gtags-prefix-key "\C-cg"
-						 helm-gtags-suggested-key-mapping t)))
+  :require (helm-config)
+  :commands (helm-gtags)
+  :config (progn
+            (setq
+             helm-gtags-ignore-case t
+             helm-gtags-auto-update t
+             helm-gtags-use-input-at-cursor t
+             helm-gtags-pulse-at-cursor t
+             helm-gtags-prefix-key "\C-cg"
+             helm-gtags-suggested-key-mapping t)))
 
 
 (req-package helm-config
-	:config (progn
-						(bind-key "C-h a" 'helm-apropos)
-						(bind-key "C-x C-b" 'switch-to-buffer)
+  :config (progn
+            (bind-key "C-h a" 'helm-apropos)
+            (bind-key "C-x C-b" 'switch-to-buffer)
 
-						(add-to-list 'display-buffer-alist
-												 `(,(rx bos "*helm" (* not-newline) "*" eos)
-													 (display-buffer-in-side-window)
-													 (inhibit-same-window . t)
-													 (window-height . 0.4)))
+            (add-to-list 'display-buffer-alist
+                         `(,(rx bos "*helm" (* not-newline) "*" eos)
+                           (display-buffer-in-side-window)
+                           (inhibit-same-window . t)
+                           (window-height . 0.4)))
 
-						(helm-mode t)))
+            (helm-mode t)))
 
 (req-package helm-ag
-	:commands (helm-ag)
-	:require (helm-config))
+  :commands (helm-ag)
+  :require (helm-config))
 
 (req-package helm-ack
-	:commands (helm-ack)
-	:require (helm-config)
-	:ensure t)
+  :commands (helm-ack)
+  :require (helm-config)
+  :ensure t)
 
 (req-package helm-swoop
-	:commands (helm-swoop)
-	:require (helm-config)
-	:ensure t)
+  :commands (helm-swoop)
+  :require (helm-config)
+  :ensure t)
 
 
 (req-package magit
-	:commands (magit-status magit-init magit-log)
-	:defer t
-	:init (progn
-					(setq magit-last-seen-setup-instructions "1.4.0")))
+  :commands (magit-status magit-init magit-log)
+  :defer t
+  :init (progn
+          (setq magit-last-seen-setup-instructions "1.4.0")))
 
 (req-package cperl-mode
-	:init (progn
-					(defalias 'perl-mode 'cperl-mode))
-	:config (progn
-						(add-to-list 'auto-mode-alist '("\\.t\\'" . cperl-mode))
-						(add-hook 'cperl-mode-hook
-											(lambda ()
-												(cperl-set-style "K&R")
-												(setq 
-												 cperl-indent-level 2)))
+  :init (progn
+          (defalias 'perl-mode 'cperl-mode))
+  :config (progn
+            (add-to-list 'auto-mode-alist '("\\.t\\'" . cperl-mode))
+            (add-hook 'cperl-mode-hook
+                      (lambda ()
+                        (cperl-set-style "K&R")
+                        (setq 
+                         cperl-indent-level 2)))
             (add-hook 'cperl-mode-hook
                       (lambda ()
                         (setq-local ac-sources 
@@ -501,36 +516,36 @@
 
 (req-package plsense
   :disabled t
-	:require (cperl-mode)
-	:commands (cperl-mode)
-	:config (progn
-						(add-hook 'cperl-mode-hook
-											'(lambda ()
-												 (setq plsense-popup-help "C-c C-:")
-												 (setq plsense-display-help-buffer "C-c M-:")
-												 (setq plsense-jump-to-definition "C-c C->")
-												 (plsense-config-default)))))
+  :require (cperl-mode)
+  :commands (cperl-mode)
+  :config (progn
+            (add-hook 'cperl-mode-hook
+                      '(lambda ()
+                         (setq plsense-popup-help "C-c C-:")
+                         (setq plsense-display-help-buffer "C-c M-:")
+                         (setq plsense-jump-to-definition "C-c C->")
+                         (plsense-config-default)))))
 
 (req-package yasnippet
-	:commands (yas-minor-mode)
-	:init (progn
-					(add-hook 'lisp-mode-hook 'yas-minor-mode)
-					(add-hook 'TeX-mode-hook 'yas-minor-mode)
-					(add-hook 'cperl-mode-hook 'yas-minor-mode)))
+  :commands (yas-minor-mode)
+  :init (progn
+          (add-hook 'lisp-mode-hook 'yas-minor-mode)
+          (add-hook 'TeX-mode-hook 'yas-minor-mode)
+          (add-hook 'cperl-mode-hook 'yas-minor-mode)))
 
 (req-package projectile
-	:config (progn
-						(setq projectile-indexing-method 'alien)
-						(setq projectile-enable-caching t)
-						(projectile-global-mode)))
+  :config (progn
+            (setq projectile-indexing-method 'alien)
+            (setq projectile-enable-caching t)
+            (projectile-global-mode)))
 
 (req-package socks
-	:defer t
-	:config (progn
-						(setq url-proxy-services
-									'(("no_proxy" . "^\\(localhost\\|10.*\\)")
-										("http" . "localhost:8118")
-										("https" . "localhost:8118")))))
+  :defer t
+  :config (progn
+            (setq url-proxy-services
+                  '(("no_proxy" . "^\\(localhost\\|10.*\\)")
+                    ("http" . "localhost:8118")
+                    ("https" . "localhost:8118")))))
 
 (req-package python
   :config (progn
@@ -540,129 +555,147 @@
                         (highlight-indentation-mode -1)))))
 
 (req-package elpy
-	:require (python)
-	:config (progn
-						(elpy-enable)
+  :require (python)
+  :disabled t
+  :config (progn
+            (setq elpy-rpc-backend "jedi")
+            (elpy-enable)
             (elpy-use-ipython)
-
             (add-hook 'inferior-python-mode-hook 'company-mode)))
 
 (req-package pyvenv
-	:require (python))
+  :require (python)
+  :config (progn
+            (add-hook 'python-mode-hook 'pyvenv-mode)))
+
+(req-package anaconda-mode
+  :config (progn
+            (add-hook 'python-mode-hook 'anaconda-mode)
+            (add-hook 'python-mode-hook 'eldoc-mode)))
+
+(req-package company-anaconda
+  :require (company anaconda-mode)
+  :config (progn
+            (add-hook 'python-mode-hook
+                      (lambda ()
+                        (make-variable-buffer-local 'company-backends)
+                        (setq-local company-backends '(company-anaconda))
+                        (add-hook 'python-mode-hook 'company-mode)))))
 
 (req-package virtualenvwrapper
-	:commands (python)
-	:config (progn
-						(venv-initialize-interactive-shells)
-						(venv-initialize-eshell)))
+  :disabled t
+  :commands (python)
+  :config (progn
+            (venv-initialize-interactive-shells)
+            (venv-initialize-eshell)))
 
 (req-package enh-ruby-mode
-	:mode "\\.rb\\'")
+  :mode "\\.rb\\'")
 
 (req-package inf-ruby
-	:require (enh-ruby-mode)
-	:config (progn
-						(add-hook 'enh-ruby-mode-hook 'inf-ruby-minor-mode)))
+  :require (enh-ruby-mode)
+  :config (progn
+            (add-hook 'enh-ruby-mode-hook 'inf-ruby-minor-mode)))
 
 (req-package robe
-	:require (enh-ruby-mode)
-	:config (progn
-						(add-hook 'enh-ruby-mode-hook 'robe-mode)
-						(add-hook 'robe-mode-hook 'ac-robe-setup)))
+  :require (enh-ruby-mode)
+  :config (progn
+            (add-hook 'enh-ruby-mode-hook 'robe-mode)
+            (add-hook 'robe-mode-hook 'ac-robe-setup)))
 
 (req-package ruby-end
-	:require (enh-ruby-mode)
-	:init(progn
-				 (add-hook 'enh-ruby-mode-hook 'ruby-end-mode)))
+  :require (enh-ruby-mode)
+  :init(progn
+         (add-hook 'enh-ruby-mode-hook 'ruby-end-mode)))
 
 (req-package re-builder
-	:defer t
-	:config (progn
-						(setq reb-re-syntax 'string)))
+  :defer t
+  :config (progn
+            (setq reb-re-syntax 'string)))
 
 (req-package rust-mode
-	:mode "\\.rs\\'")
+  :mode "\\.rs\\'")
 
 (req-package company-racer
-	:require (company rust-mode)
-	:config (progn
-						(custom-set-variables 
-						 '(company-racer-rust-executable
-							 "/home/juiko/git/racer/target/release/racer"))
+  :require (company rust-mode)
+  :config (progn
+            (custom-set-variables 
+             '(company-racer-rust-executable
+               "/home/juiko/git/racer/target/release/racer"))
 
-						(add-hook 'rust-mode-hook
-											(lambda ()
-												(make-variable-buffer-local 'company-backends)
-												(setq-local company-backends '(company-racer))))))
+            (add-hook 'rust-mode-hook
+                      (lambda ()
+                        (make-variable-buffer-local 'company-backends)
+                        (setq-local company-backends '(company-racer))))))
 
 (req-package flycheck-rust
-	:require (flycheck rust-mode)
-	:config (progn
-						(add-hook 'flycheck-mode-hook 'flycheck-rust-setup)))
+  :require (flycheck rust-mode)
+  :config (progn
+            (add-hook 'flycheck-mode-hook 'flycheck-rust-setup)))
 
 (req-package geiser
-	:require (company)
-	:commands (scheme-mode geiser-mode)
-	:config (progn
-						(add-hook 'geiser-mode 'geiser-autodoc-mode)
-						(add-hook 'scheme-mode 'turn-on-geiser-mode)
-						(add-hook 'geiser-mode-hook 'company-mode)))
+  :require (company)
+  :commands (scheme-mode geiser-mode)
+  :config (progn
+            (add-hook 'geiser-mode 'geiser-autodoc-mode)
+            (add-hook 'scheme-mode 'turn-on-geiser-mode)
+            (add-hook 'geiser-mode-hook 'company-mode)))
 
 (req-package smooth-scrolling
-	:disabled t)
+  :disabled t)
 
 (req-package web-mode
-	:commands (web-mode auto-complete)
-	:init (progn
-					(defalias 'html-mode 'web-mode)
-					(add-to-list 'auto-mode-alist '("\\.php\\'" . web-mode))
+  :commands (web-mode auto-complete)
+  :init (progn
+          (defalias 'html-mode 'web-mode)
+          (add-to-list 'auto-mode-alist '("\\.php\\'" . web-mode))
           (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
-					(add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
-					(add-to-list 'auto-mode-alist '("\\.[gj]sp\\'" . web-mode))
-					(add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
-					(add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
-					(add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
-					(add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
-					(add-to-list 'auto-mode-alist '("\\.html" . web-mode)))
-	:config (progn
-						(setq web-mode-ac-sources-alist
-									'(("css" . (ac-source-css-property))
+          (add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
+          (add-to-list 'auto-mode-alist '("\\.[gj]sp\\'" . web-mode))
+          (add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
+          (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
+          (add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
+          (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
+          (add-to-list 'auto-mode-alist '("\\.html" . web-mode)))
+  :config (progn
+            (setq web-mode-ac-sources-alist
+                  '(("css" . (ac-source-css-property))
                     ("css" . (ac-source-words-in-buffer
                               ac-source-words-in-same-mode-buffers
                               ac-source-abbev))
-										("html" . (ac-source-words-in-buffer 
+                    ("html" . (ac-source-words-in-buffer 
                                ac-source-words-in-same-mode-buffers
                                ac-source-abbrev))))))
 
 (req-package js2-mode
-	:commands (js2-mode javascript-mode)
-	:init (progn
-					(defalias 'javascript-mode 'js2-mode)))
+  :commands (js2-mode javascript-mode)
+  :init (progn
+          (defalias 'javascript-mode 'js2-mode)))
 
 (req-package ac-js2
-	:require (auto-complete)
-	:config (progn
-						(add-hook 'js2-mode-hook 'ac-js2-mode)))
+  :require (auto-complete)
+  :config (progn
+            (add-hook 'js2-mode-hook 'ac-js2-mode)))
 
 (req-package rainbow-mode
-	:require (web-mode js2-mode)
-	:mode "\\.js2\\'"
-	:config (progn
-						(add-hook 'web-mode-hook 'rainbow-mode)
-						(add-hook 'html-mode-hook 'rainbow-mode)
-						(add-hook 'css-mode-hook 'rainbow-mode)
-						(add-hook 'js2-mode-hook 'rainbow-mode)))
+  :require (web-mode js2-mode)
+  :mode "\\.js2\\'"
+  :config (progn
+            (add-hook 'web-mode-hook 'rainbow-mode)
+            (add-hook 'html-mode-hook 'rainbow-mode)
+            (add-hook 'css-mode-hook 'rainbow-mode)
+            (add-hook 'js2-mode-hook 'rainbow-mode)))
 
 (req-package whitespace
-	:defer 5
-	:config (progn
-						(setq whitespace-line-column 80)
-						(setq whitespace-style '(face lines-tail))
-						(add-hook 'prog-mode-hook 'whitespace-mode)))
+  :defer 5
+  :config (progn
+            (setq whitespace-line-column 80)
+            (setq whitespace-style '(face lines-tail))
+            (add-hook 'prog-mode-hook 'whitespace-mode)))
 
 (req-package smartparens-config
-	:config (progn
-						(dolist (hook '(lisp-mode-hook
+  :config (progn
+            (dolist (hook '(lisp-mode-hook
                             clojure-mode-hook
                             slime-repl-mode-hook
                             ielm-mode-hook
@@ -671,54 +704,58 @@
               (add-hook hook 'smartparens-strict-mode))))
 
 (req-package smartparens-haskell
-	:require (smartparens-config haskell-mode))
+  :require (smartparens-config haskell-mode))
 
 (req-package smartparens-python
-	:require (smartparens-config python))
+  :require (smartparens-config python))
 
 (req-package evil-smartparens
-	:require (evil smartparens)
-	:config (progn
-						(add-hook 'smartparens-mode-hook #'evil-smartparens-mode)
-						(evil-sp-override)))
+  :require (evil smartparens)
+  :config (progn
+            (add-hook 'smartparens-mode-hook #'evil-smartparens-mode)
+            (evil-sp-override)))
 
 (req-package evil-commentary
-	:require (evil)
-	:config (progn
-						(evil-commentary-mode)
-						(evil-commentary-default-setup)))
+  :require (evil)
+  :config (progn
+            (evil-commentary-mode)
+            (evil-commentary-default-setup)))
 
 (req-package auto-complete
-	:config (progn
+  :config (progn
             (add-hook 'cperl-mode-hook 'auto-complete-mode)
-						(add-hook 'web-mode-hook 'auto-complete-mode)))
+            (add-hook 'web-mode-hook 'auto-complete-mode)))
 
 (req-package cider
-	:config (progn
-						(add-hook 'cider-mode-hook 'eldoc-mode)
-						(setq cider-repl-pop-to-buffer-on-connect nil)))
+  :pin melpa-stable
+  :config (progn
+            (add-hook 'clojure-mode-hook 'cider-mode)
+            (add-hook 'cider-mode-hook 'eldoc-mode)
+            (setq cider-repl-pop-to-buffer-on-connect nil)))
 
 
 (req-package cider-decompile
-	:require (cider))
+  :require (cider))
 
 (req-package flycheck-clojure
-	:require (cider flycheck)
-	:config (progn
-						(add-hook 'clojure-mode-hook 'flycheck-clojure-setup)
-						(add-hook 'clojure-mode-hook 'flycheck-mode)))
+  :require (cider flycheck)
+  :config (progn
+            (add-hook 'clojure-mode-hook 'flycheck-clojure-setup)
+            (add-hook 'clojure-mode-hook 'flycheck-mode)))
+
+(req-package-finish)
 
 ;;;;;;;;;;;;;; Personal configuration ;;;;;;;;;;;;;;;;;;;;
 
 (add-hook 'highlight-parentheses-mode-hook
           '(lambda ()
-						 (setq autopair-handle-action-fns
-									 (append
-										(if autopair-handle-action-fns
-												autopair-handle-action-fns
-											'(autopair-default-handle-action))
-										'((lambda (action pair pos-before)
-												(hl-paren-color-update)))))))
+             (setq autopair-handle-action-fns
+                   (append
+                    (if autopair-handle-action-fns
+                        autopair-handle-action-fns
+                      '(autopair-default-handle-action))
+                    '((lambda (action pair pos-before)
+                        (hl-paren-color-update)))))))
 
 (defun compile-everything (list)
   (dolist (folder list) (byte-recompile-directory folder 0)))
@@ -754,7 +791,7 @@
 
 (defun safe-load-path ()
   (cl-remove-if-not (lambda (x) (string-match (expand-file-name "~") x))
-										load-path))
+                    load-path))
 
 (defun get-compiled-files (files)
   (cl-remove-if-not (lambda (x) (string-match "\\(\\.elc\\)" x)) files))
@@ -806,7 +843,7 @@
 
 
 (defun intersperce (n l)
-	(cl-reduce (lambda (a b) (concat a n b)) l))
+  (cl-reduce (lambda (a b) (concat a n b)) l))
 
 (progn
   (setq-default lexical-binding t)
@@ -834,13 +871,13 @@
   (global-set-key (kbd "C-;") 'comment-dwim)
 
   (global-set-key (kbd "M-g M-g") 
-									'(lambda ()
-										 (interactive)
-										 (unwind-protect
-												 (progn
-													 (linum-mode t)
-													 (call-interactively 'goto-line))
-											 (linum-mode -1))))
+                  '(lambda ()
+                     (interactive)
+                     (unwind-protect
+                         (progn
+                           (linum-mode t)
+                           (call-interactively 'goto-line))
+                       (linum-mode -1))))
 
   (global-set-key (kbd "M-<left>") 'enlarge-window-horizontally)
   (global-set-key (kbd "M-<down>") 'enlarge-window-vertically)
@@ -877,7 +914,6 @@
 
 (put 'downcase-region 'disabled nil)
 
-(req-package-finish)
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -894,3 +930,8 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
+
+(defun vim-macros ()
+  (interactive)
+  (eww-browse-url 
+   "http://www.thegeekstuff.com/2009/01/vi-and-vim-macro-tutorial-how-to-record-and-play/"))
