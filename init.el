@@ -20,6 +20,13 @@
 
 (package-initialize)
 
+(condition-case ex
+    (require 'req-package)
+  ('error (progn
+            (package-refresh-contents)
+            (package-install "req-package")
+            (require 'req-package))))
+
 (cl-defun define-company-sources (mode-hook backend)
   (add-hook mode-hook
             (lambda ()
@@ -27,7 +34,15 @@
               (setq-local company-backends backend))))
 
 
-(require 'req-package)
+(cl-defmacro with-packages (packages &body body)
+  (if (= (length packages) 1)
+      `(eval-after-load ,(car packages)
+         ,@body)
+    `(eval-after-load ,(car packages)
+       (with-packages ,(cdr packages) ,@body))))
+
+
+
 
 (req-package go-mode)
 
@@ -121,13 +136,14 @@
             (add-hook 'flycheck-mode-hook 'flycheck-haskell-configure)))
 
 (req-package ghc
-  :load-path "/home/juiko/git/ghc-mod/elisp"
+  :disabled t
   :config (progn
             (autoload 'ghc-init "ghc" nil t)
             (autoload 'ghc-debug "ghc" nil t)
             (add-hook 'haskell-mode-hook 'ghc-init)))
 
 (req-package company-ghc
+  :disabled t
   :require (ghc)
   )
 
@@ -136,23 +152,16 @@
 
 (req-package haskell-mode
   :commands haskell-mode
-  :require (company company-ghci company-ghc)
+  :require (company company-ghci)
   :config (progn
             (define-company-sources 'haskell-mode-hook
-              (list 'company-ghc 
-                    'company-ghci))
+              (list 'company-ghci))
             
             (define-company-sources 'haskell-interative-mode-hook
-              (list 'company-ghc
-                    'company-ghci))
+              (list 'company-ghci))
 
             (add-hook 'haskell-mode-hook 'company-mode)
             (add-hook 'haskell-interactive-mode-hook 'company-mode)
-            
-            ;; (add-hook 'haskell-mode-hook 
-            ;;           'haskell-config/setup-company)
-            ;; (add-hook 'haskell-interactive-mode-hook 
-            ;;           'haskell-config/setup-company)
             
             (bind-key "C-c C-l" 'haskell-process-load-or-reload haskell-mode-map)
             (add-hook 'haskell-mode-hook 'turn-on-haskell-doc)
@@ -263,6 +272,9 @@
               "hi" 'helm-semantic-or-imenu)
             (global-evil-leader-mode)
             
+            (evil-leader/set-key-for-mode 'emacs-lisp-mode "ma" 'pp-macroexpand-last-sexp)
+            (evil-leader/set-key-for-mode 'lisp-interaction-mode "ma" 'pp-macroexpand-last-sexp)
+
             (evil-leader/set-key-for-mode 'lisp-mode "cl" 'slime-load-file)
             (evil-leader/set-key-for-mode 'lisp-mode "e" 'slime-eval-last-expression)
             (evil-leader/set-key-for-mode 'lisp-mode "me" 'slime-macroexpand-1)
@@ -402,6 +414,8 @@
   (menu-bar-mode -1)
   (tool-bar-mode -1)
   (scroll-bar-mode -1)
+  (column-number-mode 1)
+  (global-hl-line-mode 1)
 
   (add-to-list 'default-frame-alist '(font . "Droid Sans Mono-9"))
   (add-to-list 'default-frame-alist '(cursor-color . "Gray")))
@@ -412,9 +426,10 @@
             (load-theme 'monokai t)
             (juiko/look-config)))
 
-(req-package material-light-theme
+(req-package material-theme
   :disabled t
   :config (progn
+            (load-theme 'material-light t)
             (set-face-attribute 'fringe
                                 nil
                                 :background "#FAFAFA"
@@ -579,8 +594,8 @@
             (add-hook 'python-mode-hook
                       (lambda ()
                         (make-variable-buffer-local 'company-backends)
-                        (setq-local company-backends '(company-anaconda))
-                        (add-hook 'python-mode-hook 'company-mode)))))
+                        (setq-local company-backends '(company-anaconda))))
+            (add-hook 'python-mode-hook 'company-mode)))
 
 (req-package virtualenvwrapper
   :disabled t
@@ -920,10 +935,53 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(ansi-color-names-vector
+   ["#2e3436" "#a40000" "#4e9a06" "#c4a000" "#204a87" "#5c3566" "#729fcf" "#eeeeec"])
+ '(compilation-message-face (quote default))
+ '(custom-safe-themes
+   (quote
+    ("9e1e2e7590c2f443c09a3f6240a05ada53f06566a6873c37eeae10d13dc372c9" default)))
+ '(fci-rule-color "#49483E")
  '(flycheck-display-errors-function (function flycheck-pos-tip-error-messages))
+ '(highlight-changes-colors ("#FD5FF0" "#AE81FF"))
+ '(highlight-tail-colors
+   (quote
+    (("#49483E" . 0)
+     ("#67930F" . 20)
+     ("#349B8D" . 30)
+     ("#21889B" . 50)
+     ("#968B26" . 60)
+     ("#A45E0A" . 70)
+     ("#A41F99" . 85)
+     ("#49483E" . 100))))
+ '(magit-diff-use-overlays nil)
  '(package-selected-packages
    (quote
-    (web-mode virtualenvwrapper smooth-scrolling slime-company rust-mode ruby-end robe req-package rainbow-mode plsense php-mode multiple-cursors monokai-theme material-theme magit leuven-theme irony-eldoc helm-swoop helm-projectile helm-gtags helm-descbinds helm-company helm-ag helm-ack ggtags geiser focus flycheck-rust flycheck-pos-tip flycheck-package flycheck-irony flycheck-haskell flycheck-clojure evil-smartparens evil-lisp-state evil-god-state evil-commentary enh-ruby-mode emacs-eclim elpy disaster company-racer company-irony company-ghci company-auctex common-lisp-snippets cider-decompile aggressive-indent ac-js2))))
+    (web-mode virtualenvwrapper smooth-scrolling slime-company rust-mode ruby-end robe req-package rainbow-mode plsense php-mode multiple-cursors monokai-theme material-theme magit leuven-theme irony-eldoc helm-swoop helm-projectile helm-gtags helm-descbinds helm-company helm-ag helm-ack ggtags geiser focus flycheck-rust flycheck-pos-tip flycheck-package flycheck-irony flycheck-haskell flycheck-clojure evil-smartparens evil-lisp-state evil-god-state evil-commentary enh-ruby-mode emacs-eclim elpy disaster company-racer company-irony company-ghci company-auctex common-lisp-snippets cider-decompile aggressive-indent ac-js2)))
+ '(vc-annotate-background nil)
+ '(vc-annotate-color-map
+   (quote
+    ((20 . "#F92672")
+     (40 . "#CF4F1F")
+     (60 . "#C26C0F")
+     (80 . "#E6DB74")
+     (100 . "#AB8C00")
+     (120 . "#A18F00")
+     (140 . "#989200")
+     (160 . "#8E9500")
+     (180 . "#A6E22E")
+     (200 . "#729A1E")
+     (220 . "#609C3C")
+     (240 . "#4E9D5B")
+     (260 . "#3C9F79")
+     (280 . "#A1EFE4")
+     (300 . "#299BA6")
+     (320 . "#2896B5")
+     (340 . "#2790C3")
+     (360 . "#66D9EF"))))
+ '(vc-annotate-very-old-color nil)
+ '(weechat-color-list
+   (unspecified "#272822" "#49483E" "#A20C41" "#F92672" "#67930F" "#A6E22E" "#968B26" "#E6DB74" "#21889B" "#66D9EF" "#A41F99" "#FD5FF0" "#349B8D" "#A1EFE4" "#F8F8F2" "#F8F8F0")))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
