@@ -37,9 +37,7 @@
 
 (req-package smartparens
   :config (progn
-            (cl-loop for hook in '(lisp-mode-hook
-                                   emacs-lisp-mode-hook)
-                     do (add-hook hook 'smartparens-strict-mode))))
+            (smartparens-global-strict-mode)))
 
 (req-package slime
   :init (progn
@@ -100,13 +98,13 @@
 (req-package evil-smartparens
   :require (evil smartparens)
   :config (progn
-            (add-hook 'smartparens-stric-mode-hook 'evil-smartparens-mode)))
+            (add-hook 'smartparens-strict-mode-hook 'evil-smartparens-mode)))
 
 (req-package evil-commentary
   :require (evil)
-  :commands (evil-mode)
   :config (progn
-            (add-hook 'evil-mode-hook evil-commentary-mode)))
+	    (evil-commentary-default-setup)
+            (evil-commentary-mode)))
 
 (req-package evil-god-state
   :require (evil god-mode)
@@ -200,14 +198,19 @@
 
 (req-package haskell-mode
   :config (progn
-            (bind-key "C-c C-l" 'haskell-process-load-or-reload haskell-mode-map)
-            (add-hook 'haskell-mode-hook 'turn-on-haskell-doc)
+            (define-key haskell-mode-map (kbd "C-c C-l") 'haskell-process-load-or-reload)
+            (add-hook 'haskell-mode-hook 'haskell-doc-mode)
             (add-hook 'haskell-mode-hook 'haskell-indentation-mode)
             (add-hook 'haskell-mode-hook 'interactive-haskell-mode)
-            (add-hook 'haskell-mode-hook 'turn-on-haskell-decl-scan)
-            (setq haskell-process-type 'stack-ghci)
+            (add-hook 'haskell-mode-hook 'haskell-decl-scan-mode)
+            
+	    (setq haskell-process-type 'stack-ghci)
             (setq haskell-process-path-ghci "stack")
-            (setq haskell-process-args-ghci "ghci")))
+            (setq haskell-process-args-ghci "ghci")
+
+	    (setq haskell-process-suggest-remove-import-lines t)
+	    (setq haskell-process-auto-import-loaded-modules t)
+	    (setq haskell-process-log t)))
 
 (req-package flycheck-haskell
   :require (flycheck haskell-mode)
@@ -220,18 +223,26 @@
   :config (progn
 	    (push 'company-ghci company-backends)))
 
-(req-package anaconda
+(req-package anaconda-mode
   :config (progn
+	    (add-hook 'python-mode-hook 'eldoc-mode)
 	    (add-hook 'python-mode-hook 'anaconda-mode)))
 
 (req-package company-anaconda
   :config (progn
 	    (push 'company-anaconda company-backends)))
 
+(req-package pyvenv
+  :config (progn
+	    (add-hook 'python-mode-hook 'pyvenv-mode)))
+
+(req-package yasnippet
+  :config (progn
+	    (yas-global-mode 1)))
+
 (req-package-finish)
 
 (electric-indent-mode t)
-
 (setq inhibit-startup-message t)
 (fset 'yes-or-no-p 'y-or-n-p)
 
@@ -243,6 +254,8 @@
       kept-old-versions 2
       version-control t)
 
+
+(global-set-key (kbd "C-%") 'iedit-mode)
 (global-set-key (kbd "M--") 'hippie-expand)
 (global-set-key (kbd "M-g M-g") 
 		'(lambda ()
