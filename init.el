@@ -1,8 +1,12 @@
 ;; -*- lexical-binding: t -*-
 
-(setq gc-cons-threshold 50000000000)
+(setf lexical-binding t)
 
-(add-hook 'after-init-hook '(lambda () (setq gc-cons-threshold 800000)))
+(let ((original-gc-cons-threshold gc-cons-threshold))
+  (setq gc-cons-threshold 50000000000)
+  (add-hook 'after-init-hook
+	    (lambda ()
+	      (setq gc-cons-threshold original-gc-cons-threshold))))
 
 (eval-when-compile
   (require 'cl))
@@ -14,9 +18,7 @@
 	       '("marmalade" . "http://marmalade-repo.org/packages/"))
   (add-to-list 'package-archives
 	       '("melpa" . "http://melpa.org/packages/") t)
-  ;; (add-to-list 'package-archives
-  ;; 	       '("melpa-stable" . "http://stable.melpa.org/packages/") t)
-  (package-initialize)
+  (wpackage-initialize)
 
   (when (not (package-installed-p 'req-package))
     (package-refresh-contents)
@@ -24,6 +26,16 @@
 
 (defun async-gtags-update ()
   (call-process "global" nil 0 nil "-u"))
+
+(defvar *gtags-modes*
+  '(web-mode
+    php-mode
+    cperl-mode))
+
+(add-hook 'after-save-hook
+	  (lambda ()
+	    (if (cl-member major-mode *gtags-modes*)
+		(async-gtags-update))))
 
 (require 'req-package)
 
@@ -126,7 +138,6 @@
 (req-package evil-commentary
   :require (evil)
   :config (progn
-	    (evil-commentary-default-setup)
 	    (evil-commentary-mode)
 	    ))
 
@@ -153,9 +164,14 @@
 	      "hs" 'helm-swoop
 	      "ha" 'helm-ag
 	      "hi" 'helm-semantic-or-imenu
+	      "hpa" 'helm-projectile-ag
+	      "mgb" 'magit-branch
+	      "mgc" 'magit-checkout
 	      "mgc" 'magit-checkout 
 	      "mgl" 'magit-log
-	      "mgs" 'magit-status)
+	      "mgs" 'magit-status
+	      "mgpl" 'magit-pull
+	      "mgps" 'magit-push)
 	    
 	    (evil-leader/set-key-for-mode 'haskell-mode "h" 'haskell-hoogle)
 	    (evil-leader/set-key-for-mode 'emacs-lisp-mode "ma" 'pp-macroexpand-last-sexp)
@@ -307,7 +323,9 @@
 	    (add-hook 'python-mode-hook 'pyvenv-mode)))
 
 (req-package yasnippet
-  :defer 1)
+  :defer 1
+  :config (progn
+	    (yas-global-mode)))
 
 (req-package irony
   :defer t
@@ -342,6 +360,12 @@
   :config (progn
 	    (add-hook 'web-mode-hook
 		      (lambda ()
+			(setq web-mode-enable-auto-pairing t)
+			(setq web-mode-enable-css-colorization t)
+			(setq web-mode-enable-block-face t)
+			(setq web-mode-enable-heredoc-fontification t)
+			(setq web-mode-enable-current-element-highlight nil)
+			(setq web-mode-enable-current-column-highlight nil)
 			(setq web-mode-code-indent-offset 2)
 			(setq web-mode-markup-indent-offset 2)
 			(setq web-mode-css-indent-offset 2)))
@@ -358,8 +382,12 @@
   :defer t
   :config (progn
 	    (require 'php-ext)
-	    (add-hook 'after-save-hook 'async-gtags-update)
 	    (setq php-template-compatibility nil)))
+
+(req-package js2-mode
+  :defer t
+  :config (progn
+	    (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))))
 
 (req-package-finish)
 
@@ -410,7 +438,7 @@
  '(flycheck-display-errors-function (function flycheck-pos-tip-error-messages))
  '(package-selected-packages
    (quote
-    (helm-gtags php-mode web-mode railscasts-theme hindent company-ghc ghc yasnippet wgrep-helm wgrep-ag slime-company shm req-package pyvenv magit leuven-theme irony-eldoc helm-swoop helm-projectile helm-ag flycheck-pos-tip flycheck-irony flycheck-haskell evil-smartparens evil-lisp-state evil-god-state evil-commentary company-ycmd company-quickhelp company-irony company-ghci company-anaconda benchmark-init))))
+    (flycheck js2-mode helm-gtags php-mode web-mode railscasts-theme hindent company-ghc ghc yasnippet wgrep-helm wgrep-ag slime-company shm req-package pyvenv magit leuven-theme irony-eldoc helm-swoop helm-projectile helm-ag flycheck-pos-tip flycheck-irony flycheck-haskell evil-smartparens evil-lisp-state evil-god-state evil-commentary company-ycmd company-quickhelp company-irony company-ghci company-anaconda benchmark-init))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
