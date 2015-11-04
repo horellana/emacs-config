@@ -10,7 +10,6 @@
 
 (eval-when-compile
   (require 'cl))
-
 (require 'package)
 
 (progn
@@ -18,7 +17,7 @@
 	       '("marmalade" . "http://marmalade-repo.org/packages/"))
   (add-to-list 'package-archives
 	       '("melpa" . "http://melpa.org/packages/") t)
-  (wpackage-initialize)
+  (package-initialize)
 
   (when (not (package-installed-p 'req-package))
     (package-refresh-contents)
@@ -58,6 +57,7 @@
 (req-package flycheck
   :defer t
   :config (progn
+	    (setf flycheck-perlcritic-severity 5)
 	    (custom-set-variables
 	     '(flycheck-display-errors-function 
 	       #'flycheck-pos-tip-error-messages))
@@ -86,6 +86,7 @@
 
 (req-package slime
   :require (slime-company)
+  :commands (slime)
   :init (progn
 	  ;; (setq inferior-lisp-program "/home/juiko/git/sbcl/run-sbcl.sh")
 	  (setq inferior-lisp-program "sbcl")
