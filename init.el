@@ -36,6 +36,7 @@
 			 (not (equal env
 				     python-current-env)))
 		(setf python-current-env env)
+		(message "Current python env: %s" python-current-env)
 		(pyvenv-activate env))))))
 
 (defun async-gtags-update ()
@@ -283,7 +284,13 @@
   ;; (add-to-list 'default-frame-alist '(font . "Droid Sans Mono-9"))
   (add-to-list 'default-frame-alist '(cursor-color . "Gray")))
 
+(req-package badwolf-theme
+  :config (progn
+	    (load-theme 'badwolf t)
+	    (juiko/look-config)))
+
 (req-package greymatters-theme
+  :disabled t
   :config (progn
 	    (add-hook 'after-init-hook
 		      (lambda ()
