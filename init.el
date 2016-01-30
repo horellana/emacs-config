@@ -234,9 +234,9 @@
   :config (progn
 	    (setq evil-leader/leader (kbd ","))
 	    (evil-leader/set-key
-	      "f" 'find-file
+	      "f" 'helm-find-files
 	      "b" 'switch-to-buffer
-	      "g" 'execute-extended-command
+	      "g" 'helm-M-x
 	      "k" 'kill-buffer
 	      "," 'evil-execute-in-emacs-state
 	      ";" 'comment-dwim
@@ -280,17 +280,17 @@
   (column-number-mode 1)
   (global-hl-line-mode 1)
   (show-paren-mode)
-  (add-to-list 'default-frame-alist '(font . "Oxygen Mono Regular-9"))
+  (add-to-list 'default-frame-alist '(font . "Hack-10"))
   ;; (add-to-list 'default-frame-alist '(font . "Droid Sans Mono-9"))
   (add-to-list 'default-frame-alist '(cursor-color . "Gray")))
 
 (req-package badwolf-theme
+  :disabled t
   :config (progn
 	    (load-theme 'badwolf t)
 	    (juiko/look-config)))
 
 (req-package greymatters-theme
-  :disabled t
   :config (progn
 	    (add-hook 'after-init-hook
 		      (lambda ()
@@ -366,7 +366,7 @@
   :config (progn
 	    (define-key haskell-mode-map (kbd "C-c C-l") 'haskell-process-load-or-reload)
 	    (add-hook 'haskell-mode-hook 'haskell-doc-mode)
-	    (add-hook 'haskell-mode-hook 'haskell-indent-mode)
+	    (add-hook 'haskell-mode-hook 'haskell-indentation-mode)
 	    (add-hook 'haskell-mode-hook 'interactive-haskell-mode)
 	    (add-hook 'haskell-mode-hook 'haskell-decl-scan-mode)
 	    (add-hook 'haskell-mode-hook (lambda ()
@@ -498,3 +498,11 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(default ((t (:family "DejaVu Sans Mono" :foundry "unknown" :slant normal :weight normal :height 90 :width normal)))))
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages
+   (quote
+    (flycheck-rust racer rust-mode js2-mode php-mode web-mode irony-eldoc flycheck-irony company-irony irony yasnippet pyvenv company-anaconda anaconda-mode company-ghci flycheck-haskell hindent haskell-mode magit helm-swoop helm-ag helm-projectile projectile railscasts-theme leuven-theme greymatters-theme badwolf-theme evil-leader evil-god-state evil-commentary evil-smartparens evil slime-company smartparens flycheck-pos-tip flycheck company-quickhelp company f req-package))))
