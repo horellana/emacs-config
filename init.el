@@ -283,8 +283,7 @@
   (column-number-mode 1)
   (global-hl-line-mode 1)
   (show-paren-mode)
-  (add-to-list 'default-frame-alist '(font . "Hack-10"))
-  ;; (add-to-list 'default-frame-alist '(font . "Droid Sans Mono-9"))
+  (add-to-list 'default-frame-alist '(font . "Hack-9"))
   (add-to-list 'default-frame-alist '(cursor-color . "Gray")))
 
 (req-package badwolf-theme
@@ -390,7 +389,6 @@
 	    (setq hindent-style "chris-done")
 	    (evil-define-key 'evil-visual-state hindent-mode-map "TAB"
 	      'hindent-reformat-region)
-	    ;; (bind-key "TAB" 'hindent-reformat-region hindent-mode-map)
 	    (add-hook 'haskell-mode-hook 'hindent-mode)))
 
 (req-package flycheck-haskell
@@ -493,19 +491,3 @@
 	    (add-hook 'flycheck-mode-hook 'flycheck-rust-setup)))
 
 (req-package-finish)
-
-
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(default ((t (:family "DejaVu Sans Mono" :foundry "unknown" :slant normal :weight normal :height 90 :width normal)))))
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   (quote
-    (flycheck-rust racer rust-mode js2-mode php-mode web-mode irony-eldoc flycheck-irony company-irony irony yasnippet pyvenv company-anaconda anaconda-mode company-ghci flycheck-haskell hindent haskell-mode magit helm-swoop helm-ag helm-projectile projectile railscasts-theme leuven-theme greymatters-theme badwolf-theme evil-leader evil-god-state evil-commentary evil-smartparens evil slime-company smartparens flycheck-pos-tip flycheck company-quickhelp company f req-package))))
