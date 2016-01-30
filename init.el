@@ -271,6 +271,9 @@
 	    (evil-leader/set-key-for-mode 'projectile-mode (kbd "p")'helm-projectile)
 	    (global-evil-leader-mode)))
 
+(req-package evil-magit
+  :require evil magit
+  )
 
 (defun juiko/look-config ()
   (blink-cursor-mode -1)
