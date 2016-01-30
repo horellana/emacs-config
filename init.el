@@ -213,6 +213,14 @@
 	    (evil-mode)
 	    ))
 
+(req-package evil-lisp-state
+  :require evil evil-leader
+  :init (progn
+	  (setq evil-lisp-state-global t)
+	  (setq evil-lisp-state-enter-lisp-state-on-command nil))
+  :config (progn
+	    (evil-leader/set-key "L" 'evil-lisp-state)))
+
 (req-package evil-smartparens
   :require evil smartparens
   :config (progn
