@@ -294,6 +294,17 @@
   (add-to-list 'default-frame-alist '(font . "Hack-9"))
   (add-to-list 'default-frame-alist '(cursor-color . "Gray")))
 
+(progn
+  (require 'spacemacs-light-theme)
+  (load-theme 'spacemacs-light t)
+  (juiko/look-config))
+
+(req-package paper-theme
+  :disabled t
+  :config (progn
+	    (load-theme 'paper t)
+	    (juiko/look-config)))
+
 (req-package badwolf-theme
   :disabled t
   :config (progn
