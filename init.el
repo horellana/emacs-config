@@ -150,6 +150,9 @@
 	    (setf flycheck-display-errors-function
 		  #'flycheck-pos-tip-error-messages)))
 
+(defvar *no-smartparens-list*
+  '(haskell-mode))
+
 (req-package smartparens
   :config (progn
 	    (sp-local-pair '(emacs-lisp-mode
@@ -161,8 +164,11 @@
 			     slime-repl-mode)
 			   "'" nil :actions nil)
 	    (add-to-list 'sp-no-reindent-after-kill-modes 'haskell-mode)
-	    (smartparens-global-strict-mode)))
 
+	    (add-hook 'prog-mode-hook
+		      (lambda ()
+			(unless (-contains? *no-smartparens-list* major-mode)
+			  (smartparens-strict-mode))))))
 
 (req-package slime-company
   :require company)
