@@ -435,6 +435,7 @@
 	    (add-hook 'python-mode-hook 'pyvenv-mode)))
 
 (req-package yasnippet
+  :disabled t
   :config (progn
 	    (yas-global-mode)))
 
