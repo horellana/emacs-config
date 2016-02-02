@@ -73,16 +73,6 @@
       version-control t)
 
 
-(global-set-key (kbd "C-%") 'iedit-mode)
-(global-set-key (kbd "M--") 'hippie-expand)
-(global-set-key (kbd "M-g M-g")
-		'(lambda ()
-		   (interactive)
-		   (unwind-protect
-		       (progn
-			 (linum-mode t)
-			 (call-interactively 'goto-line))
-		     (linum-mode -1))))
 
 (add-hook 'after-save-hook
 	  (lambda ()
@@ -112,8 +102,28 @@
 
 (req-package f)
 
+(req-package bind-key
+  :config (progn
+	    (bind-key (kbd "M--") 'hippie-expand)
+	    (bind-key (kbd "M-g M-g")
+		      '(lambda ()
+			 (interactive)
+			 (unwind-protect
+			     (progn
+			       (linum-mode t)
+			       (call-interactively 'goto-line))
+			   (linum-mode -1))))))
+
+(req-package iedit
+  :require bind-key
+  :config (progn
+	    (bind-key (kbd "C-%") 'iedit-mode)))
+
 (req-package erc
-  :commands erc)
+  :commands (erc)
+  :config (progn
+	    (setf erc-autojoin-channels-alist
+		  '(("freenode.net" "#emacs" "#python" "#haskell")))))
 
 (req-package company
   :config (progn
@@ -189,14 +199,16 @@
 	    (slime-setup '(slime-fancy slime-company))))
 
 (req-package evil
+  :require bind-key
   :config (progn
-	    (define-key evil-visual-state-map (kbd "TAB") 'indent-region)
-	    (define-key evil-normal-state-map (kbd "C-TAB") 'indent-whole-buffer)
-	    (define-key evil-normal-state-map [return]
-	      (lambda ()
-		(interactive)
-		(save-excursion
-		  (newline))))
+	    (bind-key "TAB" 'indent-region evil-visual-state-map)
+	    (bind-key "C-TAB" 'indent-whole-buffer evil-normal-state-map)
+	    (bind-key [return] (lambda ()
+				 (interactive)
+				 (save-excursion
+				   (newline)))
+		      evil-normal-state-map)
+
 	    (setq evil-move-cursor-back nil)
 
 	    (cl-loop for mode in '(haskell-interactive-mode
@@ -220,12 +232,13 @@
 	    ))
 
 (req-package evil-lisp-state
-  :require evil evil-leader
+  :require evil evil-leader bind-key
   :init (progn
 	  (setq evil-lisp-state-global t)
 	  (setq evil-lisp-state-enter-lisp-state-on-command nil))
   :config (progn
-	    (evil-leader/set-key "L" 'evil-lisp-state)))
+	    (bind-key "L" 'evil-lisp-state evil-normal-state-map)
+	    ))
 
 (req-package evil-smartparens
   :require evil smartparens
