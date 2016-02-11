@@ -418,7 +418,8 @@
 
 	    (setq haskell-process-suggest-remove-import-lines t)
 	    (setq haskell-process-auto-import-loaded-modules t)
-	    (setq haskell-process-log t)))
+	    (setq haskell-process-log t)
+	    (setq haskell-stylish-on-save t)))
 
 
 (req-package hindent
