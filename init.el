@@ -404,7 +404,7 @@
 
 (req-package haskell-mode
   :config (progn
-	    (define-key haskell-mode-map (kbd "C-c C-l") 'haskell-process-load-or-reload)
+	    (define-key haskell-mode-map (kbd "C-c C-l") 'haskell-process-load-file)
 	    (add-hook 'haskell-mode-hook 'haskell-doc-mode)
 	    (add-hook 'haskell-mode-hook 'haskell-indentation-mode)
 	    (add-hook 'haskell-mode-hook 'interactive-haskell-mode)
