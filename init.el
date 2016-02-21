@@ -362,6 +362,9 @@
 (req-package helm-config
   :config (progn
 
+	    (bind-key "M-x" 'helm-M-x)
+	    (bind-key "C-x C-f" 'helm-find-files)
+
 	    (setq helm-split-window-in-side-p t)
 
 	    (add-to-list 'display-buffer-alist
