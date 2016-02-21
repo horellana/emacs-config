@@ -2,11 +2,7 @@
 
 (setf lexical-binding t)
 
-(let ((original-gc-cons-threshold gc-cons-threshold))
-  (setq gc-cons-threshold 50000000000)
-  (add-hook 'after-init-hook
-	    (lambda ()
-	      (setq gc-cons-threshold original-gc-cons-threshold))))
+(setq gc-cons-threshold 100000000)
 
 (eval-when-compile
   (require 'cl))
