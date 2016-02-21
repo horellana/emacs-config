@@ -20,20 +20,19 @@
 (defun python-find-env (project-root)
   (let ((env-path (f-join project-root "env")))
     (when (f-exists? env-path)
-      env-path))
-  )
+      env-path)))
 
 (let (python-current-env)
- (add-hook 'python-mode-hook
-	  (lambda ()
-	    (let* ((root (projectile-project-root))
-		   (env (python-find-env root)))
-	      (when (and env
-			 (not (equal env
-				     python-current-env)))
-		(setf python-current-env env)
-		(message "Current python env: %s" python-current-env)
-		(pyvenv-activate env))))))
+  (add-hook 'python-mode-hook
+	    (lambda ()
+	      (let* ((root (projectile-project-root))
+		     (env (python-find-env root)))
+		(when (and env
+			   (not (equal env
+				       python-current-env)))
+		  (setf python-current-env env)
+		  (message "Current python env: %s" python-current-env)
+		  (pyvenv-activate env))))))
 
 (defun async-gtags-update ()
   (call-process "global" nil 0 nil "-u"))
@@ -119,7 +118,8 @@
   :commands (erc)
   :config (progn
 	    (setf erc-autojoin-channels-alist
-		  '(("freenode.net" "#emacs" "#python" "#haskell")))))
+		  '(("snoonet.org" "#syriancivilwar")
+		    ("freenode.net" "#emacs" "#python" "#haskell")))))
 
 (req-package company
   :config (progn
@@ -128,7 +128,6 @@
 	    (global-company-mode)))
 
 (req-package company-quickhelp
-  :disabled t
   :require company
   :config (add-hook 'company-mode-hook 'company-quickhelp-mode))
 
@@ -181,7 +180,7 @@
 
 (req-package slime
   :require slime-company
-  :commands slime
+  :commands (slime)
   :init (progn
 	  (setq inferior-lisp-program "sbcl")
 	  (setq slime-contrib '(slime-fancy
@@ -224,8 +223,8 @@
 		     do (evil-set-initial-state mode 'emacs))
 
 
-	    (evil-mode)
-	    ))
+	    (evil-mode)))
+
 
 (req-package evil-lisp-state
   :require evil evil-leader bind-key
@@ -314,6 +313,12 @@
   (load-theme 'spacemacs-light t)
   (juiko/look-config))
 
+;; (req-package spacemacs-theme-pkg
+;;   :ensure spacemacs-theme
+;;   :config (progn
+;;	    (load-theme 'spacemacs-ligt t)
+;;	    (juiko/look-config)))
+
 (req-package paper-theme
   :disabled t
   :config (progn
@@ -327,6 +332,7 @@
 	    (juiko/look-config)))
 
 (req-package greymatters-theme
+  :disabled t
   :config (progn
 	    (add-hook 'after-init-hook
 		      (lambda ()
@@ -380,22 +386,21 @@
 	    (helm-mode)))
 
 (req-package helm-projectile
-  :commands helm-mode
   :require helm projectile
   :config (progn
 	    (helm-projectile-on)))
 
 (req-package helm-ag
   :require helm
-  :commands helm-ag)
+  :commands (helm-ag))
 
 (req-package helm-swoop
-  :commands helm-swoop
-  :require helm)
+  :require helm
+  :commands (helm-swoop))
 
 (req-package helm-grep-ack
   :require helm
-  :commands helm-ack)
+  :commands (helm-ack))
 
 (req-package magit
   :init (progn
@@ -410,6 +415,11 @@
 	    (add-hook 'haskell-mode-hook 'haskell-decl-scan-mode)
 	    (add-hook 'haskell-mode-hook (lambda ()
 					   (electric-indent-local-mode -1)))
+	    ;; (add-hook 'haskell-mode-hook 'electric-pair-local-mode)
+
+	    ;; (add-hook 'haskell-mode-hook
+	    ;;	      (lambda ()
+	    ;;		(flycheck-disable-checker 'haskell-hlint)))
 
 	    (setq haskell-process-type 'stack-ghci)
 	    (setq haskell-process-path-ghci "stack")
@@ -417,7 +427,7 @@
 
 	    (setq haskell-process-suggest-remove-import-lines t)
 	    (setq haskell-process-auto-import-loaded-modules t)
-	    (setq haskell-process-log t)
+	    (setq haskell-process-log nil)
 	    (setq haskell-stylish-on-save t)))
 
 
@@ -438,7 +448,17 @@
 (req-package company-ghci
   :require company haskell-mode
   :config (progn
-	    (push 'company-ghci company-backends)))
+	    (add-hook 'haskell-mode-hook
+		      (lambda ()
+			(setq-local company-backends '(company-ghci))))
+	    ))
+
+(req-package hlint-refactor
+  :require haskell-mode
+  :config (progn
+	    (bind-key "C-c h r" 'hlint-refactor-refactor-at-point hlint-refactor-mode-map)
+
+	    (add-hook 'haskell-mode-hook 'hlint-refactor-mode)))
 
 (req-package anaconda-mode
   :config (progn
@@ -446,6 +466,7 @@
 
 (req-package company-anaconda
   :require company anaconda-mode
+  :commands (anaconda-mode)
   :config (progn
 	    (add-to-list 'company-backends 'company-anaconda)))
 
@@ -466,7 +487,7 @@
 
 (req-package company-irony
   :require company irony
-  :commands irony-mode
+  :commands (irony-mode)
   :config (progn
 	    (push 'company-irony company-backends)))
 
@@ -504,6 +525,7 @@
 	    (add-to-list 'auto-mode-alist '("\\.html\\'" . web-mode))))
 
 (req-package php-mode
+  :disabled t
   :config (progn
 	    (require 'php-ext)
 	    (setq php-template-compatibility nil)))
@@ -530,3 +552,17 @@
 	    (add-hook 'flycheck-mode-hook 'flycheck-rust-setup)))
 
 (req-package-finish)
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages
+   (quote
+    (hlint-refactor iedit yasnippet web-mode spacemacs-theme slime-company req-package railscasts-theme racer pyvenv php-mode paper-theme leuven-theme js2-mode irony-eldoc hindent helm-swoop helm-projectile helm-ag greymatters-theme flycheck-rust flycheck-pos-tip flycheck-irony flycheck-haskell evil-smartparens evil-magit evil-lisp-state evil-leader evil-god-state evil-commentary company-quickhelp company-irony company-ghci company-anaconda badwolf-theme))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
