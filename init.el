@@ -550,6 +550,12 @@
   :require rust-mode flycheck
   :config (progn
 	    (add-hook 'flycheck-mode-hook 'flycheck-rust-setup)))
+(req-package elm-mode)
+
+(req-package flycheck-elm
+  :require elm-mode flycheck
+  :config (progn
+            (add-hook 'flycheck-mode-hook 'flycheck-elm-setup)))
 
 (req-package-finish)
 (custom-set-variables
