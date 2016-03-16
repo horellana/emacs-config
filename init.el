@@ -308,10 +308,10 @@
   (add-to-list 'default-frame-alist '(font . "Hack-9"))
   (add-to-list 'default-frame-alist '(cursor-color . "Gray")))
 
-(progn
-  (require 'spacemacs-light-theme)
-  (load-theme 'spacemacs-light t)
-  (juiko/look-config))
+;; (progn
+;;   (require 'spacemacs-light-theme)
+;;   (load-theme 'spacemacs-light t)
+;;   (juiko/look-config))
 
 ;; (req-package spacemacs-theme-pkg
 ;;   :ensure spacemacs-theme
@@ -320,7 +320,6 @@
 ;;	    (juiko/look-config)))
 
 (req-package paper-theme
-  :disabled t
   :config (progn
 	    (load-theme 'paper t)
 	    (juiko/look-config)))
@@ -555,20 +554,8 @@
 (req-package flycheck-elm
   :require elm-mode flycheck
   :config (progn
-            (add-hook 'flycheck-mode-hook 'flycheck-elm-setup)))
+	    (add-hook 'flycheck-mode-hook 'flycheck-elm-setup)))
 
 (req-package-finish)
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   (quote
-    (hlint-refactor iedit yasnippet web-mode spacemacs-theme slime-company req-package railscasts-theme racer pyvenv php-mode paper-theme leuven-theme js2-mode irony-eldoc hindent helm-swoop helm-projectile helm-ag greymatters-theme flycheck-rust flycheck-pos-tip flycheck-irony flycheck-haskell evil-smartparens evil-magit evil-lisp-state evil-leader evil-god-state evil-commentary company-quickhelp company-irony company-ghci company-anaconda badwolf-theme))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+
+(juiko/look-config)
