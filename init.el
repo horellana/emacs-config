@@ -473,7 +473,6 @@
 		      (lambda ()
 			(make-variable-buffer-local 'company-backends)
 			(setq-local company-backends '(company-anaconda))))
-	    ;; (add-to-list 'company-backends 'company-anaconda)
 	    ))
 
 (req-package pyvenv
@@ -563,6 +562,10 @@
   :config (progn
 	    (add-hook 'flycheck-mode-hook 'flycheck-elm-setup)))
 
+(req-package color-theme-approximate
+  :config (progn
+	    (color-theme-approximate-on)))
+
 (req-package-finish)
 
 (juiko/look-config)
@@ -573,7 +576,7 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (yasnippet web-mode tao-theme slime-company req-package railscasts-theme racer pyvenv php-mode paper-theme leuven-theme js2-mode irony-eldoc iedit hlint-refactor hindent helm-swoop helm-projectile helm-ag greymatters-theme flycheck-rust flycheck-pos-tip flycheck-irony flycheck-haskell flycheck-elm evil-smartparens evil-magit evil-lisp-state evil-leader evil-god-state evil-commentary elm-mode company-quickhelp company-irony company-ghci company-anaconda badwolf-theme))))
+    (color-theme-approximate yasnippet web-mode tao-theme slime-company req-package railscasts-theme racer pyvenv php-mode paper-theme leuven-theme js2-mode irony-eldoc iedit hlint-refactor hindent helm-swoop helm-projectile helm-ag greymatters-theme flycheck-rust flycheck-pos-tip flycheck-irony flycheck-haskell flycheck-elm evil-smartparens evil-magit evil-lisp-state evil-leader evil-god-state evil-commentary elm-mode company-quickhelp company-irony company-ghci company-anaconda badwolf-theme))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
