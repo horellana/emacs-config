@@ -569,6 +569,9 @@
 
 (req-package-finish)
 
+(when (not window-system)
+  (load-theme 'wombat t))
+
 (juiko/look-config)
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
