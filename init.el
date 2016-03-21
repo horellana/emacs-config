@@ -320,6 +320,7 @@
 ;;	    (juiko/look-config)))
 
 (req-package paper-theme
+  :if window-system
   :config (progn
 	    (load-theme 'paper t)
 	    (juiko/look-config)))
