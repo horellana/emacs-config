@@ -17,81 +17,6 @@
     (package-refresh-contents)
     (package-install 'req-package)))
 
-(defun python-find-env (project-root)
-  (let ((env-path (f-join project-root "env")))
-    (when (f-exists? env-path)
-      env-path)))
-
-(let (python-current-env)
-  (add-hook 'python-mode-hook
-	    (lambda ()
-	      (let* ((root (projectile-project-root))
-		     (env (python-find-env root)))
-		(when (and env
-			   (not (equal env
-				       python-current-env)))
-		  (setf python-current-env env)
-		  (message "Current python env: %s" python-current-env)
-		  (pyvenv-activate env))))))
-
-(defun async-gtags-update ()
-  (call-process "global" nil 0 nil "-u"))
-
-(defvar *gtags-modes*
-  '(web-mode
-    php-mode
-    cperl-mode))
-
-(add-hook 'after-save-hook
-	  (lambda ()
-	    (if (cl-member major-mode *gtags-modes*)
-		(async-gtags-update))))
-
-(defun endless/upgrade ()
-  "Upgrade all packages, no questions asked."
-  (interactive)
-  (save-window-excursion
-    (list-packages)
-    (package-menu-mark-upgrades)
-    (package-menu-execute 'no-query)))
-
-(eldoc-mode t)
-(setq inhibit-startup-message t)
-(fset 'yes-or-no-p 'y-or-n-p)
-
-(setq backup-by-copying t      ; don't clobber symlinks
-      backup-directory-alist
-      '(("." . "~/.emacs.d/saves"))    ; don't litter my fs tree
-      delete-old-versions t
-      kept-new-versions 6
-      kept-old-versions 2
-      version-control t)
-
-
-
-(add-hook 'after-save-hook
-	  (lambda ()
-	    (let ((init-file (expand-file-name "~/.emacs.d/init.el")))
-	      (when (equal (buffer-file-name) init-file)
-		(byte-compile-file init-file)))))
-
-(add-hook 'after-save-hook
-	  'whitespace-cleanup)
-
-(setq browse-url-browser-function 'browse-url-firefox)
-
-(progn
-  (defalias 'perl-mode 'cperl-mode)
-  (setq cperl-electric-parens nil
-	cperl-electric-keywords nil
-	cperl-electric-lbrace-space nil))
-
-(setq backup-directory-alist
-      '((".*" . "/home/juiko/.emacs.d/cache/"))
-      auto-save-file-name-transforms
-      '((".*" "/home/juiko/.emacs.d/cache/" t))
-      auto-save-list-file-prefix
-      "/home/juiko/.emacs.d/cache/")
 
 (require 'req-package)
 
@@ -128,6 +53,7 @@
 	    (global-company-mode)))
 
 (req-package company-quickhelp
+  :if window-system
   :require company
   :config (add-hook 'company-mode-hook 'company-quickhelp-mode))
 
@@ -150,6 +76,7 @@
 	    (global-flycheck-mode)))
 
 (req-package flycheck-pos-tip
+  :if window-system
   :require flycheck
   :config (progn
 	    (setf flycheck-display-errors-function
@@ -297,39 +224,17 @@
   :require evil magit
   )
 
-(defun juiko/look-config ()
-  (blink-cursor-mode -1)
-  (menu-bar-mode -1)
-  (tool-bar-mode -1)
-  (scroll-bar-mode -1)
-  (column-number-mode 1)
-  (global-hl-line-mode 1)
-  (show-paren-mode)
-  (add-to-list 'default-frame-alist '(font . "Hack-9"))
-  (add-to-list 'default-frame-alist '(cursor-color . "Gray")))
-
-;; (progn
-;;   (require 'spacemacs-light-theme)
-;;   (load-theme 'spacemacs-light t)
-;;   (juiko/look-config))
-
-;; (req-package spacemacs-theme-pkg
-;;   :ensure spacemacs-theme
-;;   :config (progn
-;;	    (load-theme 'spacemacs-ligt t)
-;;	    (juiko/look-config)))
-
 (req-package paper-theme
   :if window-system
   :config (progn
 	    (load-theme 'paper t)
-	    (juiko/look-config)))
+	    ))
 
 (req-package badwolf-theme
   :disabled t
   :config (progn
 	    (load-theme 'badwolf t)
-	    (juiko/look-config)))
+	    ))
 
 (req-package greymatters-theme
   :disabled t
@@ -341,7 +246,7 @@
 					    nil
 					    :background "#f9fbfd"
 					    :foreground "#f9fbfd")))
-	    (juiko/look-config)))
+	    ))
 
 (req-package leuven-theme
   :disabled t
@@ -353,13 +258,13 @@
 					    nil
 					    :background "2e3436"
 					    :foreground "2e3436")
-			(juiko/look-config)))))
+			))))
 
 (req-package railscasts-theme
   :disabled t
   :config (progn
 	    (load-theme 'railscasts t)
-	    (juiko/look-config)))
+	    ))
 
 (req-package projectile
   :config (progn
@@ -451,9 +356,9 @@
 	    (add-hook 'haskell-mode-hook
 		      (lambda ()
 			(setq-local company-backends
-				    '(company-ghci
-				      company-dabbrev
-				      company-dabbrev-code))))))
+				    '((company-ghci
+				       company-dabbrev
+				       company-dabbrev-code)))))))
 
 
 (req-package hlint-refactor
@@ -465,7 +370,8 @@
 
 (req-package anaconda-mode
   :config (progn
-	    (add-hook 'python-mode-hook 'anaconda-mode)))
+	    (add-hook 'python-mode-hook 'anaconda-mode)
+	    (add-hook 'python-mode-hook 'eldoc-mode)))
 
 (req-package company-anaconda
   :require company anaconda-mode
@@ -473,7 +379,8 @@
 	    (add-hook 'anaconda-mode-hook
 		      (lambda ()
 			(make-variable-buffer-local 'company-backends)
-			(setq-local company-backends '(company-anaconda))))
+			(setq-local company-backends '((company-anaconda
+							company-dabbrev-code)))))
 	    ))
 
 (req-package pyvenv
@@ -564,10 +471,108 @@
 	    (add-hook 'flycheck-mode-hook 'flycheck-elm-setup)))
 
 (req-package color-theme-approximate
+  :if (not window-system)
   :config (progn
 	    (color-theme-approximate-on)))
 
+(req-package robe
+  :config (progn
+	    (add-hook 'ruby-mode-hook 'robe-mode)
+	    (add-hook 'ruby-mode-hook
+		      (lambda ()
+			(make-variable-buffer-local 'company-backends)
+			(setq-local company-backends '(company-robe
+						       company-dabbrev
+						       company-dabbrev-code))))))
+
 (req-package-finish)
+
+(defun juiko/look-config ()
+  (blink-cursor-mode -1)
+  (menu-bar-mode -1)
+  (tool-bar-mode -1)
+  (scroll-bar-mode -1)
+  (column-number-mode 1)
+  (global-hl-line-mode 1)
+  (show-paren-mode)
+  (add-to-list 'default-frame-alist '(font . "Hack-9"))
+  (add-to-list 'default-frame-alist '(cursor-color . "Gray")))
+
+
+(defun python-find-env (project-root)
+  (let ((env-path (f-join project-root "env")))
+    (when (f-exists? env-path)
+      env-path)))
+
+(let (python-current-env)
+  (add-hook 'python-mode-hook
+	    (lambda ()
+	      (let* ((root (projectile-project-root))
+		     (env (python-find-env root)))
+		(when (and env
+			   (not (equal env
+				       python-current-env)))
+		  (setf python-current-env env)
+		  (pyvenv-activate env))))))
+
+(defun async-gtags-update ()
+  (call-process "global" nil 0 nil "-u"))
+
+(defvar *gtags-modes*
+  '(web-mode
+    php-mode
+    cperl-mode))
+
+(add-hook 'after-save-hook
+	  (lambda ()
+	    (if (cl-member major-mode *gtags-modes*)
+		(async-gtags-update))))
+
+(defun endless/upgrade ()
+  "Upgrade all packages, no questions asked."
+  (interactive)
+  (save-window-excursion
+    (list-packages)
+    (package-menu-mark-upgrades)
+    (package-menu-execute 'no-query)))
+
+(add-hook 'prog-mode-hook 'eldoc-mode)
+
+(setq inhibit-startup-message t)
+(fset 'yes-or-no-p 'y-or-n-p)
+
+(setq backup-by-copying t      ; don't clobber symlinks
+      backup-directory-alist
+      '(("." . "~/.emacs.d/saves"))    ; don't litter my fs tree
+      delete-old-versions t
+      kept-new-versions 6
+      kept-old-versions 2
+      version-control t)
+
+(add-hook 'after-save-hook
+	  (lambda ()
+	    (let ((init-file (expand-file-name "~/.emacs.d/init.el")))
+	      (when (equal (buffer-file-name) init-file)
+		(byte-compile-file init-file)))))
+
+(add-hook 'after-save-hook
+	  'whitespace-cleanup)
+
+(setq browse-url-browser-function 'browse-url-firefox)
+
+(progn
+  (defalias 'perl-mode 'cperl-mode)
+  (setq cperl-electric-parens nil
+	cperl-electric-keywords nil
+	cperl-electric-lbrace-space nil))
+
+(setq backup-directory-alist
+      '((".*" . "/home/juiko/.emacs.d/cache/"))
+      auto-save-file-name-transforms
+      '((".*" "/home/juiko/.emacs.d/cache/" t))
+      auto-save-list-file-prefix
+      "/home/juiko/.emacs.d/cache/")
+
 
 (when (not window-system)
   (load-theme 'wombat t))
@@ -580,7 +585,7 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (color-theme-approximate yasnippet web-mode tao-theme slime-company req-package railscasts-theme racer pyvenv php-mode paper-theme leuven-theme js2-mode irony-eldoc iedit hlint-refactor hindent helm-swoop helm-projectile helm-ag greymatters-theme flycheck-rust flycheck-pos-tip flycheck-irony flycheck-haskell flycheck-elm evil-smartparens evil-magit evil-lisp-state evil-leader evil-god-state evil-commentary elm-mode company-quickhelp company-irony company-ghci company-anaconda badwolf-theme))))
+    (yasnippet web-mode slime-company robe req-package railscasts-theme racer pyvenv php-mode paper-theme leuven-theme js2-mode irony-eldoc iedit hlint-refactor hindent helm-swoop helm-projectile helm-ag greymatters-theme flycheck-rust flycheck-pos-tip flycheck-irony flycheck-haskell flycheck-elm evil-smartparens evil-magit evil-lisp-state evil-leader evil-god-state evil-commentary elm-mode company-quickhelp company-irony company-ghci company-anaconda color-theme-approximate badwolf-theme))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
