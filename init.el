@@ -16,9 +16,111 @@
   (when (not (package-installed-p 'req-package))
     (package-refresh-contents)
     (package-install 'req-package)))
-
-
 (require 'req-package)
+
+(defun juiko/look-config ()
+  (blink-cursor-mode -1)
+  (menu-bar-mode -1)
+  (tool-bar-mode -1)
+  (scroll-bar-mode -1)
+  (column-number-mode 1)
+  (global-hl-line-mode 1)
+  (show-paren-mode)
+  (add-to-list 'default-frame-alist '(font . "mononoki-9"))
+  (add-to-list 'default-frame-alist '(cursor-color . "Gray")))
+
+(defvar *python-env-name*
+  (list "env" ".env"))
+
+(defun python-find-env (project-root)
+  (let ((found-env (-intersection *python-env-name*
+				  (mapcar 'f-filename (f-directories project-root)))))
+    (when (car found-env))))
+  
+(let (python-current-env)
+  (add-hook 'python-mode-hook
+	    (lambda ()
+	      (let* ((root (projectile-project-root))
+		     (env (python-find-env root)))
+		(when (and env
+			   (not (equal env
+				       python-current-env)))
+		  (setf python-current-env env)
+		  (pyvenv-activate env))))))
+
+(defun gtags-exists-p (root)
+  (-contains-p  (f-files root)
+		(concat root "GTAGS")))
+
+(defun async-gtags-create ()
+  (call-process "gtags" nil 0 nil))
+
+(defun async-gtags-update ()
+  (call-process "global" nil 0 nil "-u"))
+
+(defun async-gtags (root)
+  (if (gtags-exists-p root)
+      (async-gtags-update)
+    (async-gtags-create)))
+
+(defvar *gtags-modes*
+  '(web-mode
+    php-mode
+    cperl-mode
+    ruby-mode))
+
+(add-hook 'after-save-hook
+	  (lambda ()
+	    (if (cl-member major-mode *gtags-modes*)
+		;; (async-gtags-update (projectile-project-root))
+		(async-gtags (projectile-project-root)))))
+
+
+(defun endless/upgrade ()
+  "Upgrade all packages, no questions asked."
+  (interactive)
+  (save-window-excursion
+    (list-packages)
+    (package-menu-mark-upgrades)
+    (package-menu-execute 'no-query)))
+
+(add-hook 'prog-mode-hook 'eldoc-mode)
+
+(setq inhibit-startup-message t)
+(fset 'yes-or-no-p 'y-or-n-p)
+
+(setq backup-by-copying t      ; don't clobber symlinks
+      backup-directory-alist
+      '(("." . "~/.emacs.d/saves"))    ; don't litter my fs tree
+      delete-old-versions t
+      kept-new-versions 6
+      kept-old-versions 2
+      version-control t)
+
+(add-hook 'after-save-hook
+	  (lambda ()
+	    (let ((init-file (expand-file-name "~/.emacs.d/init.el")))
+	      (when (equal (buffer-file-name) init-file)
+		(byte-compile-file init-file)))))
+
+(setq browse-url-browser-function 'browse-url-firefox)
+
+(progn
+  (defalias 'perl-mode 'cperl-mode)
+  (setq cperl-electric-parens nil
+	cperl-electric-keywords nil
+	cperl-electric-lbrace-space nil))
+
+(setq backup-directory-alist
+      '((".*" . "/home/juiko/.emacs.d/cache/"))
+      auto-save-file-name-transforms
+      '((".*" "/home/juiko/.emacs.d/cache/" t))
+      auto-save-list-file-prefix
+      "/home/juiko/.emacs.d/cache/")
+
+(juiko/look-config)
+
+
 
 (req-package f)
 
@@ -224,31 +326,8 @@
   :require evil magit
   )
 
-(req-package paper-theme
-  :if window-system
-  :config (progn
-	    (load-theme 'paper t)
-	    ))
-
-(req-package badwolf-theme
-  :disabled t
-  :config (progn
-	    (load-theme 'badwolf t)
-	    ))
-
-(req-package greymatters-theme
-  :disabled t
-  :config (progn
-	    (add-hook 'after-init-hook
-		      (lambda ()
-			(load-theme 'greymatters t)
-			(set-face-attribute 'fringe
-					    nil
-					    :background "#f9fbfd"
-					    :foreground "#f9fbfd")))
-	    ))
-
 (req-package leuven-theme
+  :if window-system
   :disabled t
   :config (progn
 	    (add-hook 'after-init-hook
@@ -259,12 +338,6 @@
 					    :background "2e3436"
 					    :foreground "2e3436")
 			))))
-
-(req-package railscasts-theme
-  :disabled t
-  :config (progn
-	    (load-theme 'railscasts t)
-	    ))
 
 (req-package projectile
   :config (progn
@@ -320,11 +393,6 @@
 	    (add-hook 'haskell-mode-hook 'haskell-decl-scan-mode)
 	    (add-hook 'haskell-mode-hook (lambda ()
 					   (electric-indent-local-mode -1)))
-	    ;; (add-hook 'haskell-mode-hook 'electric-pair-local-mode)
-
-	    ;; (add-hook 'haskell-mode-hook
-	    ;;	      (lambda ()
-	    ;;		(flycheck-disable-checker 'haskell-hlint)))
 
 	    (setq haskell-process-type 'stack-ghci)
 	    (setq haskell-process-path-ghci "stack")
@@ -379,8 +447,7 @@
 	    (add-hook 'anaconda-mode-hook
 		      (lambda ()
 			(make-variable-buffer-local 'company-backends)
-			(setq-local company-backends '((company-anaconda
-							company-dabbrev-code)))))
+			(setq-local company-backends '(company-anaconda company-dabbrev-code))))
 	    ))
 
 (req-package pyvenv
@@ -388,11 +455,13 @@
 	    (add-hook 'python-mode-hook 'pyvenv-mode)))
 
 (req-package yasnippet
-  :disabled t
   :config (progn
-	    (yas-global-mode)))
+	    (yas-reload-all)
+	    (add-hook 'python-mode-hook 'yas-minor-mode)
+	    (add-hook 'ruby-mode-hook 'yas-minor-mode)))
 
 (req-package irony
+  :disabled t
   :config (progn
 	    (add-hook 'c-mode-hook 'irony-mode)
 	    (add-hook 'c++-mode-hook 'irony-mode)
@@ -416,6 +485,8 @@
 
 (req-package web-mode
   :config (progn
+	    (add-hook 'web-mode-hook #'turn-off-smartparens-mode)
+
 	    (add-hook 'web-mode-hook
 		      (lambda ()
 			(setq web-mode-enable-auto-pairing t)
@@ -427,21 +498,49 @@
 			(setq web-mode-code-indent-offset 2)
 			(setq web-mode-markup-indent-offset 2)
 			(setq web-mode-css-indent-offset 2)))
-	    (add-to-list 'auto-mode-alist '("\\.blade\\.php\\'" . web-mode))
-	    (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
-	    (add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
-	    (add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
-	    (add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
-	    (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
-	    (add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
-	    (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
-	    (add-to-list 'auto-mode-alist '("\\.html\\'" . web-mode))))
+
+	    (cl-loop
+	     for extension in '("\\.blade\\.php\\'"
+				"\\.phtml\\'"
+				"\\.tpl\\.php\\'"
+				"\\.[agj]sp\\'"
+				"\\.as[cp]x\\'"
+				"\\.erb\\'"
+				"\\.mustache\\'"
+				"\\.djhtml\\'"
+				"\\.html\\'"
+				"\\html\\.twig\\'")
+	     do (add-to-list 'auto-mode-alist `(,extension . web-mode)))))
+
 
 (req-package php-mode
-  :disabled t
   :config (progn
 	    (require 'php-ext)
-	    (setq php-template-compatibility nil)))
+	    (setq php-template-compatibility nil)
+	    (add-hook 'php-mode-hook
+		      'php-enable-symfony2-coding-style)
+
+	    (add-hook 'php-mode-hook
+		      (lambda ()
+			(setq-local company-backends '(company-gtags
+						       company-dabbrev-code
+						       company-dabbrev
+						       ))))
+	    (with-eval-after-load "yasnippet"
+	      (add-hook 'php-mode-hook 'yas-minor-mode))))
+
+(req-package ac-php
+  :disabled t
+  :requires php-mode
+  :config (progn
+	    (require 'ac-php-company)
+	    (add-hook 'php-mode-hook
+		      (lambda ()
+			(setq-local company-backends '((company-ac-php-backend
+							company-dabbrev-code)))))))
+
+(req-package php-eldoc
+  :requires php-mode)
 
 (req-package js2-mode
   :config (progn
@@ -463,6 +562,7 @@
   :require rust-mode flycheck
   :config (progn
 	    (add-hook 'flycheck-mode-hook 'flycheck-rust-setup)))
+
 (req-package elm-mode)
 
 (req-package flycheck-elm
@@ -485,110 +585,24 @@
 						       company-dabbrev
 						       company-dabbrev-code))))))
 
+(req-package rbenv
+  :require robe
+  :config (progn
+	    (global-rbenv-mode)))
+
+
+(req-package cider)
+
 (req-package-finish)
 
-(defun juiko/look-config ()
-  (blink-cursor-mode -1)
-  (menu-bar-mode -1)
-  (tool-bar-mode -1)
-  (scroll-bar-mode -1)
-  (column-number-mode 1)
-  (global-hl-line-mode 1)
-  (show-paren-mode)
-  (add-to-list 'default-frame-alist '(font . "Hack-9"))
-  (add-to-list 'default-frame-alist '(cursor-color . "Gray")))
+
+(use-package tao-yang-theme
+  :load-path "tao-theme-emacs"
+  :config (progn
+	    (load-theme 'tao-yang t)))
+
+;; (load "~/.emacs.d/tao-theme-emacs/tao-yang-theme.el")
+
+;; (load-theme 'tao-yang t)
 
 
-(defun python-find-env (project-root)
-  (let ((env-path (f-join project-root "env")))
-    (when (f-exists? env-path)
-      env-path)))
-
-(let (python-current-env)
-  (add-hook 'python-mode-hook
-	    (lambda ()
-	      (let* ((root (projectile-project-root))
-		     (env (python-find-env root)))
-		(when (and env
-			   (not (equal env
-				       python-current-env)))
-		  (setf python-current-env env)
-		  (pyvenv-activate env))))))
-
-(defun async-gtags-update ()
-  (call-process "global" nil 0 nil "-u"))
-
-(defvar *gtags-modes*
-  '(web-mode
-    php-mode
-    cperl-mode))
-
-(add-hook 'after-save-hook
-	  (lambda ()
-	    (if (cl-member major-mode *gtags-modes*)
-		(async-gtags-update))))
-
-(defun endless/upgrade ()
-  "Upgrade all packages, no questions asked."
-  (interactive)
-  (save-window-excursion
-    (list-packages)
-    (package-menu-mark-upgrades)
-    (package-menu-execute 'no-query)))
-
-(add-hook 'prog-mode-hook 'eldoc-mode)
-
-(setq inhibit-startup-message t)
-(fset 'yes-or-no-p 'y-or-n-p)
-
-(setq backup-by-copying t      ; don't clobber symlinks
-      backup-directory-alist
-      '(("." . "~/.emacs.d/saves"))    ; don't litter my fs tree
-      delete-old-versions t
-      kept-new-versions 6
-      kept-old-versions 2
-      version-control t)
-
-(add-hook 'after-save-hook
-	  (lambda ()
-	    (let ((init-file (expand-file-name "~/.emacs.d/init.el")))
-	      (when (equal (buffer-file-name) init-file)
-		(byte-compile-file init-file)))))
-
-(add-hook 'after-save-hook
-	  'whitespace-cleanup)
-
-(setq browse-url-browser-function 'browse-url-firefox)
-
-(progn
-  (defalias 'perl-mode 'cperl-mode)
-  (setq cperl-electric-parens nil
-	cperl-electric-keywords nil
-	cperl-electric-lbrace-space nil))
-
-(setq backup-directory-alist
-      '((".*" . "/home/juiko/.emacs.d/cache/"))
-      auto-save-file-name-transforms
-      '((".*" "/home/juiko/.emacs.d/cache/" t))
-      auto-save-list-file-prefix
-      "/home/juiko/.emacs.d/cache/")
-
-
-(when (not window-system)
-  (load-theme 'wombat t))
-
-(juiko/look-config)
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   (quote
-    (yasnippet web-mode slime-company robe req-package railscasts-theme racer pyvenv php-mode paper-theme leuven-theme js2-mode irony-eldoc iedit hlint-refactor hindent helm-swoop helm-projectile helm-ag greymatters-theme flycheck-rust flycheck-pos-tip flycheck-irony flycheck-haskell flycheck-elm evil-smartparens evil-magit evil-lisp-state evil-leader evil-god-state evil-commentary elm-mode company-quickhelp company-irony company-ghci company-anaconda color-theme-approximate badwolf-theme))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
