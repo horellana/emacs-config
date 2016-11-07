@@ -62,10 +62,11 @@
 
 (add-hook 'after-save-hook
 	  (lambda ()
-	    (let ((proc (python-shell-get-process)))
-	      (when proc
-		(python-shell-send-file (buffer-file-name (current-buffer))
-					proc)))))
+	    (when (eq major-mode 'python-mode)
+	      (let ((process (python-shell-get-process)))
+		(when process
+		  (python-shell-send-file (buffer-file-name (current-buffer))
+					  process))))))
 
 (defun gtags-exists-p (root)
   (-contains-p  (f-files root)
@@ -126,7 +127,7 @@
 
 (progn
   (setf browse-url-browser-function 'browse-url-firefox)
-  (setf browse-url-firefox-program "firefox-aurora"))
+  (setf browse-url-firefox-program "firefox-nightly"))
 
 (progn
   (defalias 'perl-mode 'cperl-mode)
@@ -406,7 +407,6 @@
 ;;					:foreground "ffffff"))
 
 (req-package leuven-theme
-  :disabled t
   :if window-system
   :config (progn
 	    (add-hook 'after-init-hook
@@ -735,6 +735,7 @@
 (req-package-finish)
 
 (use-package spacemacs-light-theme
+  :disabled t
   :load-path "/home/juiko/git/spacemacs-theme"
   :config (progn
 	    (load-theme 'spacemacs-light t)))
