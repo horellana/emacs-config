@@ -217,7 +217,6 @@
   :config (add-hook 'company-mode-hook 'company-quickhelp-mode))
 
 (req-package flycheck
-
   :config (progn
 	    (setf flycheck-perlcritic-severity 5)
 	    (setf flycheck-ghc-args (list
@@ -240,6 +239,8 @@
 	     '(flycheck-warning ((t (:underline "DarkOrange"))))
 	     )
 
+	    (flycheck-disable-checker 'ruby-rubylint)
+
 	    (global-flycheck-mode)))
 
 (req-package flycheck-pos-tip
@@ -253,7 +254,6 @@
   '(haskell-mode))
 
 (req-package smartparens
-
   :config (progn
 	    (sp-local-pair '(emacs-lisp-mode
 			     lisp-mode
@@ -317,7 +317,9 @@
 				   slime-macroexpansion-minor-mode-hook
 				   geiser-repl-mode
 				   cider-repl-mode
-				   inferior-python-mode)
+				   inferior-python-mode
+				   intero-repl-mode
+				   inf-ruby-mode)
 		     do (evil-set-initial-state mode 'emacs))
 
 
@@ -396,18 +398,19 @@
   )
 
 
-;; (req-package material-theme)
+(req-package material-theme
+  :disabled t
+  :config (progn
+	    (load-theme 'material-light t)
+	    (set-face-attribute 'fringe
+				nil
+				:background "ffffff"
+				:foreground "ffffff")))
 
-
-;; (progn
-;;   (load-theme 'wombat t)
-;;   (set-face-attribute 'fringe
-;;					nil
-;;					:background "ffffff"
-;;					:foreground "ffffff"))
 
 (req-package leuven-theme
   :if window-system
+  :disabled t
   :config (progn
 	    (add-hook 'after-init-hook
 		      (lambda ()
@@ -469,36 +472,32 @@
 
 (req-package haskell-mode
   :config (progn
-	    (define-key haskell-mode-map (kbd "C-c C-l") 'haskell-process-load-file)
 	    (add-hook 'haskell-mode-hook 'haskell-doc-mode)
 	    (add-hook 'haskell-mode-hook 'haskell-indentation-mode)
-	    (add-hook 'haskell-mode-hook 'interactive-haskell-mode)
+	    ;; (add-hook 'haskell-mode-hook 'interactive-haskell-mode)
 	    (add-hook 'haskell-mode-hook 'haskell-decl-scan-mode)
 	    (add-hook 'haskell-mode-hook (lambda ()
 					   (electric-indent-local-mode -1)))
 
 	    (setf haskell-process-type 'stack-ghci)
 	    (setf haskell-process-path-ghci "stack")
-	    (setf haskell-process-args-ghci '("ghci"))
+	    (setf haskell-process-args-ghci '("ghci "))
 
 	    (setf haskell-process-suggest-remove-import-lines t)
 	    (setf haskell-process-auto-import-loaded-modules t)
 	    (setf haskell-process-log nil)
-	    (setf haskell-stylish-on-save t)))
+	    (setf haskell-stylish-on-save t))
+  )
 
 (req-package intero
-  :require haskell-mode flycheck
+  :require haskell-mode
   :config (progn
-	    (flycheck-add-next-checker 'intero '(warning . haskell-hlint))
-
 	    (add-hook 'haskell-mode-hook 'intero-mode)
 	    (add-hook 'intero-mode-hook
 		      (lambda ()
 			(progn
 			  (make-variable-buffer-local 'company-backends)
-			  (setq-local company-backends '(company-intero)
-				      ;; '((company-intero
-				      ;;	 company-dabbrev-code))
+			  (setq-local company-backends '((company-intero company-dabbrev-code))
 				      ))
 			))))
 
@@ -533,20 +532,6 @@
 	    (bind-key "C-c h r" 'hlint-refactor-refactor-at-point hlint-refactor-mode-map)
 
 	    (add-hook 'haskell-mode-hook 'hlint-refactor-mode)))
-
-(req-package ghc-mod
-  :disabled t
-  :require haskell-mode
-  :init (progn
-	  (autoload 'ghc-init "ghc" nil t)
-	  (autoload 'ghc-debug "ghc" nil t)
-	  (add-hook 'haskell-mode-hook (lambda () (ghc-init)))))
-
-(req-package company-ghc
-  :disabled t
-  :require haskell-mode ghc-mod company
-  :config (progn
-	    (add-to-list 'company-backends 'company-ghc)))
 
 (req-package anaconda-mode
   :config (progn
@@ -676,10 +661,8 @@
 	    (add-hook 'robe-mode-hook
 		      (lambda ()
 			(make-variable-buffer-local 'company-backends)
-			(setq-local company-backends '((company-robe
-							company-gtags
-							company-dabbrev
-							company-dabbrev-code)))))
+			(setq-local company-backends '(company-robe
+							company-dabbrev-code))))
 	    (add-hook 'robe-mode-hook 'eldoc-mode)))
 
 (req-package rbenv
@@ -735,17 +718,9 @@
 (req-package-finish)
 
 (use-package spacemacs-light-theme
-  :disabled t
-  :load-path "/home/juiko/git/spacemacs-theme"
-  :config (progn
-	    (load-theme 'spacemacs-light t)))
+  :load-path "/home/juiko/git/spacemacs-theme")
 
 
-(use-package tao-yang-theme
-  :disabled t
-  :load-path "tao-theme-emacs"
-  :config (progn
-	    (load-theme 'tao-yang t)))
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -753,7 +728,7 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (meghanada minitest yaml-mode web-mode tide slime-company robe req-package rbenv racer projectile-rails php-mode php-eldoc leuven-theme js2-mode irony-eldoc intero iedit hlint-refactor hindent helm-swoop helm-projectile helm-gtags helm-ag go-eldoc go-complete flycheck-rust flycheck-pos-tip flycheck-irony flycheck-haskell flycheck-elm evil-smartparens evil-magit evil-lisp-state evil-leader evil-god-state evil-commentary elpy elm-mode dumb-jump company-quickhelp company-irony company-go company-ghci company-ghc company-anaconda color-theme-approximate cider))))
+    (material-theme geiser fuel meghanada minitest yaml-mode web-mode tide slime-company robe req-package rbenv racer projectile-rails php-mode php-eldoc leuven-theme js2-mode irony-eldoc intero iedit hlint-refactor hindent helm-swoop helm-projectile helm-gtags helm-ag go-eldoc go-complete flycheck-rust flycheck-pos-tip flycheck-irony flycheck-haskell flycheck-elm evil-smartparens evil-magit evil-lisp-state evil-leader evil-god-state evil-commentary elpy elm-mode dumb-jump company-quickhelp company-irony company-go company-ghci company-ghc company-anaconda color-theme-approximate cider))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
