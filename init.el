@@ -720,6 +720,9 @@
 
 (req-package-finish)
 
+;;; Windows shut the fuck up,mgs
+(setq ring-bell-function 'ignore)
+
 (use-package spacemacs-dark-theme
 	:disabled t
 	:load-path "/home/juiko/git/spacemacs-theme")
