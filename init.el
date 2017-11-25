@@ -303,7 +303,6 @@
             (global-evil-leader-mode)))
 
 (req-package evil-magit
-  :defer t
   :require evil magit
   )
 
