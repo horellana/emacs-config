@@ -1,8 +1,7 @@
 ;; -*- lexical-binding: t -*-
 
-(setf lexical-binding t)
-
-(setf package-menu-async nil)
+(setq lexical-binding t)
+(setq package-menu-async nil)
 
 (eval-when-compile
   (require 'cl))
@@ -81,13 +80,13 @@
                            (linum-mode -1))))))
 
 (req-package iedit
-  :defer t
+
   :require bind-key
   :config (progn
             (bind-key (kbd "C-%") 'iedit-mode)))
 
 (req-package erc
-  :defer t
+
   :commands (erc)
   :config (progn
             (setf erc-autojoin-channels-alist
@@ -583,18 +582,17 @@
 
 
 (req-package projectile-rails
-  :defer t
   :require projectile
   :config (progn
             (add-hook 'projectile-mode-hook 'projectile-rails-on)))
 
 (req-package minitest
-  :defer t
+
   :config (progn
             (add-hook 'ruby-mode-hook 'minitest-mode)))
 
 (req-package cider
-  :defer t
+
   :config (progn
             (add-hook 'clojure-mode-hook 'cider-mode)))
 
@@ -603,18 +601,18 @@
   )
 
 (req-package tide
-  :defer t
+
   :config (progn
             (add-hook 'typescript-mode-hook  'tide-setup)
             ))
 
 (req-package dumb-jump
-  :defer t
+
   :config (progn
             (dumb-jump-mode)))
 
 (req-package go-mode
-  :defer t
+
   :config (progn
             (add-hook 'before-save-hook #'gofmt-before-save)))
 
@@ -632,10 +630,15 @@
                         (setq-local company-backends '(company-go))))))
 
 (req-package counsel-etags
-  :defer t
+
   :requires evil
   :config (progn
             (evil-define-key 'evil-emacs-state prog-mode-map (kbd"M-.") #'counsel-etags-find-tag-at-point)))
+
+(req-package smart-mode-line
+  :config (progn
+            (setq sml/theme 'light)
+            (sml/setup)))
 
 (req-package-finish)
 
@@ -706,13 +709,6 @@
         ruby-mode
         ))
 
-;; (add-hook 'after-save-hook
-;;		(lambda ()
-;;			(if (cl-member major-mode *gtags-modes*)
-;;		(async-gtags (projectile-project-root)))))
-
-(add-hook 'after-save-hook 'whitespace-cleanup)
-
 (defun endless/upgrade ()
   "Upgrade all packages, no questions asked."
   (interactive)
@@ -723,16 +719,15 @@
 
 (add-hook 'prog-mode-hook 'eldoc-mode)
 
-(setf inhibit-startup-message t)
+(setq-default inhibit-startup-message t)
 (fset 'yes-or-no-p 'y-or-n-p)
 
-(setf backup-by-copying t      ; don't clobber symlinks
-      backup-directory-alist
-      '(("." . "~/.emacs.d/saves"))    ; don't litter my fs tree
-      delete-old-versions t
-      kept-new-versions 6
-      kept-old-versions 2
-      version-control t)
+(setq-default backup-by-copying t      ; don't clobber symlinks
+              backup-directory-alist '(("." . "~/.emacs.d/saves"))    ; don't litter my fs tree
+              delete-old-versions t
+              kept-new-versions 6
+              kept-old-versions 2
+              version-control t)
 
 (add-hook 'after-save-hook
           (lambda ()
@@ -747,9 +742,9 @@
 
 (progn
   (defalias 'perl-mode 'cperl-mode)
-  (setf cperl-electric-parens nil
-        cperl-electric-keywords nil
-        cperl-electric-lbrace-space nil))
+  (setq-default cperl-electric-parens nil
+                cperl-electric-keywords nil
+                cperl-electric-lbrace-space nil))
 
 (setf backup-directory-alist
       '((".*" . "/home/juiko/.emacs.d/cache/"))
@@ -758,24 +753,29 @@
       auto-save-list-file-prefix
       "/home/juiko/.emacs.d/cache/")
 
-(juiko/look-config)
 
-(setf tab-width 2)
-(setf tramp-default-method "ssh")
+(setq-default tab-width 2)
+(setq-default tramp-default-method "ssh")
 (setq-default indent-tabs-mode nil)
 
+(juiko/look-config)
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(custom-safe-themes
+   (quote
+    ("a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" "c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" default)))
  '(package-selected-packages
    (quote
-    (pyenv-mode spacemacs-theme counsel-etags abyss-theme afternoon-theme ahungry-theme airline-themes alect-themes ample-theme ample-zen-theme anti-zenburn-theme apropospriate-theme arjen-grey-theme atom-dark-theme atom-one-dark-theme autothemer autumn-light-theme avk-emacs-themes badger-theme badwolf-theme base16-theme basic-theme birds-of-paradise-plus-theme blackboard-theme bliss-theme borland-blue-theme boron-theme bubbleberry-theme busybee-theme yaml-mode web-mode tide slime-company rtags robe req-package rbenv racer projectile-rails php-mode php-eldoc minitest material-theme leuven-theme js2-mode irony-eldoc intero iedit hlint-refactor hindent helm-swoop helm-projectile helm-gtags helm-ag go-eldoc flycheck-rust flycheck-pos-tip flycheck-irony flycheck-haskell flycheck-elm evil-smartparens evil-magit evil-lisp-state evil-leader evil-god-state evil-commentary elpy elm-mode dumb-jump company-quickhelp company-irony company-go company-ghci company-anaconda color-theme-approximate cider))))
+    (smart-mode-line pyenv-mode spacemacs-theme counsel-etags abyss-theme afternoon-theme ahungry-theme airline-themes alect-themes ample-theme ample-zen-theme anti-zenburn-theme apropospriate-theme arjen-grey-theme atom-dark-theme atom-one-dark-theme autothemer autumn-light-theme avk-emacs-themes badger-theme badwolf-theme base16-theme basic-theme birds-of-paradise-plus-theme blackboard-theme bliss-theme borland-blue-theme boron-theme bubbleberry-theme busybee-theme yaml-mode web-mode tide slime-company rtags robe req-package rbenv racer projectile-rails php-mode php-eldoc minitest material-theme leuven-theme js2-mode irony-eldoc intero iedit hlint-refactor hindent helm-swoop helm-projectile helm-gtags helm-ag go-eldoc flycheck-rust flycheck-pos-tip flycheck-irony flycheck-haskell flycheck-elm evil-smartparens evil-magit evil-lisp-state evil-leader evil-god-state evil-commentary elpy elm-mode dumb-jump company-quickhelp company-irony company-go company-ghci company-anaconda color-theme-approximate cider))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(flycheck-error ((t (:underline "Red1"))))
+ '(flycheck-info ((t (:underline "ForestGreen"))))
+ '(flycheck-warning ((t (:underline "DarkOrange")))))
