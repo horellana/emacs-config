@@ -1,0 +1,5 @@
+elpa/*
+cache/*
+anaconda-mode/*
+*.elc
+projectile-bookmarks*
