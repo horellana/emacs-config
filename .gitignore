@@ -1,5 +1,8 @@
+projectile-bookmarks*
+plugins/
+anaconda-mode/*
 elpa/*
 cache/*
-anaconda-mode/*
+eshell/*
 *.elc
-projectile-bookmarks*
+*.eld

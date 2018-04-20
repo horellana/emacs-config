@@ -1,5 +1,6 @@
 ;; -*- lexical-binding: t -*-
 
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -16,6 +17,7 @@
 
 (eval-when-compile
   (require 'cl))
+
 
 (require 'package)
 ;; (package-initialize)
@@ -70,6 +72,7 @@
                          (lambda ()
                            (let* ((root (projectile-project-root))
                                   (env (juiko/python-find-env root)))
+
                              (when (and env
                                         (not (equal env *python-current-env*)))
                                (progn
@@ -108,6 +111,7 @@
   )
 
 (req-package bind-key
+
   :config (eval-after-load "bind-key"
             '(progn
                (bind-key (kbd "M--") 'hippie-expand)
@@ -129,6 +133,7 @@
 (req-package erc
 
   :commands (erc)
+
   :config (eval-after-load "erc"
             '(progn
                (setf erc-autojoin-channels-alist
@@ -160,6 +165,7 @@
   :config (add-hook 'company-mode-hook 'company-quickhelp-mode))
 
 (req-package flycheck
+
   :config (eval-after-load "flycheck"
             '(progn
                (global-flycheck-mode)
@@ -193,6 +199,7 @@
   :disabled t
   :if window-system
   :require flycheck
+
   :config (eval-after-load "flycheck-pos-tip"
             '(progn
                (setq flycheck-display-errors-function
@@ -202,6 +209,7 @@
   '(haskell-mode))
 
 (req-package smartparens
+
   :config (eval-after-load "smartparens"
             '(progn
                (sp-local-pair '(emacs-lisp-mode
@@ -237,6 +245,7 @@
                     (lambda ()
                       (unless (slime-connected-p)
                         (save-excursion (slime))))))
+
   :config (eval-after-load "slime"
             '(progn
                (slime-setup '(slime-fancy slime-company))
@@ -288,6 +297,7 @@
   :init (progn
           (setf evil-lisp-state-global t)
           (setf evil-lisp-state-enter-lisp-state-on-command nil))
+
   :config (eval-after-load "evil-lisp-state"
             '(progn
                (bind-key "L" 'evil-lisp-state evil-normal-state-map)
@@ -362,6 +372,7 @@
 (req-package material-theme
   :if window-system
   :disabled t
+
   :config (eval-after-load "material-theme"
             '(progn
                (load-theme 'material-light t)
@@ -376,6 +387,7 @@
 (req-package leuven-theme
   :disabled t
   :if window-system
+
   :config (eval-after-load "leuven-theme"
             '(progn
                (add-hook 'after-init-hook
@@ -438,6 +450,7 @@
           (setf magit-last-seen-setup-instructions "1.4.0")))
 
 (req-package haskell-mode
+
   :config (eval-after-load "haskell-mode"
             '(progn
                (add-hook 'haskell-mode-hook 'haskell-doc-mode)
@@ -459,6 +472,7 @@
 
 (req-package intero
   :require haskell-mode
+
   :config (eval-after-load "intero"
             '(progn
                (add-hook 'haskell-mode-hook 'intero-mode)
@@ -480,6 +494,7 @@
 (req-package flycheck-haskell
   :require flycheck haskell-mode
   :disabled t
+
   :config (eval-after-load "flycheck-haskell"
             '(progn
                (add-hook 'haskell-mode-hook 'flycheck-mode)
@@ -488,6 +503,7 @@
 (req-package company-ghci
   :disabled t
   :require company haskell-mode
+
   :config (eval-after-load "company-ghci"
             '(progn
                (add-hook 'haskell-mode-hook
@@ -542,6 +558,7 @@
 
 
 (req-package web-mode
+
 
   :config (eval-after-load "web-mode"
             '(progn
@@ -610,6 +627,7 @@
 
 (req-package racer
   :require rust-mode company
+
   :config (eval-after-load "racer"
             '(progn
                ;; (setf racer-cmd "/home/juiko/git/racer/target/release/racer")
@@ -641,6 +659,7 @@
 
 (req-package flycheck-elm
   :require elm-mode flycheck
+
   :config (eval-after-load "flycheck-elm"
             '(progn
                (add-hook 'flycheck-mode-hook 'flycheck-elm-setup))))
@@ -674,6 +693,7 @@
 
 (req-package projectile-rails
   :require projectile
+
   :config (eval-after-load "projectile-rails"
             '(progn
                (add-hook 'projectile-mode-hook 'projectile-rails-on))))
@@ -690,16 +710,10 @@
             '(progn
                (add-hook 'clojure-mode-hook 'cider-mode))))
 
-
-(req-package yaml-mode
-  )
-
-(req-package tide
-
   :config (eval-after-load "tide"
             '(progn
                (add-hook 'typescript-mode-hook  'tide-setup)
-               )))
+               ))
 
 (req-package dumb-jump
 
@@ -778,6 +792,7 @@
   (column-number-mode 1)
   (global-hl-line-mode 1)
   (show-paren-mode)
+
   (add-to-list 'default-frame-alist '(font . "Hack-9"))
   (add-to-list 'default-frame-alist '(cursor-color . "Gray")))
 
@@ -816,6 +831,7 @@
         cperl-mode
         ruby-mode
         ))
+
 
 (add-hook 'after-save-hook
           (lambda ()
@@ -877,10 +893,11 @@
 
 (juiko/look-config)
 
+
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+
  )
- 
