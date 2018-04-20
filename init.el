@@ -751,25 +751,12 @@
 (req-package smart-mode-line
   :config (eval-after-load "smart-mode-line"
             '(progn
-               (setq sml/theme 'light)
+               (setq sml/theme 'dark)
                (sml/setup))))
-
-;; (use-package auctex
-;;   :ensure t
-;;   :config (progn
-;;             (setq Tex-auto-save t)
-;;             (setq Tex-parse-self t)
-
-;;             (eval-after-load "tex-mode"
-;;               '(progn 
-;;                  (bind-key "<f8>" 'compile latex-mode-map)))))
 
 (req-package-finish)
 
 (add-hook 'doc-view-minor-mode-hook 'auto-revert-mode)
-
-
-
 
 ;;; Windows shut the fuck up,mgs
 (setq ring-bell-function 'ignore)
