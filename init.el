@@ -111,11 +111,7 @@
             (linum-mode -1)))))))
 
 (req-package iedit
-
-  :require bind-key
-  :config (eval-after-load "iedit"
-      '(progn
-         (bind-key (kbd "C-%") 'iedit-mode))))
+  :bind (("C-%" . iedit-mode))
 
 (req-package erc
   :commands (erc)
