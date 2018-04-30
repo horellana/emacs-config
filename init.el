@@ -12,7 +12,7 @@
  '(custom-safe-themes
    '("a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" "c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" default))
  '(package-selected-packages
-   '(benchmark-init moe-theme darkokai-theme monokai-alt-theme monokai-theme auctex hy-mode yaml-mode web-mode tide smart-mode-line slime-company robe req-package rbenv racer pyvenv projectile-rails php-mode php-eldoc minitest js2-mode irony-eldoc intero iedit hlint-refactor hindent helm-swoop helm-projectile helm-gtags helm-ag go-eldoc flycheck-rust flycheck-irony flycheck-elm evil-smartparens evil-magit evil-lisp-state evil-leader evil-god-state evil-commentary elm-mode el-get dumb-jump counsel-etags company-irony company-go company-anaconda cider)))
+   '(counsel-projectile benchmark-init moe-theme darkokai-theme monokai-alt-theme monokai-theme auctex hy-mode yaml-mode web-mode tide smart-mode-line slime-company robe req-package rbenv racer pyvenv projectile-rails php-mode php-eldoc minitest js2-mode irony-eldoc intero iedit hlint-refactor hindent helm-swoop helm-projectile helm-gtags helm-ag go-eldoc flycheck-rust flycheck-irony flycheck-elm evil-smartparens evil-magit evil-lisp-state evil-leader evil-god-state evil-commentary elm-mode el-get dumb-jump counsel-etags company-irony company-go company-anaconda cider)))
 
 
 (setq lexical-binding t)
@@ -327,20 +327,19 @@
       '(progn
          (setf evil-leader/leader (kbd ","))
          (evil-leader/set-key
-     "f" 'helm-find-files
+     "f" 'counsel-find-file
      "b" 'switch-to-buffer
-     "g" 'helm-M-x
+     "g" 'counsel-M-x
      "k" 'kill-buffer
      "," 'evil-execute-in-emacs-state
      ";" 'comment-dwim
      "e" 'eval-last-sexp
      "w" 'save-buffer
      "." 'ggtags-find-tag-dwim
-     "hs" 'helm-swoop
-     "ha" 'helm-ag
-     "hi" 'helm-semantic-or-imenu
-     "hP"  'helm-projectile
-     "hpa" 'helm-projectile-ag
+     "hs" 'swiper
+     "hP"  'counsel-projectile
+     "hpa" 'counsel-projectile-ag
+     "hpg" 'counsel-projectile-grep
      "ptp" 'projectile-test-project
      "mgb" 'magit-branch
      "mgc" 'magit-checkout
@@ -361,7 +360,7 @@
          (evil-leader/set-key-for-mode 'lisp-mode "sds" 'slime-disassemble-symbol)
          (evil-leader/set-key-for-mode 'lisp-mode "sdd" 'slime-disassemble-definition)
          (evil-leader/set-key-for-mode 'cider-mode "e" 'cider-eval-last-sexp)
-         (evil-leader/set-key-for-mode 'projectile-mode (kbd "p")'helm-projectile)
+         ;; (evil-leader/set-key-for-mode 'projectile-mode (kbd "p")'helm-projectile)
          (global-evil-leader-mode))))
 
 (req-package evil-magit
@@ -403,53 +402,6 @@
   :config (eval-after-load "projectile"
       '(progn
          (add-hook 'after-init-hook 'projectile-global-mode))))
-
-(req-package helm-config
-
-  :config (eval-after-load "helm-config"
-      '(progn
-
-         (bind-key "M-x" 'helm-M-x)
-         (bind-key "C-x C-f" 'helm-find-files)
-
-         (setf helm-split-window-in-side-p t)
-
-         (add-to-list 'display-buffer-alist
-          '("\\`\\*helm.*\\*\\'"
-            (display-buffer-in-side-window)
-            (inhibit-same-window . t)
-            (window-height . 0.4)))
-
-         (setf helm-swoop-split-with-multiple-windows nil
-         helm-swoop-split-direction 'split-window-vertically
-         helm-swoop-split-window-function 'helm-default-display-buffer)
-
-         (helm-mode))))
-
-(req-package helm-projectile
-
-  :require helm projectile
-  :config (eval-after-load "helm-projectile"
-      '(progn
-         (helm-projectile-on))))
-
-
-(req-package helm-ag
-  :commands (helm-ag)
-  :require helm
-  )
-
-(req-package helm-swoop
-  :commands (helm-swoop)
-  :require helm
-  )
-
-(req-package helm-gtags
-  :commands (helm-gtags-dwim)
-  :require helm
-  :config (eval-after-load "helm-gtags"
-      '(progn
-         (add-hook 'prog-mode-hook 'helm-gtags-mode))))
 
 (req-package magit
   :commands (magit-status magit-init magit-log magit-diff)
@@ -758,6 +710,19 @@
          (setq sml/theme 'dark)
          (sml/setup))))
 
+
+(req-package ivy
+  :config (eval-after-load "ivy"
+            '(progn
+               (ivy-mode 1)
+               (counsel-mode 1))))
+
+(req-package counsel-projectile
+  :require ivy projectile
+  :config (eval-after-load "counsel-projectile"
+            '(progn
+               (counsel-projectile-mode))))
+
 (req-package-finish)
 
 
@@ -792,17 +757,19 @@
   (add-to-list 'default-frame-alist '(cursor-color . "Gray")))
 
 
-(add-hook 'inferior-python-mode-hook
-    (lambda ()
-      (python-shell-send-string "__name__ = None")))
+(eval-after-load "python-mode"
+  '(progn
+     (add-hook 'inferior-python-mode-hook
+               (lambda ()
+                 (python-shell-send-string "__name__ = None")))
 
-(add-hook 'after-save-hook
-    (lambda ()
-      (when (eq major-mode 'python-mode)
-        (let ((process (python-shell-get-process)))
-    (when process
-      (python-shell-send-file (buffer-file-name (current-buffer))
-            process))))))
+     (add-hook 'after-save-hook
+               (lambda ()
+                 (when (eq major-mode 'python-mode)
+                   (let ((process (python-shell-get-process)))
+                     (when process
+                       (python-shell-send-file (buffer-file-name (current-buffer))
+                                               process))))))))
 
 (defun gtags-exists-p (root)
   (-contains-p  (f-files root)
@@ -889,4 +856,6 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(flycheck-error ((t (:underline "Red1"))))
+ '(flycheck-info ((t (:underline "ForestGreen"))))
+ '(flycheck-warning ((t (:underline "DarkOrange")))))
