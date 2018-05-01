@@ -40,30 +40,38 @@
 (require 'req-package)
 
 
-(defun juiko/python-find-env (project-root)
-  "Find the python project env directory, inside PROJECT-ROOT."
-  (car (-intersection (mapcar (lambda (path) (f-join project-root path))
-            (list "env" ".env"))
-          (f-directories project-root))))
+(use-package benchmark-init
+  :disabled t
+  :config (eval-after-load "benchmark-init"
+            '(progn
+               (add-hook 'after-init-hook 'benchmark-init/deactivate))))
+
 
 (req-package pyvenv
   :mode "\\.py\\'"
-  :require projectile
-  :init (defvar *python-current-env* "")
-  :config (eval-after-load "pyvenv"
-      '(progn
-         (add-hook 'python-mode-hook
-       (lambda ()
-         (let* ((root (projectile-project-root))
-          (env (juiko/python-find-env root)))
+  :require projectile f
+  :init (progn
+          (defun juiko/python-find-env (project-root)
+            "Find the python project env directory, inside PROJECT-ROOT."
+            (car (-intersection (mapcar (lambda (path) (f-join project-root path))
+                                        (list "env" ".env"))
+                                (f-directories project-root))))
 
-           (when (and env
-          (not (equal env *python-current-env*)))
-             (progn
-         (setf *python-current-env* env)
-         (pyvenv-activate env)
-         (message "Current python env: %s" *python-current-env*))
-             )))))))
+          (defvar *python-current-env* ""))
+  :config (eval-after-load "pyvenv"
+            '(progn
+               (add-hook 'python-mode-hook
+                         (lambda ()
+                           (let* ((root (projectile-project-root))
+                                  (env (juiko/python-find-env root)))
+
+                             (when (and env
+                                        (not (equal env *python-current-env*)))
+                               (progn
+                                 (setf *python-current-env* env)
+                                 (pyvenv-activate env)
+                                 (message "Current python env: %s" *python-current-env*))
+                               )))))))
 
 (req-package irony
   :disabled t
@@ -111,20 +119,15 @@
             (linum-mode -1)))))))
 
 (req-package iedit
-  :bind (("C-%" . iedit-mode))
+  :bind (("C-%" . iedit-mode)))
 
 (req-package erc
-  :commands (erc)
-
-  :config (eval-after-load "erc"
-      '(progn
-         (setf erc-autojoin-channels-alist
-         '(("snoonet.org" "#syriancivilwar")
-           ;; ("freenode.net" "#emacs" "#python" "#haskell")
-           )))))
+  :defer t
+  :commands (erc erc-tls)
+  )
 
 (req-package company
-
+  :defer 5
   :config (eval-after-load "company"
       '(progn
          (setf company-minimum-prefix-length 2)
@@ -142,13 +145,13 @@
                    company-dabbrev-code)))))))))
 
 (req-package company-quickhelp
-  :disabled t
+  :disabled
   :if window-system
   :require company
   :config (add-hook 'company-mode-hook 'company-quickhelp-mode))
 
 (req-package flycheck
-
+  :defer 5
   :config (eval-after-load "flycheck"
       '(progn
          (global-flycheck-mode)
@@ -251,7 +254,7 @@
   :require bind-key
   :config (eval-after-load "evil"
       '(progn
-         (bind-key "tab" 'indent-region evil-visual-state-map)
+         (bind-key "<tab>" 'indent-region evil-visual-state-map)
          (bind-key "C-<tab>" 'indent-whole-buffer evil-normal-state-map)
          (bind-key [return] (lambda ()
             (interactive)
@@ -395,6 +398,10 @@
          )))))
 
 (req-package projectile
+  :commands (projectile-find-file-dwim
+             counsel-projectile
+             counsel-projectile-ag
+             counsel-projectile-grep)
   :config (eval-after-load "projectile"
       '(progn
          (add-hook 'after-init-hook 'projectile-global-mode))))
@@ -567,9 +574,8 @@
   )
 
 (req-package racer
-
   :require rust-mode company
-
+  :mode "\\.rs\\'"
   :config (eval-after-load "racer"
       '(progn
          ;; (setf racer-cmd "/home/juiko/git/racer/target/release/racer")
@@ -591,7 +597,7 @@
          )))))
 
 (req-package flycheck-rust
-
+  :mode "\\.rs\\'"
   :require rust-mode flycheck
   :config (eval-after-load "flycheck-rust"
       '(progn
@@ -602,7 +608,7 @@
   )
 
 (req-package flycheck-elm
-
+  :mode "\\.elm\\'"
   :require elm-mode flycheck
 
   :config (eval-after-load "flycheck-elm"
@@ -695,7 +701,7 @@
 
 (req-package counsel-etags
   :commands (counsel-etags-find-tag-at-point)
-  :requires evil
+  :requires evil ivy
   :config (eval-after-load "counsel-etags"
       '(progn
          (evil-define-key 'evil-emacs-state prog-mode-map (kbd "M-.") #'counsel-etags-find-tag-at-point))))
@@ -708,13 +714,17 @@
 
 
 (req-package ivy
+  :defer 5
+  :commands (counsel-M-x counsel-find-file counsel-describe-function)
   :config (eval-after-load "ivy"
             '(progn
                (ivy-mode 1)
                (counsel-mode 1))))
 
 (req-package counsel-projectile
+  :defer 5
   :require ivy projectile
+  :commands (counsel-projectile counsel-projectile-ag counsel-projectile-grep)
   :config (eval-after-load "counsel-projectile"
             '(progn
                (counsel-projectile-mode))))
