@@ -445,15 +445,15 @@
   :requires evil magit
   )
 
-(req-package projectile
-  :commands (projectile-find-file-dwim
-             counsel-projectile
-             counsel-projectile-ag
-             counsel-projectile-grep
-             counsel-projectile-switch-project)
+;; (req-package projectile
+;;   :commands (projectile-find-file-dwim
+;;              counsel-projectile
+;;              counsel-projectile-ag
+;;              counsel-projectile-grep
+;;              counsel-projectile-switch-project)
 
-  :config (projectile-global-mode)
-  )
+;;   :config (projectile-global-mode)
+;;   )
 
 (req-package magit
   :commands (magit-status magit-init magit-log magit-diff)
@@ -709,13 +709,16 @@
 
 (req-package ivy
   :commands (counsel-M-x counsel-find-file counsel-describe-function ivy-switch-buffer)
-  :config (eval-after-load "ivy"
-            '(progn
+  :bind (("M-x" . counsel-M-x)
+         ("C-x C-f" . counsel-find-file)
+         ("C-h f" . counsel-describe-function)
+         ("C-x b" . ivy-switch-buffer))
+  :config (progn
                (ivy-mode 1)
-               (counsel-mode 1))))
+               (counsel-mode 1))
+)
 
 (req-package counsel-projectile
-  ;; :requires (ivy counsel projectile)
   :commands (counsel-projectile counsel-projectile-ag counsel-projectile-grep)
   :bind (("C-c p p" . counsel-projectile-switch-project))
   :config (progn
