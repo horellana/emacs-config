@@ -16,7 +16,7 @@
  '(custom-safe-themes
    '("a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" default))
  '(package-selected-packages
-   '(yaml-mode web-mode tide tao-theme smart-mode-line slime-company robe req-package rbenv racer pyvenv projectile-rails php-mode php-eldoc minitest js2-mode irony-eldoc intero iedit hlint-refactor hindent go-eldoc ggtags flycheck-rust flycheck-irony flycheck-elm evil-smartparens evil-magit evil-lisp-state evil-leader evil-god-state evil-commentary elm-mode el-get dumb-jump counsel-projectile counsel-etags company-irony company-go company-anaconda color-theme-approximate cider benchmark-init)))
+   '(org-plus-contrib yaml-mode web-mode tide tao-theme smart-mode-line slime-company robe req-package rbenv racer pyvenv projectile-rails php-mode php-eldoc minitest js2-mode irony-eldoc intero iedit hlint-refactor hindent go-eldoc ggtags flycheck-rust flycheck-irony flycheck-elm evil-smartparens evil-magit evil-lisp-state evil-leader evil-god-state evil-commentary elm-mode el-get dumb-jump counsel-projectile counsel-etags company-irony company-go company-anaconda color-theme-approximate cider benchmark-init)))
 
 
 (setq lexical-binding t)
@@ -32,7 +32,8 @@
 (progn
   (setq package-archives
         '(("melpa" . "https://melpa.org/packages/")
-          ("gnu" . "https://elpa.gnu.org/packages/"))))
+          ("gnu" . "https://elpa.gnu.org/packages/")
+          ("org" . "https://orgmode.org/elpa/"))))
 (when (or (not (package-installed-p 'use-package))
           (not (package-installed-p 'req-package)))
   (package-refresh-contents)
@@ -44,7 +45,6 @@
 (require 'req-package)
 
 (use-package benchmark-init
-  :disabled t
   :config (add-hook 'after-init-hook 'benchmark-init/deactivate))
 
 (use-package tao-theme
@@ -196,6 +196,36 @@
                                  (message "Current python env: %s" *python-current-env*))
                                )))))))
 
+(req-package flycheck
+  :config (progn
+               (global-flycheck-mode)
+
+               (setq flycheck-perlcritic-severity 5)
+               (setq flycheck-ghc-args (list
+                                        "-fwarn-tabs"
+                                        "-fwarn-type-defaults"
+                                        "-fwarn-unused-do-bind"
+                                        "-fwarn-incomplete-uni-patterns"
+                                        "-fwarn-incomplete-patterns"
+                                        "-fwarn-incomplete-record-updates"
+                                        "-fwarn-monomorphism-restriction"
+                                        "-fwarn-auto-orphans"
+                                        "-fwarn-implicit-prelude"
+                                        "-fwarn-missing-exported-sigs"
+                                        "-fwarn-identities"
+                                        "-Wall"))
+
+               (custom-set-faces
+                '(flycheck-error ((t (:underline "Red1"))))
+                '(flycheck-info ((t (:underline "ForestGreen"))))
+                '(flycheck-warning ((t (:underline "DarkOrange"))))
+                )
+
+               (setq-default flycheck-disabled-checkers
+                             '(ruby-rubylint))
+               )
+  )
+
 (req-package company-irony
   :requires irony
   :config (eval-after-load "company-irony"
@@ -253,36 +283,7 @@
                                                              company-dabbrev
                                                              company-dabbrev-code)))))))))
 
-(req-package flycheck
-  :config (progn
-               (global-flycheck-mode)
 
-               (setq flycheck-perlcritic-severity 5)
-               (setq flycheck-ghc-args (list
-                                        "-fwarn-tabs"
-                                        "-fwarn-type-defaults"
-                                        "-fwarn-unused-do-bind"
-                                        "-fwarn-incomplete-uni-patterns"
-                                        "-fwarn-incomplete-patterns"
-                                        "-fwarn-incomplete-record-updates"
-                                        "-fwarn-monomorphism-restriction"
-                                        "-fwarn-auto-orphans"
-                                        "-fwarn-implicit-prelude"
-                                        "-fwarn-missing-exported-sigs"
-                                        "-fwarn-identities"
-                                        "-Wall"))
-
-               (custom-set-faces
-                '(flycheck-error ((t (:underline "Red1"))))
-                '(flycheck-info ((t (:underline "ForestGreen"))))
-                '(flycheck-warning ((t (:underline "DarkOrange"))))
-                )
-
-               ;; (add-hook 'ruby-mode-hook
-               ;;           (flycheck-disable-checker 'ruby-rubylint nil))
-               ;; )
-  )
-)
 (defvar *no-smartparens-list*
   '(haskell-mode))
 
@@ -448,7 +449,9 @@
   :commands (projectile-find-file-dwim
              counsel-projectile
              counsel-projectile-ag
-             counsel-projectile-grep)
+             counsel-projectile-grep
+             counsel-projectile-switch-project)
+
   :config (projectile-global-mode)
   )
 
@@ -704,9 +707,7 @@
                (setq sml/theme 'light)
                (sml/setup))))
 
-
 (req-package ivy
-  :defer 5
   :commands (counsel-M-x counsel-find-file counsel-describe-function ivy-switch-buffer)
   :config (eval-after-load "ivy"
             '(progn
@@ -714,17 +715,19 @@
                (counsel-mode 1))))
 
 (req-package counsel-projectile
-  :defer 5
-  :requires (ivy projectile)
+  ;; :requires (ivy counsel projectile)
   :commands (counsel-projectile counsel-projectile-ag counsel-projectile-grep)
-  :config (eval-after-load "counsel-projectile"
-            '(progn
-               (counsel-projectile-mode))))
+  :bind (("C-c p p" . counsel-projectile-switch-project))
+  :config (progn
+               (counsel-projectile-mode)))
 
 (req-package ggtags
   :defer t)
 
 (req-package yaml-mode
   :mode ("\\.yml\\'" "\\.yaml\\'"))
+
+(req-package org-plus-contrib
+  :mode ("\\.org\\'"))
 
 (req-package-finish)
