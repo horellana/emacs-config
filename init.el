@@ -14,7 +14,9 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
-   '("a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" default)))
+   '("a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" default))
+ '(package-selected-packages
+   '(yaml-mode web-mode tide tao-theme smart-mode-line slime-company robe req-package rbenv racer pyvenv projectile-rails php-mode php-eldoc minitest js2-mode irony-eldoc intero iedit hlint-refactor hindent go-eldoc ggtags flycheck-rust flycheck-irony flycheck-elm evil-smartparens evil-magit evil-lisp-state evil-leader evil-god-state evil-commentary elm-mode el-get dumb-jump counsel-projectile counsel-etags company-irony company-go company-anaconda color-theme-approximate cider benchmark-init)))
 
 
 (setq lexical-binding t)
@@ -252,9 +254,7 @@
                                                              company-dabbrev-code)))))))))
 
 (req-package flycheck
-  :defer 5
-  :config (eval-after-load "flycheck"
-            '(progn
+  :config (progn
                (global-flycheck-mode)
 
                (setq flycheck-perlcritic-severity 5)
@@ -278,10 +278,11 @@
                 '(flycheck-warning ((t (:underline "DarkOrange"))))
                 )
 
-               (add-hook 'ruby-mode-hook
-                         (flycheck-disable-checker 'ruby-rubylint nil))
-               )))
-
+               ;; (add-hook 'ruby-mode-hook
+               ;;           (flycheck-disable-checker 'ruby-rubylint nil))
+               ;; )
+  )
+)
 (defvar *no-smartparens-list*
   '(haskell-mode))
 
@@ -440,7 +441,7 @@
                (global-evil-leader-mode))))
 
 (req-package evil-magit
-  :requires (evil magit)
+  :requires evil magit
   )
 
 (req-package projectile
@@ -518,7 +519,7 @@
 
 
 (req-package web-mode
-  :mode "\\.html\\'"
+  :hook (html-mode . web-mode)
   :config (eval-after-load "web-mode"
             '(progn
                (add-hook 'web-mode-hook #'turn-off-smartparens-mode)
@@ -545,6 +546,7 @@
                                    "\\.mustache\\'"
                                    "\\.djhtml\\'"
                                    "\\.html\\'"
+                                   "\\.html\\.erb\\'"
                                    "\\html\\.twig\\'"
                                    "\\html\\.jinja\\'"
                                    "\\pdf\\.twig\\'")
