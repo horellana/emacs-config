@@ -13,10 +13,39 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(ansi-color-faces-vector
+   [default bold shadow italic underline bold bold-italic bold])
+ '(ansi-color-names-vector
+   (vector "#373b41" "#cc6666" "#b5bd68" "#f0c674" "#81a2be" "#b294bb" "#8abeb7" "#c5c8c6"))
+ '(beacon-color "#cc6666")
  '(custom-safe-themes
-   '("a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" default))
+   '("e11569fd7e31321a33358ee4b232c2d3cf05caccd90f896e1df6cab228191109" "0e0c37ee89f0213ce31205e9ae8bce1f93c9bcd81b1bcda0233061bb02c357a8" "444238426b59b360fb74f46b521933f126778777c68c67841c31e0a68b0cc920" "086970da368bb95e42fd4ddac3149e84ce5f165e90dfc6ce6baceae30cf581ef" "1b8d67b43ff1723960eb5e0cba512a2c7a2ad544ddb2533a90101fd1852b426e" "c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" "82d2cac368ccdec2fcc7573f24c3f79654b78bf133096f9b40c20d97ec1d8016" "06f0b439b62164c6f8f84fdda32b62fb50b6d00e8b01c2208e55543a6337433a" "628278136f88aa1a151bb2d6c8a86bf2b7631fbea5f0f76cba2a0079cd910f7d" "bb08c73af94ee74453c90422485b29e5643b73b05e8de029a6909af6a3fb3f58" "a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" default))
+ '(fci-rule-color "#373b41")
+ '(flycheck-color-mode-line-face-to-color 'mode-line-buffer-id)
+ '(frame-background-mode 'dark)
  '(package-selected-packages
-   '(htmlize ox-twbs yasnippet-snippets yasnippet org-plus-contrib yaml-mode web-mode tide tao-theme smart-mode-line slime-company robe req-package rbenv racer pyvenv projectile-rails php-mode php-eldoc minitest js2-mode irony-eldoc intero iedit hlint-refactor hindent go-eldoc ggtags flycheck-rust flycheck-irony flycheck-elm evil-smartparens evil-magit evil-lisp-state evil-leader evil-god-state evil-commentary elm-mode el-get dumb-jump counsel-projectile counsel-etags company-irony company-go company-anaconda color-theme-approximate cider benchmark-init)))
+   '(zenburn-theme color-theme-sanityinc-tomorrow paradox htmlize ox-twbs yasnippet-snippets yasnippet org-plus-contrib yaml-mode web-mode tide tao-theme smart-mode-line slime-company robe req-package rbenv racer pyvenv projectile-rails php-mode php-eldoc minitest js2-mode irony-eldoc intero iedit hlint-refactor hindent go-eldoc ggtags flycheck-rust flycheck-irony flycheck-elm evil-smartparens evil-magit evil-lisp-state evil-leader evil-god-state evil-commentary elm-mode el-get dumb-jump counsel-projectile counsel-etags company-irony company-go company-anaconda color-theme-approximate cider benchmark-init))
+ '(vc-annotate-background nil)
+ '(vc-annotate-color-map
+   '((20 . "#cc6666")
+     (40 . "#de935f")
+     (60 . "#f0c674")
+     (80 . "#b5bd68")
+     (100 . "#8abeb7")
+     (120 . "#81a2be")
+     (140 . "#b294bb")
+     (160 . "#cc6666")
+     (180 . "#de935f")
+     (200 . "#f0c674")
+     (220 . "#b5bd68")
+     (240 . "#8abeb7")
+     (260 . "#81a2be")
+     (280 . "#b294bb")
+     (300 . "#cc6666")
+     (320 . "#de935f")
+     (340 . "#f0c674")
+     (360 . "#b5bd68")))
+ '(vc-annotate-very-old-color nil))
 
 
 (setq lexical-binding t)
@@ -47,30 +76,7 @@
 (use-package benchmark-init
   :config (add-hook 'after-init-hook 'benchmark-init/deactivate))
 
-(use-package tao-theme
-  :config (progn
-            (load-theme 'tao-yang t)))
-
-(add-hook 'ruby-mode-hook 'eldoc-mode)
-
-(add-hook 'before-save-hook 'whitespace-cleanup)
-
-(add-hook 'doc-view-minor-mode-hook 'auto-revert-mode)
-
-
-(setq browse-url-generic-program "firefox")
-(setq browse-url-browser-function 'browse-url-firefox)
-
-;;; Windows shut the fuck up,mgs
-(setq ring-bell-function 'ignore)
-
-(defun windows-subsystem-linux-p ()
-  "Return t if running in WSL."
-  (not
-   (null (string-match-p "Microsoft"
-                         (shell-command-to-string "uname -a")))))
-
-(defun juiko/look-config ()
+(progn
   (blink-cursor-mode -1)
   (menu-bar-mode -1)
   (tool-bar-mode -1)
@@ -78,108 +84,19 @@
   (column-number-mode 1)
   (global-hl-line-mode 1)
   (show-paren-mode)
-
-  (add-to-list 'default-frame-alist '(font . "Hack-9"))
   (add-to-list 'default-frame-alist '(cursor-color . "Gray")))
 
 
-(eval-after-load "python"
-  '(progn
-     (add-hook 'inferior-python-mode-hook
-               (lambda ()
-                 (python-shell-send-string "__name__ = None")))
+    (set-frame-font "Inconsolata-11" nil t)
 
-     (add-hook 'after-save-hook
-               (lambda ()
-                 (when (eq major-mode 'python-mode)
-                   (let ((process (python-shell-get-process)))
-                     (when process
-                       (python-shell-send-file (buffer-file-name (current-buffer))
-                                               process))))))))
+(use-package tao-theme
+  :disabled t
+  :config (progn
+            (load-theme 'tao-yang t)))
 
-(eval-after-load "projectile"
-  '(eval-after-load "f"
-     '(progn
-        (defun gtags-exists-p (root)
-          (require 'f)
-          (-contains-p  (f-files root)
-                        (f-join root "GTAGS")))
-
-        (defun async-gtags-create ()
-          (call-process "gtags" nil 0 nil))
-
-        (defun async-gtags-update ()
-          (call-process "global" nil 0 nil "-u"))
-
-        (defun async-gtags (root)
-          (if (gtags-exists-p root)
-              (async-gtags-update)
-            (let ((default-directory root))
-              (async-gtags-create))))
-
-        (defvar *gtags-modes*)
-        (setf *gtags-modes*
-              '(web-mode
-                php-mode
-                cperl-mode
-                ruby-mode
-                ))
-
-
-        (add-hook 'after-save-hook
-                  (lambda ()
-                    (require 'projectile)
-                    (let ((generate-tags-p (member major-mode *gtags-modes*))
-                          (project-root (projectile-project-root)))
-
-                      (when (and generate-tags-p
-                                 project-root)
-                        (async-gtags project-root))))))))
-
-(defun endless/upgrade ()
-  "Upgrade all packages, no questions asked."
-  (interactive)
-  (save-window-excursion
-    (list-packages)
-    (package-menu-mark-upgrades)
-    (package-menu-execute 'no-query)))
-
-(add-hook 'prog-mode-hook 'eldoc-mode)
-
-(setq-default inhibit-startup-message t)
-(fset 'yes-or-no-p 'y-or-n-p)
-
-(setq-default backup-by-copying t      ; don't clobber symlinks
-              backup-directory-alist '(("." . "~/.emacs.d/saves"))    ; don't litter my fs tree
-              delete-old-versions t
-              kept-new-versions 6
-              kept-old-versions 2
-              version-control t)
-
-(add-hook 'after-save-hook
-          (lambda ()
-            (let ((init-file (expand-file-name "~/.emacs.d/init.el")))
-              (when (equal (buffer-file-name) init-file)
-                (byte-compile-file init-file)))))
-
-(progn
-  (defalias 'perl-mode 'cperl-mode)
-  (setq-default cperl-electric-parens nil
-                cperl-electric-keywords nil
-                cperl-electric-lbrace-space nil))
-
-(setq-default tab-width 2)
-(setq-default tramp-default-method "ssh")
-(setq-default indent-tabs-mode nil)
-
-(setq org-plantuml-jar-path
-                  (shell-command-to-string "which plantuml | perl -ne 'chomp; print'"))
-
-(juiko/look-config)
-
-(eval-after-load "org"
-  '(progn
-     (org-babel-do-load-languages 'org-babel-load-languages '((plantuml . t)))))
+(use-package color-theme-sanityinc-tomorrow
+  :config (progn
+            (load-theme 'sanityinc-tomorrow-night t)))
 
 (defun juiko/python-find-env (project-root)
   "Find the python project env directory, inside PROJECT-ROOT."
@@ -209,32 +126,32 @@
 
 (req-package flycheck
   :config (progn
-               (global-flycheck-mode)
+            (global-flycheck-mode)
 
-               (setq flycheck-perlcritic-severity 5)
-               (setq flycheck-ghc-args (list
-                                        "-fwarn-tabs"
-                                        "-fwarn-type-defaults"
-                                        "-fwarn-unused-do-bind"
-                                        "-fwarn-incomplete-uni-patterns"
-                                        "-fwarn-incomplete-patterns"
-                                        "-fwarn-incomplete-record-updates"
-                                        "-fwarn-monomorphism-restriction"
-                                        "-fwarn-auto-orphans"
-                                        "-fwarn-implicit-prelude"
-                                        "-fwarn-missing-exported-sigs"
-                                        "-fwarn-identities"
-                                        "-Wall"))
+            (setq flycheck-perlcritic-severity 5)
+            (setq flycheck-ghc-args (list
+                                     "-fwarn-tabs"
+                                     "-fwarn-type-defaults"
+                                     "-fwarn-unused-do-bind"
+                                     "-fwarn-incomplete-uni-patterns"
+                                     "-fwarn-incomplete-patterns"
+                                     "-fwarn-incomplete-record-updates"
+                                     "-fwarn-monomorphism-restriction"
+                                     "-fwarn-auto-orphans"
+                                     "-fwarn-implicit-prelude"
+                                     "-fwarn-missing-exported-sigs"
+                                     "-fwarn-identities"
+                                     "-Wall"))
 
-               (custom-set-faces
-                '(flycheck-error ((t (:underline "Red1"))))
-                '(flycheck-info ((t (:underline "ForestGreen"))))
-                '(flycheck-warning ((t (:underline "DarkOrange"))))
-                )
+            (custom-set-faces
+             '(flycheck-error ((t (:underline "Red1"))))
+             '(flycheck-info ((t (:underline "ForestGreen"))))
+             '(flycheck-warning ((t (:underline "DarkOrange"))))
+             )
 
-               (setq-default flycheck-disabled-checkers
-                             '(ruby-rubylint))
-               )
+            (setq-default flycheck-disabled-checkers
+                          '(ruby-rubylint))
+            )
   )
 
 (req-package company-irony
@@ -300,32 +217,32 @@
 
 (req-package smartparens
   :config (progn
-               (sp-local-pair '(emacs-lisp-mode
-                                lisp-mode
-                                slime-repl-mode)
-                              "`" nil :actions nil)
-               (sp-local-pair '(emacs-lisp-mode
-                                lisp-mode
-                                slime-repl-mode)
-                              "'" nil :actions nil)
-               (add-to-list 'sp-no-reindent-after-kill-modes 'haskell-mode)
+            (sp-local-pair '(emacs-lisp-mode
+                             lisp-mode
+                             slime-repl-mode)
+                           "`" nil :actions nil)
+            (sp-local-pair '(emacs-lisp-mode
+                             lisp-mode
+                             slime-repl-mode)
+                           "'" nil :actions nil)
+            (add-to-list 'sp-no-reindent-after-kill-modes 'haskell-mode)
 
-               (add-hook 'prog-mode-hook
-                         (lambda ()
-                           (unless (-contains? *no-smartparens-list* major-mode)
-                             (smartparens-strict-mode))))
+            (add-hook 'prog-mode-hook
+                      (lambda ()
+                        (unless (-contains? *no-smartparens-list* major-mode)
+                          (smartparens-strict-mode))))
 
-               (add-hook 'web-mode-hook
-                         (lambda () (require 'smartparens-html)))
+            (add-hook 'web-mode-hook
+                      (lambda () (require 'smartparens-html)))
 
-               (add-hook 'rust-mode-hook
-                         (lambda () (require 'smartparens-rust)))
+            (add-hook 'rust-mode-hook
+                      (lambda () (require 'smartparens-rust)))
 
-               (add-hook 'python-mode-hook
-                         (lambda () (require 'smartparens-python)))
+            (add-hook 'python-mode-hook
+                      (lambda () (require 'smartparens-python)))
 
-               (add-hook 'ruby-mode-hook
-                         (lambda () (require 'smartparens-ruby)))))
+            (add-hook 'ruby-mode-hook
+                      (lambda () (require 'smartparens-ruby)))))
 
 
 (req-package slime-company
@@ -391,7 +308,7 @@
 (req-package evil-lisp-state
   :disabled t
   ;; :bind (:map evil-normal-state-map
-              ;; ("L" . evil-lisp-state))
+  ;; ("L" . evil-lisp-state))
   :requires (evil smartparens)
   :config (progn
             (setf evil-lisp-state-global t)
@@ -456,16 +373,6 @@
 (req-package evil-magit
   :requires evil magit
   )
-
-;; (req-package projectile
-;;   :commands (projectile-find-file-dwim
-;;              counsel-projectile
-;;              counsel-projectile-ag
-;;              counsel-projectile-grep
-;;              counsel-projectile-switch-project)
-
-;;   :config (projectile-global-mode)
-;;   )
 
 (req-package magit
   :commands (magit-status magit-init magit-log magit-diff)
@@ -716,7 +623,7 @@
 (req-package smart-mode-line
   :config (eval-after-load "smart-mode-line"
             '(progn
-               (setq sml/theme 'light)
+               (setq sml/theme 'respectful)
                (sml/setup))))
 
 (req-package ivy
@@ -726,15 +633,15 @@
          ("C-h f" . counsel-describe-function)
          ("C-x b" . ivy-switch-buffer))
   :config (progn
-               (ivy-mode 1)
-               (counsel-mode 1))
-)
+            (ivy-mode 1)
+            (counsel-mode 1))
+  )
 
 (req-package counsel-projectile
   :commands (counsel-projectile counsel-projectile-ag counsel-projectile-grep)
   :bind (("C-c p p" . counsel-projectile-switch-project))
   :config (progn
-               (counsel-projectile-mode)))
+            (counsel-projectile-mode)))
 
 (req-package ggtags
   :defer t)
@@ -759,3 +666,108 @@
   )
 
 (req-package-finish)
+
+(setq-default tab-width 2)
+(setq-default tramp-default-method "ssh")
+(setq-default indent-tabs-mode nil)
+(setq-default inhibit-startup-message t)
+(setq browse-url-generic-program "firefox")
+(setq browse-url-browser-function 'browse-url-firefox)
+(setq ring-bell-function 'ignore)
+(setq org-plantuml-jar-path
+      (shell-command-to-string "which plantuml | perl -ne 'chomp; print'"))
+(setq-default backup-by-copying t      ; don't clobber symlinks
+              backup-directory-alist '(("." . "~/.emacs.d/saves"))    ; don't litter my fs tree
+              delete-old-versions t
+              kept-new-versions 6
+              kept-old-versions 2
+              version-control t)
+
+(progn
+  (defalias 'perl-mode 'cperl-mode)
+  (eval-after-load "cperl-mode"
+    '(progn
+       (setq-default cperl-electric-parens nil
+                cperl-electric-keywords nil
+                cperl-electric-lbrace-space nil))))
+
+(set-face-attribute 'fringe nil
+                      :foreground (face-foreground 'default)
+                      :background (face-background 'default))
+
+(fset 'yes-or-no-p 'y-or-n-p)
+
+(add-hook 'ruby-mode-hook 'eldoc-mode)
+(add-hook 'before-save-hook 'whitespace-cleanup)
+(add-hook 'doc-view-minor-mode-hook 'auto-revert-mode)
+(add-hook 'prog-mode-hook 'eldoc-mode)
+
+(add-hook 'after-save-hook
+          (lambda ()
+            (let ((init-file (expand-file-name "~/.emacs.d/init.el")))
+              (when (equal (buffer-file-name) init-file)
+                (byte-compile-file init-file)))))
+
+
+(defun windows-subsystem-linux-p ()
+  "Return t if running in WSL."
+  (not
+   (null (string-match-p "Microsoft"
+                         (shell-command-to-string "uname -a")))))
+
+(eval-after-load "projectile"
+  '(eval-after-load "f"
+     '(progn
+        (defun gtags-exists-p (root)
+          (require 'f)
+          (-contains-p  (f-files root)
+                        (f-join root "GTAGS")))
+
+        (defun async-gtags-create ()
+          (call-process "gtags" nil 0 nil))
+
+        (defun async-gtags-update ()
+          (call-process "global" nil 0 nil "-u"))
+
+        (defun async-gtags (root)
+          (if (gtags-exists-p root)
+              (async-gtags-update)
+            (let ((default-directory root))
+              (async-gtags-create))))
+
+        (defvar *gtags-modes*)
+        (setf *gtags-modes*
+              '(web-mode
+                php-mode
+                cperl-mode
+                ruby-mode
+                ))
+
+
+        (add-hook 'after-save-hook
+                  (lambda ()
+                    (require 'projectile)
+                    (let ((generate-tags-p (member major-mode *gtags-modes*))
+                          (project-root (projectile-project-root)))
+
+                      (when (and generate-tags-p
+                                 project-root)
+                        (async-gtags project-root))))))))
+
+(eval-after-load "python"
+  '(progn
+     (add-hook 'inferior-python-mode-hook
+               (lambda ()
+                 (python-shell-send-string "__name__ = None")))
+
+     (add-hook 'after-save-hook
+               (lambda ()
+                 (when (eq major-mode 'python-mode)
+                   (let ((process (python-shell-get-process)))
+                     (when process
+                       (python-shell-send-file (buffer-file-name (current-buffer))
+                                               process))))))))
+
+(eval-after-load "org"
+  '(progn
+     (org-babel-do-load-languages 'org-babel-load-languages '((plantuml . t)))))
