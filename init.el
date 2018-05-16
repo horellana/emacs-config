@@ -57,6 +57,10 @@
 
 (add-hook 'doc-view-minor-mode-hook 'auto-revert-mode)
 
+
+(setq browse-url-generic-program "firefox")
+(setq browse-url-browser-function 'browse-url-firefox)
+
 ;;; Windows shut the fuck up,mgs
 (setq ring-bell-function 'ignore)
 
@@ -732,5 +736,13 @@
 
 (req-package org-plus-contrib
   :mode ("\\.org\\'"))
+(req-package yasnippet
+  :hook (web-mode . yas-minor-mode)
+  :config (progn
+            (yas-reload-all)))
+
+
+(req-package yasnippet-snippets
+  :requires (yasnippet))
 
 (req-package-finish)
