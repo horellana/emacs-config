@@ -16,7 +16,7 @@
  '(custom-safe-themes
    '("a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" default))
  '(package-selected-packages
-   '(org-plus-contrib yaml-mode web-mode tide tao-theme smart-mode-line slime-company robe req-package rbenv racer pyvenv projectile-rails php-mode php-eldoc minitest js2-mode irony-eldoc intero iedit hlint-refactor hindent go-eldoc ggtags flycheck-rust flycheck-irony flycheck-elm evil-smartparens evil-magit evil-lisp-state evil-leader evil-god-state evil-commentary elm-mode el-get dumb-jump counsel-projectile counsel-etags company-irony company-go company-anaconda color-theme-approximate cider benchmark-init)))
+   '(htmlize ox-twbs yasnippet-snippets yasnippet org-plus-contrib yaml-mode web-mode tide tao-theme smart-mode-line slime-company robe req-package rbenv racer pyvenv projectile-rails php-mode php-eldoc minitest js2-mode irony-eldoc intero iedit hlint-refactor hindent go-eldoc ggtags flycheck-rust flycheck-irony flycheck-elm evil-smartparens evil-magit evil-lisp-state evil-leader evil-god-state evil-commentary elm-mode el-get dumb-jump counsel-projectile counsel-etags company-irony company-go company-anaconda color-theme-approximate cider benchmark-init)))
 
 
 (setq lexical-binding t)
@@ -172,7 +172,14 @@
 (setq-default tramp-default-method "ssh")
 (setq-default indent-tabs-mode nil)
 
+(setq org-plantuml-jar-path
+                  (shell-command-to-string "which plantuml | perl -ne 'chomp; print'"))
+
 (juiko/look-config)
+
+(eval-after-load "org"
+  '(progn
+     (org-babel-do-load-languages 'org-babel-load-languages '((plantuml . t)))))
 
 (defun juiko/python-find-env (project-root)
   "Find the python project env directory, inside PROJECT-ROOT."
@@ -376,6 +383,7 @@
                                       inferior-python-mode
                                       intero-repl-mode
                                       inf-ruby-mode
+                                      org-mode
                                       magit-mode)
                         do (evil-set-initial-state mode 'emacs))
                (evil-mode))))
@@ -734,15 +742,20 @@
 (req-package yaml-mode
   :mode ("\\.yml\\'" "\\.yaml\\'"))
 
-(req-package org-plus-contrib
-  :mode ("\\.org\\'"))
 (req-package yasnippet
-  :hook (web-mode . yas-minor-mode)
+  :hook ((web-mode . yas-minor-mode)
+         (org-mode . yas-minor-mode))
   :config (progn
             (yas-reload-all)))
 
+(req-package ox-twbs
+  :requires (org))
 
 (req-package yasnippet-snippets
   :requires (yasnippet))
+
+(req-package htmlize
+  :requires (org)
+  )
 
 (req-package-finish)
