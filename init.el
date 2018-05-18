@@ -24,7 +24,7 @@
  '(flycheck-color-mode-line-face-to-color 'mode-line-buffer-id)
  '(frame-background-mode 'dark)
  '(package-selected-packages
-   '(zenburn-theme color-theme-sanityinc-tomorrow paradox htmlize ox-twbs yasnippet-snippets yasnippet org-plus-contrib yaml-mode web-mode tide tao-theme smart-mode-line slime-company robe req-package rbenv racer pyvenv projectile-rails php-mode php-eldoc minitest js2-mode irony-eldoc intero iedit hlint-refactor hindent go-eldoc ggtags flycheck-rust flycheck-irony flycheck-elm evil-smartparens evil-magit evil-lisp-state evil-leader evil-god-state evil-commentary elm-mode el-get dumb-jump counsel-projectile counsel-etags company-irony company-go company-anaconda color-theme-approximate cider benchmark-init))
+   '(ob-erd ox-gfm flycheck-package org-mind-map zenburn-theme color-theme-sanityinc-tomorrow paradox htmlize ox-twbs yasnippet-snippets yasnippet org-plus-contrib yaml-mode web-mode tide tao-theme smart-mode-line slime-company robe req-package rbenv racer pyvenv projectile-rails php-mode php-eldoc minitest js2-mode irony-eldoc intero iedit hlint-refactor hindent go-eldoc ggtags flycheck-rust flycheck-irony flycheck-elm evil-smartparens evil-magit evil-lisp-state evil-leader evil-god-state evil-commentary elm-mode el-get dumb-jump counsel-projectile counsel-etags company-irony company-go company-anaconda color-theme-approximate cider benchmark-init))
  '(vc-annotate-background nil)
  '(vc-annotate-color-map
    '((20 . "#cc6666")
@@ -46,7 +46,6 @@
      (340 . "#f0c674")
      (360 . "#b5bd68")))
  '(vc-annotate-very-old-color nil))
-
 
 (setq lexical-binding t)
 (setq package-menu-async nil)
@@ -70,10 +69,10 @@
   (package-install 'use-package)
   (package-install 'req-package))
 
-
 (require 'req-package)
 
 (use-package benchmark-init
+  :disabled t
   :config (add-hook 'after-init-hook 'benchmark-init/deactivate))
 
 (progn
@@ -84,10 +83,8 @@
   (column-number-mode 1)
   (global-hl-line-mode 1)
   (show-paren-mode)
-  (add-to-list 'default-frame-alist '(cursor-color . "Gray")))
-
-
-    (set-frame-font "Inconsolata-11" nil t)
+  (add-to-list 'default-frame-alist '(cursor-color . "Gray"))
+  (set-frame-font "Inconsolata-11" nil t))
 
 (use-package tao-theme
   :disabled t
@@ -154,6 +151,9 @@
             )
   )
 
+(req-package flycheck-package
+  :requires flycheck)
+
 (req-package company-irony
   :requires irony
   :config (eval-after-load "company-irony"
@@ -163,7 +163,7 @@
                            (setq-local company-backends '(company-irony)))))))
 
 (req-package flycheck-irony
-  :requires irony
+  :requires flycheck irony
   :config (eval-after-load "flycheck-irony"
             '(progn
                (add-hook 'flycheck-mode-hook 'flycheck-irony-setup))))
@@ -304,17 +304,6 @@
                                       magit-mode)
                         do (evil-set-initial-state mode 'emacs))
                (evil-mode))))
-
-(req-package evil-lisp-state
-  :disabled t
-  ;; :bind (:map evil-normal-state-map
-  ;; ("L" . evil-lisp-state))
-  :requires (evil smartparens)
-  :config (progn
-            (setf evil-lisp-state-global t)
-            (setf evil-lisp-state-enter-lisp-state-on-command nil)
-            )
-  )
 
 (req-package evil-smartparens
   :requires (evil smartparens)
@@ -665,6 +654,16 @@
   :requires (org)
   )
 
+(req-package evil-lisp-state
+  :require evil evil-leader bind-key
+  :init (progn
+          (setf evil-lisp-state-global t)
+          (setf evil-lisp-state-enter-lisp-state-on-command nil))
+
+  :config (eval-after-load "evil-lisp-state"
+            '(progn
+               (bind-key "L" 'evil-lisp-state evil-normal-state-map))))
+
 (req-package-finish)
 
 (setq-default tab-width 2)
@@ -674,8 +673,8 @@
 (setq browse-url-generic-program "firefox")
 (setq browse-url-browser-function 'browse-url-firefox)
 (setq ring-bell-function 'ignore)
-(setq org-plantuml-jar-path
-      (shell-command-to-string "which plantuml | perl -ne 'chomp; print'"))
+(setq org-plantuml-jar-path "/usr/share/plantuml/plantuml.jar")
+;; (shell-command-to-string "which plantuml | perl -ne 'chomp; print'"))
 (setq-default backup-by-copying t      ; don't clobber symlinks
               backup-directory-alist '(("." . "~/.emacs.d/saves"))    ; don't litter my fs tree
               delete-old-versions t
@@ -688,12 +687,12 @@
   (eval-after-load "cperl-mode"
     '(progn
        (setq-default cperl-electric-parens nil
-                cperl-electric-keywords nil
-                cperl-electric-lbrace-space nil))))
+                     cperl-electric-keywords nil
+                     cperl-electric-lbrace-space nil))))
 
 (set-face-attribute 'fringe nil
-                      :foreground (face-foreground 'default)
-                      :background (face-background 'default))
+                    :foreground (face-foreground 'default)
+                    :background (face-background 'default))
 
 (fset 'yes-or-no-p 'y-or-n-p)
 
@@ -707,7 +706,6 @@
             (let ((init-file (expand-file-name "~/.emacs.d/init.el")))
               (when (equal (buffer-file-name) init-file)
                 (byte-compile-file init-file)))))
-
 
 (defun windows-subsystem-linux-p ()
   "Return t if running in WSL."
