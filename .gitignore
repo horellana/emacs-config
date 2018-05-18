@@ -4,5 +4,7 @@ anaconda-mode/*
 elpa/*
 cache/*
 eshell/*
+saves/*
+auto-save-list/*
 *.elc
 *.eld
