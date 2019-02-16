@@ -53,7 +53,7 @@
  '(nrepl-message-colors
    '("#dc322f" "#cb4b16" "#b58900" "#546E00" "#B4C342" "#00629D" "#2aa198" "#d33682" "#6c71c4"))
  '(package-selected-packages
-   '(go-mode rust-mode haskell-mode evil smartparens irony flycheck use-package erc company-lsp lsp-mode lsp-typescript lsp-ui forge smart-jump doom-modeline doom-themes monokai monokai-theme solarized-theme material-theme sass-mode klere-theme dracula-theme rjsx-mode jsx-mode ob-erd ox-gfm flycheck-package org-mind-map zenburn-theme color-theme-sanityinc-tomorrow paradox htmlize ox-twbs yasnippet-snippets yasnippet org-plus-contrib yaml-mode web-mode tide tao-theme smart-mode-line slime-company robe req-package rbenv racer pyvenv projectile-rails php-mode php-eldoc minitest js2-mode irony-eldoc intero iedit hlint-refactor hindent go-eldoc ggtags flycheck-rust flycheck-irony flycheck-elm evil-smartparens evil-magit evil-lisp-state evil-leader evil-god-state evil-commentary elm-mode el-get dumb-jump counsel-projectile counsel-etags company-irony company-go company-anaconda color-theme-approximate cider benchmark-init))
+   '(company go-mode rust-mode haskell-mode evil smartparens irony flycheck use-package erc company-lsp lsp-mode lsp-typescript lsp-ui forge smart-jump doom-modeline doom-themes monokai monokai-theme solarized-theme material-theme sass-mode klere-theme dracula-theme rjsx-mode jsx-mode ob-erd ox-gfm flycheck-package org-mind-map zenburn-theme color-theme-sanityinc-tomorrow paradox htmlize ox-twbs yasnippet-snippets yasnippet org-plus-contrib yaml-mode web-mode tide tao-theme smart-mode-line slime-company robe req-package rbenv racer pyvenv projectile-rails php-mode php-eldoc minitest js2-mode irony-eldoc intero iedit hlint-refactor hindent go-eldoc ggtags flycheck-rust flycheck-irony flycheck-elm evil-smartparens evil-magit evil-lisp-state evil-leader evil-god-state evil-commentary elm-mode el-get dumb-jump counsel-projectile counsel-etags company-irony company-go company-anaconda color-theme-approximate cider benchmark-init))
  '(pos-tip-background-color "#eee8d5")
  '(pos-tip-foreground-color "#586e75")
  '(smartrep-mode-line-active-bg (solarized-color-blend "#859900" "#eee8d5" 0.2))
@@ -244,7 +244,7 @@
   :config (progn
             (doom-themes-visual-bell-config)
             (doom-themes-org-config)
-            (load-theme 'doom-one-light t)))
+            (load-theme 'doom-one t)))
 
 (defun juiko/python-find-env (project-root)
   "Find the python project env directory, inside PROJECT-ROOT."
@@ -275,6 +275,7 @@
                                )))))))
 
 (req-package flycheck
+  :disabled t
   :ensure t
   :defer 1
   :config (progn
@@ -310,35 +311,35 @@
   :ensure t
   :requires flycheck)
 
-(req-package irony
-  :ensure t
-  :config (eval-after-load "irony"
-            '(progn
-               (add-hook 'c++-mode-hook 'irony-mode)
-               (add-hook 'c-mode-hook 'irony-mode)
-               (add-hook 'objc-mode-hook 'irony-mode)
-               (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options))))
+;; (req-package irony
+;;   :ensure t
+;;   :config (eval-after-load "irony"
+;;             '(progn
+;;                (add-hook 'c++-mode-hook 'irony-mode)
+;;                (add-hook 'c-mode-hook 'irony-mode)
+;;                (add-hook 'objc-mode-hook 'irony-mode)
+;;                (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options))))
 
-(req-package company-irony
-  :ensure t
-  :requires irony
-  :config (eval-after-load "company-irony"
-            '(progn
-               (add-hook 'irony-mode-hook
-                         (lambda ()
-                           (setq-local company-backends '(company-irony)))))))
+;; (req-package company-irony
+;;   :ensure t
+;;   :requires irony
+;;   :config (eval-after-load "company-irony"
+;;             '(progn
+;;                (add-hook 'irony-mode-hook
+;;                          (lambda ()
+;;                            (setq-local company-backends '(company-irony)))))))
 
-(req-package flycheck-irony
-  :ensure t
-  :requires flycheck irony
-  :config (eval-after-load "flycheck-irony"
-            '(progn
-               (add-hook 'flycheck-mode-hook 'flycheck-irony-setup))))
+;; (req-package flycheck-irony
+;;   :ensure t
+;;   :requires flycheck irony
+;;   :config (eval-after-load "flycheck-irony"
+;;             '(progn
+;;                (add-hook 'flycheck-mode-hook 'flycheck-irony-setup))))
 
-(req-package irony-eldoc
-  :ensure t
-  :hook (irony-mode . irony-eldoc)
-  )
+;; (req-package irony-eldoc
+;;   :ensure t
+;;   :hook (irony-mode . irony-eldoc)
+;;   )
 
 (req-package bind-key
   :ensure t
@@ -415,31 +416,31 @@
                       (lambda () (require 'smartparens-ruby)))))
 
 
-(req-package slime-company
-  :ensure t
-  :requires company)
+;; (req-package slime-company
+;;   :ensure t
+;;   :requires company)
 
-(req-package slime
-  :ensure t
-  :mode "\\.lisp\\'"
-  :commands slime
-  :init (progn
-          (setf inferior-lisp-program "sbcl")
-          (setf slime-contrib '(slime-fancy slime-company))
-          (setf slime-sbcl-manual-root "/usr/local/share/info/sbcl.info")
-          (add-hook 'lisp-mode-hook
-                    (lambda ()
-                      (unless (slime-connected-p)
-                        (save-excursion (slime))))))
+;; (req-package slime
+;;   :ensure t
+;;   :mode "\\.lisp\\'"
+;;   :commands slime
+;;   :init (progn
+;;           (setf inferior-lisp-program "sbcl")
+;;           (setf slime-contrib '(slime-fancy slime-company))
+;;           (setf slime-sbcl-manual-root "/usr/local/share/info/sbcl.info")
+;;           (add-hook 'lisp-mode-hook
+;;                     (lambda ()
+;;                       (unless (slime-connected-p)
+;;                         (save-excursion (slime))))))
 
-  :config (eval-after-load "slime"
-            '(progn
-               (slime-setup '(slime-fancy slime-company))
-               (cl-loop for hook in '(slime-mode-hook slime-repl-mode-hook)
-                        do
-                        (add-hook hook
-                                  (lambda ()
-                                    (setq-local company-backends '(company-slime))))))))
+;;   :config (eval-after-load "slime"
+;;             '(progn
+;;                (slime-setup '(slime-fancy slime-company))
+;;                (cl-loop for hook in '(slime-mode-hook slime-repl-mode-hook)
+;;                         do
+;;                         (add-hook hook
+;;                                   (lambda ()
+;;                                     (setq-local company-backends '(company-slime))))))))
 
 (req-package evil
   :ensure t
@@ -535,87 +536,87 @@
                ;; (evil-leader/set-key-for-mode 'projectile-mode (kbd "p")'helm-projectile)
                (global-evil-leader-mode))))
 
-(req-package evil-magit
-  :ensure t
-  :requires evil magit
-  )
+;; (req-package evil-magit
+;;   :ensure t
+;;   :requires evil magit
+;;   )
 
-(req-package magit
-  :ensure t
-  :commands (magit-status magit-init magit-log magit-diff)
-  :init (progn
-          (setf magit-last-seen-setup-instructions "1.4.0")))
+;; (req-package magit
+;;   :ensure t
+;;   :commands (magit-status magit-init magit-log magit-diff)
+;;   :init (progn
+;;           (setf magit-last-seen-setup-instructions "1.4.0")))
 
-(req-package forge
-  :requires forge)
+;; (req-package forge
+;;   :requires forge)
 
-(req-package haskell-mode
-  :ensure t
-  :mode ("\\.hs\\'")
-  :config (progn
-            (add-hook 'haskell-mode-hook 'haskell-doc-mode)
-            (add-hook 'haskell-mode-hook 'haskell-indentation-mode)
-            ;; (add-hook 'haskell-mode-hook 'interactive-haskell-mode)
-            (add-hook 'haskell-mode-hook 'haskell-decl-scan-mode)
-            (add-hook 'haskell-mode-hook (lambda ()
-                                           (electric-indent-local-mode -1)))
+;; (req-package haskell-mode
+;;   :ensure t
+;;   :mode ("\\.hs\\'")
+;;   :config (progn
+;;             (add-hook 'haskell-mode-hook 'haskell-doc-mode)
+;;             (add-hook 'haskell-mode-hook 'haskell-indentation-mode)
+;;             ;; (add-hook 'haskell-mode-hook 'interactive-haskell-mode)
+;;             (add-hook 'haskell-mode-hook 'haskell-decl-scan-mode)
+;;             (add-hook 'haskell-mode-hook (lambda ()
+;;                                            (electric-indent-local-mode -1)))
 
-            (setf haskell-process-type 'stack-ghci)
-            (setf haskell-process-path-ghci "stack")
-            (setf haskell-process-args-ghci '("ghci "))
+;;             (setf haskell-process-type 'stack-ghci)
+;;             (setf haskell-process-path-ghci "stack")
+;;             (setf haskell-process-args-ghci '("ghci "))
 
-            (setf haskell-process-suggest-remove-import-lines t)
-            (setf haskell-process-auto-import-loaded-modules t)
-            (setf haskell-process-log nil)
-            (setf haskell-stylish-on-save t)))
+;;             (setf haskell-process-suggest-remove-import-lines t)
+;;             (setf haskell-process-auto-import-loaded-modules t)
+;;             (setf haskell-process-log nil)
+;;             (setf haskell-stylish-on-save t)))
 
-(req-package intero
-  :ensure t
-  :hook (haskell-mode . intero-mode)
-  :config (eval-after-load "intero"
-            '(progn
-               (add-hook 'intero-mode-hook
-                         (lambda ()
-                           (progn
-                             (make-variable-buffer-local 'company-backends)
-                             (setq-local company-backends '(company-intero))))))))
+;; (req-package intero
+;;   :ensure t
+;;   :hook (haskell-mode . intero-mode)
+;;   :config (eval-after-load "intero"
+;;             '(progn
+;;                (add-hook 'intero-mode-hook
+;;                          (lambda ()
+;;                            (progn
+;;                              (make-variable-buffer-local 'company-backends)
+;;                              (setq-local company-backends '(company-intero))))))))
 
-(req-package hindent
-  :ensure t
-  :hook (haskell-mode . hindent-mode)
-  :config (progn
-            (setf hindent-style "chris-done")
-            (evil-define-key 'evil-visual-state hindent-mode-map "TAB"
-              'hindent-reformat-region)
-            ))
+;; (req-package hindent
+;;   :ensure t
+;;   :hook (haskell-mode . hindent-mode)
+;;   :config (progn
+;;             (setf hindent-style "chris-done")
+;;             (evil-define-key 'evil-visual-state hindent-mode-map "TAB"
+;;               'hindent-reformat-region)
+;;             ))
 
-(req-package hlint-refactor
-  :ensure t
-  :hook (haskell-mode . hlint-refactor-mode)
-  :config (eval-after-load "hlint-refactor"
-            '(progn
-               (bind-key "C-c h r" 'hlint-refactor-refactor-at-point hlint-refactor-mode-map)
+;; (req-package hlint-refactor
+;;   :ensure t
+;;   :hook (haskell-mode . hlint-refactor-mode)
+;;   :config (eval-after-load "hlint-refactor"
+;;             '(progn
+;;                (bind-key "C-c h r" 'hlint-refactor-refactor-at-point hlint-refactor-mode-map)
 
-               )))
+;;                )))
 
-(req-package anaconda-mode
-  :disabled t
-  :ensure t
-  :mode ("\\.py\\'" . python-mode)
-  :hook (python-mode . anaconda-mode)
-  )
+;; (req-package anaconda-mode
+;;   :disabled t
+;;   :ensure t
+;;   :mode ("\\.py\\'" . python-mode)
+;;   :hook (python-mode . anaconda-mode)
+;;   )
 
-(req-package company-anaconda
-  :disabled t
-  :ensure t
-  :requires (company anaconda-mode)
-  :config (eval-after-load "company-anaconda"
-            '(progn
-               (add-hook 'anaconda-mode-hook
-                         (lambda ()
-                           (make-variable-buffer-local 'company-backends)
-                           (setq-local company-backends '(company-anaconda))))))
-  )
+;; (req-package company-anaconda
+;;   :disabled t
+;;   :ensure t
+;;   :requires (company anaconda-mode)
+;;   :config (eval-after-load "company-anaconda"
+;;             '(progn
+;;                (add-hook 'anaconda-mode-hook
+;;                          (lambda ()
+;;                            (make-variable-buffer-local 'company-backends)
+;;                            (setq-local company-backends '(company-anaconda))))))
+;;   )
 
 
 (req-package web-mode
@@ -658,32 +659,32 @@
                 do (add-to-list 'auto-mode-alist `(,extension . web-mode))))))
 
 
-(req-package php-mode
-  :ensure t
-  :mode "\\.php\\'"
-  :config (eval-after-load "php-mode"
-            '(progn
-               (require 'php-ext)
-               (setf php-template-compatibility nil)
-               (setf php-lineup-cascaded-calls t)
+;; (req-package php-mode
+;;   :ensure t
+;;   :mode "\\.php\\'"
+;;   :config (eval-after-load "php-mode"
+;;             '(progn
+;;                (require 'php-ext)
+;;                (setf php-template-compatibility nil)
+;;                (setf php-lineup-cascaded-calls t)
 
-               (add-hook 'php-mode-hook
-                         'php-enable-symfony2-coding-style)
+;;                (add-hook 'php-mode-hook
+;;                          'php-enable-symfony2-coding-style)
 
-               (add-hook 'php-mode-hook
-                         (lambda ()
-                           (setq-local company-backends '((company-gtags
-                                                           company-dabbrev-code)
-                                                          ))))
-               (with-eval-after-load "yasnippet"
-                 (add-hook 'php-mode-hook 'yas-minor-mode)))))
+;;                (add-hook 'php-mode-hook
+;;                          (lambda ()
+;;                            (setq-local company-backends '((company-gtags
+;;                                                            company-dabbrev-code)
+;;                                                           ))))
+;;                (with-eval-after-load "yasnippet"
+;;                  (add-hook 'php-mode-hook 'yas-minor-mode)))))
 
-(req-package php-eldoc
-  :ensure t
-  :requires php-mode
-  :config (eval-after-load "php-eldoc"
-            '(progn
-               (add-hook 'php-mode-hook 'php-eldoc-enable))))
+;; (req-package php-eldoc
+;;   :ensure t
+;;   :requires php-mode
+;;   :config (eval-after-load "php-eldoc"
+;;             '(progn
+;;                (add-hook 'php-mode-hook 'php-eldoc-enable))))
 
 (req-package js2-mode
   :ensure t
@@ -697,40 +698,40 @@
   :mode "\\.rs\\'"
   )
 
-(req-package racer
-  :ensure t
-  :config (eval-after-load "racer"
-            '(progn
-               (add-hook 'rust-mode-hook 'racer-mode)
-               (add-hook 'racer-mode-hook 'eldoc-mode)
+;; (req-package racer
+;;   :ensure t
+;;   :config (eval-after-load "racer"
+;;             '(progn
+;;                (add-hook 'rust-mode-hook 'racer-mode)
+;;                (add-hook 'racer-mode-hook 'eldoc-mode)
 
-               (add-hook 'racer-mode-hook
-                         (lambda ()
-                           (make-variable-buffer-local 'company-minimum-prefix-length)
-                           (make-variable-buffer-local 'company-idle-delay)
-                           )))))
+;;                (add-hook 'racer-mode-hook
+;;                          (lambda ()
+;;                            (make-variable-buffer-local 'company-minimum-prefix-length)
+;;                            (make-variable-buffer-local 'company-idle-delay)
+;;                            )))))
 
-(req-package flycheck-rust
-  :ensure t
-  :mode "\\.rs\\'"
-  :requires (rust-mode flycheck)
-  :config (eval-after-load "flycheck-rust"
-            '(progn
-               (add-hook 'flycheck-mode-hook 'flycheck-rust-setup))))
+;; (req-package flycheck-rust
+;;   :ensure t
+;;   :mode "\\.rs\\'"
+;;   :requires (rust-mode flycheck)
+;;   :config (eval-after-load "flycheck-rust"
+;;             '(progn
+;;                (add-hook 'flycheck-mode-hook 'flycheck-rust-setup))))
 
-(req-package elm-mode
-  :ensure t
-  :mode "\\.elm\\'"
-  )
+;; (req-package elm-mode
+;;   :ensure t
+;;   :mode "\\.elm\\'"
+;;   )
 
-(req-package flycheck-elm
-  :ensure t
-  :mode "\\.elm\\'"
-  :requires (elm-mode flycheck)
+;; (req-package flycheck-elm
+;;   :ensure t
+;;   :mode "\\.elm\\'"
+;;   :requires (elm-mode flycheck)
 
-  :config (eval-after-load "flycheck-elm"
-            '(progn
-               (add-hook 'flycheck-mode-hook 'flycheck-elm-setup))))
+;;   :config (eval-after-load "flycheck-elm"
+;;             '(progn
+;;                (add-hook 'flycheck-mode-hook 'flycheck-elm-setup))))
 
 (req-package color-theme-approximate
   :ensure t
@@ -741,73 +742,73 @@
                (color-theme-approximate-on))))
 
 
-(req-package robe
-  :ensure t
-  :hook (ruby-mode . robe-mode)
-  :config (add-hook 'robe-mode-hook
-                    (lambda ()
-                      (setq-local company-backends '((company-robe company-dabbrev-code))))))
+;; (req-package robe
+;;   :ensure t
+;;   :hook (ruby-mode . robe-mode)
+;;   :config (add-hook 'robe-mode-hook
+;;                     (lambda ()
+;;                       (setq-local company-backends '((company-robe company-dabbrev-code))))))
 
 
-(req-package rbenv
-  :ensure t
-  :hook (ruby-mode . global-rbenv-mode)
-  )
+;; (req-package rbenv
+;;   :ensure t
+;;   :hook (ruby-mode . global-rbenv-mode)
+;;   )
 
 
-(req-package minitest
-  :ensure t
-  :hook (ruby-mode . minitest-mode)
-  )
+;; (req-package minitest
+;;   :ensure t
+;;   :hook (ruby-mode . minitest-mode)
+;;   )
 
 (req-package cider
   :ensure t
   :hook (clojure-mode . cider-mode)
   )
 
-(req-package tide
-  :ensure t
-  :init (progn
-          ;; (add-hook 'before-save-hook 'tide-format-before-save)
-          (add-hook 'typescript-mode-hook
-                    (lambda ()
-                      (tide-setup)
-                      (eldoc-mode t)
-                      (tide-hl-identifier-mode t)
-                      ))
-          ))
+;; (req-package tide
+;;   :ensure t
+;;   :init (progn
+;;           ;; (add-hook 'before-save-hook 'tide-format-before-save)
+;;           (add-hook 'typescript-mode-hook
+;;                     (lambda ()
+;;                       (tide-setup)
+;;                       (eldoc-mode t)
+;;                       (tide-hl-identifier-mode t)
+;;                       ))
+;;           ))
 
-(req-package dumb-jump
-  :disabled t
-  :ensure t
-  :commands (dumb-jump-go dumb-jump-quick-look dumb-jump-go-prompt)
-  :config (eval-after-load "dumb-jump"
-            '(progn
-               (dumb-jump-mode))))
+;; (req-package dumb-jump
+;;   :disabled t
+;;   :ensure t
+;;   :commands (dumb-jump-go dumb-jump-quick-look dumb-jump-go-prompt)
+;;   :config (eval-after-load "dumb-jump"
+;;             '(progn
+;;                (dumb-jump-mode))))
 
-(req-package go-mode
-  :ensure t
-  :mode "\\.go\\'"
-  :config (eval-after-load "go-mode"
-            '(progn
-               (add-hook 'before-save-hook #'gofmt-before-save))))
+;; (req-package go-mode
+;;   :ensure t
+;;   :mode "\\.go\\'"
+;;   :config (eval-after-load "go-mode"
+;;             '(progn
+;;                (add-hook 'before-save-hook #'gofmt-before-save))))
 
-(req-package go-eldoc
-  :ensure t
-  :requires go-mode
-  :config (eval-after-load "go-eldoc"
-            '(progn
-               (add-hook go-mode-hook 'eldoc-mode))))
+;; (req-package go-eldoc
+;;   :ensure t
+;;   :requires go-mode
+;;   :config (eval-after-load "go-eldoc"
+;;             '(progn
+;;                (add-hook go-mode-hook 'eldoc-mode))))
 
-(req-package company-go
-  :ensure t
-  :requires (go-mode company)
-  :config (eval-after-load "company-go"
-            '(progn
-               (add-hook go-mode-hook
-                         (lambda ()
-                           (make-variable-buffer-local 'company-backends)
-                           (setq-local company-backends '(company-go)))))))
+;; (req-package company-go
+;;   :ensure t
+;;   :requires (go-mode company)
+;;   :config (eval-after-load "company-go"
+;;             '(progn
+;;                (add-hook go-mode-hook
+;;                          (lambda ()
+;;                            (make-variable-buffer-local 'company-backends)
+;;                            (setq-local company-backends '(company-go)))))))
 
 (req-package counsel-etags
   :ensure t
@@ -817,14 +818,14 @@
             '(progn
                (evil-define-key 'evil-emacs-state prog-mode-map (kbd "M-.") #'counsel-etags-find-tag-at-point))))
 
-(req-package smart-mode-line
-  :disabled t
-  :ensure t
-  :defer 1
-  :config (eval-after-load "smart-mode-line"
-            '(progn
-               (setq sml/theme 'respectful)
-               (sml/setup))))
+;; (req-package smart-mode-line
+;;   :disabled t
+;;   :ensure t
+;;   :defer 1
+;;   :config (eval-after-load "smart-mode-line"
+;;             '(progn
+;;                (setq sml/theme 'respectful)
+;;                (sml/setup))))
 
 (req-package ivy
   :ensure t
@@ -853,28 +854,28 @@
   :ensure t
   :mode ("\\.yml\\'" "\\.yaml\\'"))
 
-(req-package yasnippet
-  :disabled t
-  :ensure t
-  :hook ((web-mode . yas-minor-mode)
-         (org-mode . yas-minor-mode))
-  :config (progn
-            (yas-reload-all)))
+;; (req-package yasnippet
+;;   :disabled t
+;;   :ensure t
+;;   :hook ((web-mode . yas-minor-mode)
+;;          (org-mode . yas-minor-mode))
+;;   :config (progn
+;;             (yas-reload-all)))
 
 (req-package ox-twbs
   :ensure t
   :ensure t
   :requires (org))
 
-(req-package yasnippet
-  :disabled t
-  :ensure t
-  :requires (yasnippet))
+;; (req-package yasnippet
+;;   :disabled t
+;;   :ensure t
+;;   :requires (yasnippet))
 
-(req-package htmlize
-  :ensure t
-  :requires (org)
-  )
+;; (req-package htmlize
+;;   :ensure t
+;;   :requires (org)
+;;   )
 
 (req-package evil-lisp-state
   :ensure t
@@ -888,24 +889,24 @@
                (bind-key "L" 'evil-lisp-state evil-normal-state-map))))
 
 
-(req-package rjsx-mode
-  :ensure t
-  :disabled t
-  :mode ("\\.jsx\\'"))
+;; (req-package rjsx-mode
+;;   :ensure t
+;;   :disabled t
+;;   :mode ("\\.jsx\\'"))
 
-(req-package sass-mode
-  :ensure t
-  :mode ("\\.sass\\'"))
+;; (req-package sass-mode
+;;   :ensure t
+;;   :mode ("\\.sass\\'"))
 
-(req-package dumb-jump
-  :ensure t
-  :bind (("M-g o" . dumb-jump-go-other-window)
-         ("M-g j" . dumb-jump-go)
-         ("M-g i" . dumb-jump-go-prompt)
-         ("M-g x" . dumb-jump-go-prefer-external)
-         ("M-g z" . dumb-jump-go-prefer-external-other-window))
-  :config (setq dumb-jump-selector 'ivy) ;; (setq dumb-jump-selector 'helm)
-  :ensure)
+;; (req-package dumb-jump
+;;   :ensure t
+;;   :bind (("M-g o" . dumb-jump-go-other-window)
+;;          ("M-g j" . dumb-jump-go)
+;;          ("M-g i" . dumb-jump-go-prompt)
+;;          ("M-g x" . dumb-jump-go-prefer-external)
+;;          ("M-g z" . dumb-jump-go-prefer-external-other-window))
+;;   :config (setq dumb-jump-selector 'ivy) ;; (setq dumb-jump-selector 'helm)
+;;   :ensure)
 
 
 (req-package doom-modeline
@@ -921,23 +922,44 @@
             (bind-key "M-," 'smart-jump-back)))
 
 
-;; (req-package lsp-mode
-;;   :ensure t
-;;   :config (progn
-;;             (add-hook typescript-mode-hook #'lsp))
-;;   )
+(req-package lsp-mode
+  :ensure t
+  :config (progn
+            (add-hook typescript-mode-hook #'lsp))
+  )
 
-;; (req-package lsp-typescript
-;;   :disabled t
-;;   :ensure t
-;;   :config (progn
-;;             (add-hook typescript-mode-hook #'lsp)))
+(req-package lsp-ui
+  :ensure t
+  :commands lsp-ui-mode
+  :config (progn
+            (req-package 'lsp-ui)
+            (add-hook 'lsp-mode-hook 'lsp-ui-mode)))
 
-;; (req-package company-lsp
-;;   :ensure t
-;;   :requires lsp-mode
-;;   :config (progn
-;;             (push 'company-lsp company-backends)))
+(req-package company-lsp
+  :ensure t
+  :commands company-lsp)
 
+
+(req-package lsp-typescript
+  :disabled t
+  :ensure t
+  :config (progn
+            (cl-loop for mode in '(typescript-mode-hook
+                                   python-mode-hook
+                                   rust-mode-hook)
+                     do (add-hook mode #'lsp))
+
+            (add-hook 'typescript-mode-hook #'lsp)
+            (add-hook 'python-mode-hook #'lsp)
+            (add-hook 'ruby-mode-hook #'lsp)
+            (add-hook 'rust-mode-hook #'lsp)
+
+            (setq lsp-prefer-flymake :none)))
+
+(req-package company-lsp
+  :ensure t
+  :requires lsp-mode
+  :config (progn
+            (push 'company-lsp company-backends)))
 
 (req-package-finish)
