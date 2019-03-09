@@ -259,7 +259,7 @@
 (use-package solarized-theme
   :ensure t
   :config (progn
-            (load-theme 'solarized-light t)))
+            (load-theme 'solarized-dark t)))
 
 (use-package doom-themes
   :disabled t
@@ -547,9 +547,11 @@
 (req-package js2-mode
   :ensure t
   :mode "\\.js\\'"
-  :config (eval-after-load "js2-mode"
-            '(progn
-               (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode)))))
+  :config (progn
+            (setq js2-basic-offset 4)
+            (eval-after-load "js2-mode"
+                  '(progn
+                     (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))))))
 
 (req-package rust-mode
   :ensure t
@@ -640,6 +642,7 @@
             (add-hook 'python-mode-hook #'lsp)
             (add-hook 'ruby-mode-hook #'lsp)
             (add-hook 'rust-mode-hook #'lsp)
+            (add-hook 'js2-mode-hook #'lsp)
 
             (setq lsp-prefer-flymake t)))
 
