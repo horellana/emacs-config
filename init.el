@@ -1,7 +1,5 @@
 ; -*- lexical-binding: t -*-
 
-(toggle-debug-on-error)
-
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -258,7 +256,13 @@
             (when (memq window-system '(mac ns x))
               (exec-path-from-shell-initialize))))
 
+(use-package solarized-theme
+  :ensure t
+  :config (progn
+            (load-theme 'solarized-light t)))
+
 (use-package doom-themes
+  :disabled t
   :ensure t
   :config (progn
             (doom-themes-visual-bell-config)
