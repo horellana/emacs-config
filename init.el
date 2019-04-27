@@ -5,7 +5,9 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(flycheck-error ((t (:underline "Red1"))))
+ '(flycheck-info ((t (:underline "ForestGreen"))))
+ '(flycheck-warning ((t (:underline "DarkOrange")))))
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -57,7 +59,7 @@
     ("#dc322f" "#cb4b16" "#b58900" "#546E00" "#B4C342" "#00629D" "#2aa198" "#d33682" "#6c71c4")))
  '(package-selected-packages
    (quote
-    (sublime-themes paper-theme mac-classic-theme intellij-theme leuven-theme eink-theme eink exec-path-from-shell ivy magit typescript-mode company go-mode rust-mode haskell-mode evil smartparens irony flycheck use-package erc company-lsp lsp-mode lsp-typescript lsp-ui forge smart-jump doom-modeline doom-themes monokai monokai-theme solarized-theme material-theme sass-mode klere-theme dracula-theme rjsx-mode jsx-mode ob-erd ox-gfm flycheck-package org-mind-map zenburn-theme color-theme-sanityinc-tomorrow paradox htmlize ox-twbs yasnippet-snippets yasnippet org-plus-contrib yaml-mode web-mode tide tao-theme smart-mode-line slime-company robe req-package rbenv racer pyvenv projectile-rails php-mode php-eldoc minitest js2-mode irony-eldoc intero iedit hlint-refactor hindent go-eldoc ggtags flycheck-rust flycheck-irony flycheck-elm evil-smartparens evil-magit evil-lisp-state evil-leader evil-god-state evil-commentary elm-mode el-get dumb-jump counsel-projectile counsel-etags company-irony company-go company-anaconda color-theme-approximate cider benchmark-init)))
+    (platformio platformio-mode sublime-themes paper-theme mac-classic-theme intellij-theme leuven-theme eink-theme eink exec-path-from-shell ivy magit typescript-mode company go-mode rust-mode haskell-mode evil smartparens irony flycheck use-package erc company-lsp lsp-mode lsp-typescript lsp-ui forge smart-jump doom-modeline doom-themes monokai monokai-theme solarized-theme material-theme sass-mode klere-theme dracula-theme rjsx-mode jsx-mode ob-erd ox-gfm flycheck-package org-mind-map zenburn-theme color-theme-sanityinc-tomorrow paradox htmlize ox-twbs yasnippet-snippets yasnippet org-plus-contrib yaml-mode web-mode tide tao-theme smart-mode-line slime-company robe req-package rbenv racer pyvenv projectile-rails php-mode php-eldoc minitest js2-mode irony-eldoc intero iedit hlint-refactor hindent go-eldoc ggtags flycheck-rust flycheck-irony flycheck-elm evil-smartparens evil-magit evil-lisp-state evil-leader evil-god-state evil-commentary elm-mode el-get dumb-jump counsel-projectile counsel-etags company-irony company-go company-anaconda color-theme-approximate cider benchmark-init)))
  '(pos-tip-background-color "#eee8d5")
  '(pos-tip-foreground-color "#586e75")
  '(smartrep-mode-line-active-bg (solarized-color-blend "#859900" "#eee8d5" 0.2))
@@ -166,9 +168,7 @@
    (null (string-match-p "Microsoft"
                          (shell-command-to-string "uname -a")))))
 
-(eval-after-load "js-mode"
-  '(progn
-     (setf js-indent-level 2)))
+(setf js-indent-level 2)
 
 (eval-after-load "projectile"
   '(eval-after-load "f"
@@ -686,5 +686,11 @@
   :ensure t
   :config (progn
             (setq-default typescript-indent-level 2)))
+
+(req-package platformio-mode
+  :ensure t
+  :config (progn
+            (add-hook 'c++-mode-hook 'platformio-condiitonally-enable)
+            (add-hook 'c++-mode-hook 'platformio-init-update-workspace)))
 
 (req-package-finish)
