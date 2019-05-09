@@ -663,9 +663,9 @@
             (add-hook 'rust-mode-hook #'lsp)
             (add-hook 'js2-mode-hook #'lsp)
             (add-hook 'js-mode-hook #'lsp)
-            ;; (add-hook 'c++-mode-hook #'lsp)
 
-            (setq lsp-prefer-flymake nil)))
+            (setq lsp-prefer-flymake nil)
+            (setq lsp-enable-snippet nil)))
 
 (req-package lsp-ui
   :ensure t
