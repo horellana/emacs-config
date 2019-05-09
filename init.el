@@ -726,6 +726,9 @@
 (req-package platformio-mode
   :ensure t
   :config (progn
-            (add-hook 'c++-mode-hook 'platformio-init-update-workspace)))
+            (add-hook 'c++-mode-hook
+                      (lambda ()
+                        (platformio-mode)
+                        (platformio-init-update-workspace)))))
 
 (req-package-finish)
