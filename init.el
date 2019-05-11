@@ -52,7 +52,7 @@
  '(nrepl-message-colors
    '("#dc322f" "#cb4b16" "#b58900" "#546E00" "#B4C342" "#00629D" "#2aa198" "#d33682" "#6c71c4"))
  '(package-selected-packages
-   '(lsp-elixir elixir-ls elixir-lsp irony-mode speed-type platformio platformio-mode sublime-themes paper-theme mac-classic-theme intellij-theme leuven-theme eink-theme eink exec-path-from-shell ivy magit typescript-mode company go-mode rust-mode haskell-mode evil smartparens irony flycheck use-package erc company-lsp lsp-mode lsp-typescript lsp-ui forge smart-jump doom-modeline doom-themes monokai monokai-theme solarized-theme material-theme sass-mode klere-theme dracula-theme rjsx-mode jsx-mode ob-erd ox-gfm flycheck-package org-mind-map zenburn-theme color-theme-sanityinc-tomorrow paradox htmlize ox-twbs yasnippet-snippets yasnippet org-plus-contrib yaml-mode web-mode tide tao-theme smart-mode-line slime-company robe req-package rbenv racer pyvenv projectile-rails php-mode php-eldoc minitest js2-mode irony-eldoc intero iedit hlint-refactor hindent go-eldoc ggtags flycheck-rust flycheck-irony flycheck-elm evil-smartparens evil-magit evil-lisp-state evil-leader evil-god-state evil-commentary elm-mode el-get dumb-jump counsel-projectile counsel-etags company-irony company-go company-anaconda color-theme-approximate cider benchmark-init))
+   '(elixir-mode lsp-elixir elixir-ls elixir-lsp irony-mode speed-type platformio platformio-mode sublime-themes paper-theme mac-classic-theme intellij-theme leuven-theme eink-theme eink exec-path-from-shell ivy magit typescript-mode company go-mode rust-mode haskell-mode evil smartparens irony flycheck use-package erc company-lsp lsp-mode lsp-typescript lsp-ui forge smart-jump doom-modeline doom-themes monokai monokai-theme solarized-theme material-theme sass-mode klere-theme dracula-theme rjsx-mode jsx-mode ob-erd ox-gfm flycheck-package org-mind-map zenburn-theme color-theme-sanityinc-tomorrow paradox htmlize ox-twbs yasnippet-snippets yasnippet org-plus-contrib yaml-mode web-mode tide tao-theme smart-mode-line slime-company robe req-package rbenv racer pyvenv projectile-rails php-mode php-eldoc minitest js2-mode irony-eldoc intero iedit hlint-refactor hindent go-eldoc ggtags flycheck-rust flycheck-irony flycheck-elm evil-smartparens evil-magit evil-lisp-state evil-leader evil-god-state evil-commentary elm-mode el-get dumb-jump counsel-projectile counsel-etags company-irony company-go company-anaconda color-theme-approximate cider benchmark-init))
  '(pos-tip-background-color "#eee8d5")
  '(pos-tip-foreground-color "#586e75")
  '(smartrep-mode-line-active-bg (solarized-color-blend "#859900" "#eee8d5" 0.2))
@@ -230,8 +230,8 @@
 (require 'req-package)
 
 (use-package benchmark-init
-  :ensure t
   :disabled t
+  :ensure t
   :config (add-hook 'after-init-hook 'benchmark-init/deactivate))
 
 (progn
@@ -292,6 +292,7 @@
                       (f-directories project-root))))
 
 (req-package magit
+  :defer t
   :ensure t)
 
 (req-package pyvenv
@@ -317,7 +318,7 @@
 
 (req-package flycheck
   :ensure t
-  :defer 1
+  :defer t
   :config (progn
             (setq flycheck-perlcritic-severity 5)
             (setq flycheck-ghc-args (list
@@ -643,13 +644,15 @@
 
 (req-package smart-jump
   :ensure t
+  :bind (:map evil-normal-state-map
+              ("M-." . smart-jump-go)
+              ("M-," . smart-jump-back))
   :config (progn
-            (smart-jump-setup-default-registers)
-            (bind-key "M-." 'smart-jump-go evil-normal-state-map)
-            (bind-key "M-," 'smart-jump-back)))
+            (smart-jump-setup-default-registers)))
 
 (req-package lsp-mode
   :ensure t
+  :commands lsp
   :config (progn
             (require 'lsp-clients)
             (add-hook 'typescript-mode-hook #'lsp)
@@ -681,17 +684,21 @@
 
 (req-package typescript-mode
   :ensure t
+  :mode "\\.ts\\'"
   :config (progn
             (setq-default typescript-indent-level 2)))
 
 (req-package elixir-mode
+  :mode "\\.ex\\'"
   :ensure t)
 
 (req-package lsp-elixir
+  :mode "\\.ex\\'"
   :ensure t)
 
 (req-package irony
   :ensure t
+  :mode "\\.cpp\\'"
   :config (progn
             (message "Configuring irony-mode for platformio-mode")
             (add-hook 'platformio-mode-hook 'irony-mode)
@@ -699,11 +706,13 @@
 
 (req-package irony-eldoc
   :ensure t
+  :requires irony
   :config (progn
             (add-hook 'irony-mode-hook 'irony-eldoc)))
 
 (req-package flycheck-irony
   :ensure t
+  :requires irony
   :config (progn
             (add-hook 'irony-mode-hook
                       (lambda ()
@@ -718,6 +727,7 @@
 
 (req-package company-irony
   :ensure t
+  :requires irony
   :config (progn
             (add-hook 'irony-mode-hook
                       (lambda ()
@@ -727,6 +737,7 @@
 
 (req-package platformio-mode
   :ensure t
+  :requires irony
   :config (progn
             (add-hook 'c++-mode-hook
                       (lambda ()
