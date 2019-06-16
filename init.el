@@ -1,101 +1,5 @@
 ; -*- lexical-binding: t -*-
 
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(default ((t (:family "Hack" :foundry "nil" :slant normal :weight normal :height 130 :width normal))))
- '(flycheck-error ((t (:underline "Red1"))))
- '(flycheck-info ((t (:underline "ForestGreen"))))
- '(flycheck-warning ((t (:underline "DarkOrange")))))
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(beacon-color "#cc6666")
- '(compilation-message-face (quote default))
- '(cua-global-mark-cursor-color "#2aa198")
- '(cua-normal-cursor-color "#657b83")
- '(cua-overwrite-cursor-color "#b58900")
- '(cua-read-only-cursor-color "#859900")
- '(custom-safe-themes
-   (quote
-    ("dbade2e946597b9cda3e61978b5fcc14fa3afa2d3c4391d477bdaeff8f5638c5" "801a567c87755fe65d0484cb2bded31a4c5bb24fd1fe0ed11e6c02254017acb2" "8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" "d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" "a8245b7cc985a0610d71f9852e9f2767ad1b852c2bdea6f4aadc12cce9c4d6d0" "732b807b0543855541743429c9979ebfb363e27ec91e82f463c91e68c772f6e3" "a24c5b3c12d147da6cef80938dca1223b7c7f70f2f382b26308eba014dc4833a" "f41ecd2c34a9347aeec0a187a87f9668fa8efb843b2606b6d5d92a653abe2439" "233bb646e100bda00c0af26afe7ab563ef118b9d685f1ac3ca5387856674285d" "e11569fd7e31321a33358ee4b232c2d3cf05caccd90f896e1df6cab228191109" "0e0c37ee89f0213ce31205e9ae8bce1f93c9bcd81b1bcda0233061bb02c357a8" "444238426b59b360fb74f46b521933f126778777c68c67841c31e0a68b0cc920" "086970da368bb95e42fd4ddac3149e84ce5f165e90dfc6ce6baceae30cf581ef" "1b8d67b43ff1723960eb5e0cba512a2c7a2ad544ddb2533a90101fd1852b426e" "c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" "82d2cac368ccdec2fcc7573f24c3f79654b78bf133096f9b40c20d97ec1d8016" "06f0b439b62164c6f8f84fdda32b62fb50b6d00e8b01c2208e55543a6337433a" "628278136f88aa1a151bb2d6c8a86bf2b7631fbea5f0f76cba2a0079cd910f7d" "bb08c73af94ee74453c90422485b29e5643b73b05e8de029a6909af6a3fb3f58" "a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" default)))
- '(fci-rule-color "#373b41")
- '(flycheck-color-mode-line-face-to-color (quote mode-line-buffer-id))
- '(frame-background-mode (quote dark))
- '(highlight-changes-colors (quote ("#d33682" "#6c71c4")))
- '(highlight-symbol-colors
-   (--map
-    (solarized-color-blend it "#fdf6e3" 0.25)
-    (quote
-     ("#b58900" "#2aa198" "#dc322f" "#6c71c4" "#859900" "#cb4b16" "#268bd2"))))
- '(highlight-symbol-foreground-color "#586e75")
- '(highlight-tail-colors
-   (quote
-    (("#eee8d5" . 0)
-     ("#B4C342" . 20)
-     ("#69CABF" . 30)
-     ("#69B7F0" . 50)
-     ("#DEB542" . 60)
-     ("#F2804F" . 70)
-     ("#F771AC" . 85)
-     ("#eee8d5" . 100))))
- '(hl-bg-colors
-   (quote
-    ("#DEB542" "#F2804F" "#FF6E64" "#F771AC" "#9EA0E5" "#69B7F0" "#69CABF" "#B4C342")))
- '(hl-fg-colors
-   (quote
-    ("#fdf6e3" "#fdf6e3" "#fdf6e3" "#fdf6e3" "#fdf6e3" "#fdf6e3" "#fdf6e3" "#fdf6e3")))
- '(hl-paren-colors (quote ("#2aa198" "#b58900" "#268bd2" "#6c71c4" "#859900")))
- '(lsp-ui-doc-use-webkit t)
- '(lsp-ui-sideline-delay 0.8)
- '(lsp-ui-sideline-ignore-duplicate nil)
- '(lsp-ui-sideline-show-code-actions nil)
- '(magit-diff-use-overlays nil)
- '(nrepl-message-colors
-   (quote
-    ("#dc322f" "#cb4b16" "#b58900" "#546E00" "#B4C342" "#00629D" "#2aa198" "#d33682" "#6c71c4")))
- '(package-selected-packages
-   (quote
-    (one-themes elixir-mode lsp-elixir elixir-ls elixir-lsp irony-mode speed-type platformio platformio-mode sublime-themes paper-theme mac-classic-theme intellij-theme leuven-theme eink-theme eink exec-path-from-shell ivy magit typescript-mode company go-mode rust-mode haskell-mode evil smartparens irony flycheck use-package erc company-lsp lsp-mode lsp-typescript lsp-ui forge smart-jump doom-modeline doom-themes monokai monokai-theme solarized-theme material-theme sass-mode klere-theme dracula-theme rjsx-mode jsx-mode ob-erd ox-gfm flycheck-package org-mind-map zenburn-theme color-theme-sanityinc-tomorrow paradox htmlize ox-twbs yasnippet-snippets yasnippet org-plus-contrib yaml-mode web-mode tide tao-theme smart-mode-line slime-company robe req-package rbenv racer pyvenv projectile-rails php-mode php-eldoc minitest js2-mode irony-eldoc intero iedit hlint-refactor hindent go-eldoc ggtags flycheck-rust flycheck-irony flycheck-elm evil-smartparens evil-magit evil-lisp-state evil-leader evil-god-state evil-commentary elm-mode el-get dumb-jump counsel-projectile counsel-etags company-irony company-go company-anaconda color-theme-approximate cider benchmark-init)))
- '(pos-tip-background-color "#eee8d5")
- '(pos-tip-foreground-color "#586e75")
- '(smartrep-mode-line-active-bg (solarized-color-blend "#859900" "#eee8d5" 0.2))
- '(term-default-bg-color "#fdf6e3")
- '(term-default-fg-color "#657b83")
- '(vc-annotate-background nil)
- '(vc-annotate-background-mode nil)
- '(vc-annotate-color-map
-   (quote
-    ((20 . "#cc6666")
-     (40 . "#de935f")
-     (60 . "#f0c674")
-     (80 . "#b5bd68")
-     (100 . "#8abeb7")
-     (120 . "#81a2be")
-     (140 . "#b294bb")
-     (160 . "#cc6666")
-     (180 . "#de935f")
-     (200 . "#f0c674")
-     (220 . "#b5bd68")
-     (240 . "#8abeb7")
-     (260 . "#81a2be")
-     (280 . "#b294bb")
-     (300 . "#cc6666")
-     (320 . "#de935f")
-     (340 . "#f0c674")
-     (360 . "#b5bd68"))))
- '(vc-annotate-very-old-color nil)
- '(weechat-color-list
-   (quote
-    (unspecified "#fdf6e3" "#eee8d5" "#990A1B" "#dc322f" "#546E00" "#859900" "#7B6000" "#b58900" "#00629D" "#268bd2" "#93115C" "#d33682" "#00736F" "#2aa198" "#657b83" "#839496")))
- '(xterm-color-names
-   ["#eee8d5" "#dc322f" "#859900" "#b58900" "#268bd2" "#d33682" "#2aa198" "#073642"])
- '(xterm-color-names-bright
-   ["#fdf6e3" "#cb4b16" "#93a1a1" "#839496" "#657b83" "#6c71c4" "#586e75" "#002b36"]))
 
 (setq lexical-binding t)
 
@@ -242,8 +146,8 @@
 (require 'req-package)
 
 (use-package benchmark-init
-  :ensure t
   :disabled t
+  :ensure t
   :config (add-hook 'after-init-hook 'benchmark-init/deactivate))
 
 (progn
@@ -310,6 +214,7 @@
                       (f-directories project-root))))
 
 (req-package magit
+  :defer t
   :ensure t)
 
 (req-package pyvenv
@@ -335,7 +240,7 @@
 
 (req-package flycheck
   :ensure t
-  :defer 1
+  :defer t
   :config (progn
             (setq flycheck-perlcritic-severity 5)
             (setq flycheck-ghc-args (list
@@ -661,13 +566,15 @@
 
 (req-package smart-jump
   :ensure t
+  :bind (:map evil-normal-state-map
+              ("M-." . smart-jump-go)
+              ("M-," . smart-jump-back))
   :config (progn
-            (smart-jump-setup-default-registers)
-            (bind-key "M-." 'smart-jump-go evil-normal-state-map)
-            (bind-key "M-," 'smart-jump-back)))
+            (smart-jump-setup-default-registers)))
 
 (req-package lsp-mode
   :ensure t
+  :commands lsp
   :config (progn
             (require 'lsp-clients)
             (add-hook 'typescript-mode-hook #'lsp)
@@ -699,18 +606,22 @@
 
 (req-package typescript-mode
   :ensure t
+  :mode "\\.ts\\'"
   :config (progn
             (setq-default typescript-indent-level 2)))
 
 (req-package elixir-mode
+  :mode "\\.ex\\'"
   :ensure t)
 
 (req-package lsp-elixir
   :disabled t
+  :mode "\\.ex\\'"
   :ensure t)
 
 (req-package irony
   :ensure t
+  :mode "\\.cpp\\'"
   :config (progn
             (message "Configuring irony-mode for platformio-mode")
             (add-hook 'platformio-mode-hook 'irony-mode)
@@ -718,11 +629,13 @@
 
 (req-package irony-eldoc
   :ensure t
+  :requires irony
   :config (progn
             (add-hook 'irony-mode-hook 'irony-eldoc)))
 
 (req-package flycheck-irony
   :ensure t
+  :requires irony
   :config (progn
             (add-hook 'irony-mode-hook
                       (lambda ()
@@ -737,6 +650,7 @@
 
 (req-package company-irony
   :ensure t
+  :requires irony
   :config (progn
             (add-hook 'irony-mode-hook
                       (lambda ()
@@ -746,6 +660,7 @@
 
 (req-package platformio-mode
   :ensure t
+  :requires irony
   :config (progn
             (add-hook 'c++-mode-hook
                       (lambda ()
