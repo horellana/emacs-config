@@ -1,6 +1,5 @@
 ; -*- lexical-binding: t -*-
 
-
 (setq lexical-binding t)
 
 (eval-when-compile
@@ -132,11 +131,7 @@
   '(progn
      (org-babel-do-load-languages 'org-babel-load-languages '((plantuml . t)))))
 
-;; (if (eq system-type 'darwin)
-;; (set-frame-font "Hack-13"))
-;; (set-frame-font "DejaVu Sans Mono-12"))
-
-(set-frame-font "Hack-13")
+(set-frame-font "Hack-9")
 
 (eval-after-load "bind-key"
   '(progn
@@ -188,6 +183,7 @@
             (load-theme 'leuven t)))
 
 (use-package dracula-theme
+  :disabled t
   :ensure t
   :config (progn
             (load-theme 'dracula t)))
@@ -199,12 +195,11 @@
             (load-theme 'tao-yin)))
 
 (use-package doom-themes
-  :disabled t
   :ensure t
   :config (progn
             (doom-themes-visual-bell-config)
             (doom-themes-org-config)
-            (load-theme 'doom-one-light t)))
+            (load-theme 'doom-gruvbox t)))
 
 (defun juiko/python-find-env (project-root)
   "Find the python project env directory, inside PROJECT-ROOT."
@@ -219,24 +214,23 @@
 
 (req-package pyvenv
   :ensure t
-  :mode "\\.py\\'"
   :requires (projectile f)
   :init (progn
           (defvar *python-current-env* ""))
-  :config (eval-after-load "pyvenv"
-            '(progn
-               (add-hook 'python-mode-hook
-                         (lambda ()
-                           (require 'projectile)
-                           (let* ((root (projectile-project-root))
-                                  (env (juiko/python-find-env root)))
-                             (when (and env
-                                        (not (equal env *python-current-env*)))
-                               (progn
-                                 (setf *python-current-env* env)
-                                 (pyvenv-activate env)
-                                 (message "Current python env: %s" *python-current-env*))
-                               )))))))
+  :config (progn
+            (message "Configuring python-env")
+            (add-hook 'python-mode-hook
+                      (lambda ()
+                        (require 'projectile)
+                        (let* ((root (projectile-project-root))
+                               (env (juiko/python-find-env root)))
+                          (when (and env
+                                     (not (equal env *python-current-env*)))
+                            (progn
+                              (setf *python-current-env* env)
+                              (pyvenv-activate env)
+                              (message "Current python env: %s" *python-current-env*))
+                            ))))))
 
 (req-package flycheck
   :ensure t
@@ -319,6 +313,7 @@
 (req-package smartparens
   :ensure t
   :config (progn
+
             (sp-local-pair '(emacs-lisp-mode
                              lisp-mode
                              slime-repl-mode)
@@ -668,9 +663,39 @@
                         (platformio-init-update-workspace)))))
 
 (req-package js2-mode
+  :ensure t
   :config (progn
             (add-to-list 'auto-mode-alist '("\\.jsx?\\'" . js2-jsx-mode))
             (add-to-list 'interpreter-mode-alist '("node" . js2-jsx-mode))
             (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))))
 
+(req-package haskell-mode
+  :ensure t
+  :mode "\\.hs\\'")
+
+(req-package slime
+  :ensure t
+  :config (progn
+            ))
+
+
+(req-package lua-mode
+  :ensure t)
+
 (req-package-finish)
+
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages
+   '(json-mode doom-themes solarized-theme one-themes lua-mode slime haskell-mode js2-mode platformio-mode company-irony flycheck-irony irony-eldoc irony elixir-mode typescript-mode company-lsp lsp-ui lsp-mode smart-jump doom-modeline ox-twbs yaml-mode ggtags counsel-projectile counsel-etags cider color-theme-approximate rust-mode web-mode evil-leader evil-god-state evil-commentary evil-smartparens evil smartparens company iedit flycheck-package flycheck pyvenv magit req-package exec-path-from-shell el-get dracula-theme)))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(flycheck-error ((t (:underline "Red1"))))
+ '(flycheck-info ((t (:underline "ForestGreen"))))
+ '(flycheck-warning ((t (:underline "DarkOrange")))))
