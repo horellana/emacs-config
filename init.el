@@ -40,7 +40,6 @@
 
 (setf tab-width 2)
 
-
 (progn
   (defalias 'perl-mode 'cperl-mode)
   (eval-after-load "cperl-mode"
@@ -131,7 +130,7 @@
   '(progn
      (org-babel-do-load-languages 'org-babel-load-languages '((plantuml . t)))))
 
-(set-frame-font "Hack-9")
+(set-frame-font "Hack-10")
 
 (eval-after-load "bind-key"
   '(progn
@@ -163,6 +162,12 @@
   :config (progn
             (when (memq window-system '(mac ns x))
               (exec-path-from-shell-initialize))))
+
+(use-package kooten-theme
+  :ensure t
+  :config (progn
+            (load-theme 'kooten t)
+            (set-face-attribute 'fringe nil :background nil)))
 
 (use-package one-themes
   :ensure t
@@ -196,6 +201,7 @@
 
 (use-package doom-themes
   :ensure t
+  :disabled t
   :config (progn
             (doom-themes-visual-bell-config)
             (doom-themes-org-config)
@@ -690,7 +696,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(json-mode doom-themes solarized-theme one-themes lua-mode slime haskell-mode js2-mode platformio-mode company-irony flycheck-irony irony-eldoc irony elixir-mode typescript-mode company-lsp lsp-ui lsp-mode smart-jump doom-modeline ox-twbs yaml-mode ggtags counsel-projectile counsel-etags cider color-theme-approximate rust-mode web-mode evil-leader evil-god-state evil-commentary evil-smartparens evil smartparens company iedit flycheck-package flycheck pyvenv magit req-package exec-path-from-shell el-get dracula-theme)))
+   '(kooten-theme dakrone-theme json-mode doom-themes solarized-theme one-themes lua-mode slime haskell-mode js2-mode platformio-mode company-irony flycheck-irony irony-eldoc irony elixir-mode typescript-mode company-lsp lsp-ui lsp-mode smart-jump doom-modeline ox-twbs yaml-mode ggtags counsel-projectile counsel-etags cider color-theme-approximate rust-mode web-mode evil-leader evil-god-state evil-commentary evil-smartparens evil smartparens company iedit flycheck-package flycheck pyvenv magit req-package exec-path-from-shell el-get dracula-theme)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
