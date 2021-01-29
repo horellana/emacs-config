@@ -6,7 +6,6 @@
   (require 'cl)
   )
 
-
 (setq gc-cons-threshold 100000000)
 (setq read-process-output-max (* 1024 1024))
 (setq comp-deferred-compilation t)
@@ -116,6 +115,9 @@
    (null (string-match-p "Microsoft"
        (shell-command-to-string "uname -a")))))
 
+(add-to-list 'display-buffer-alist
+  (cons "\\*Async Shell Command\\*.*" (cons #'display-buffer-no-window nil)))
+
 (eval-after-load "js-mode"
   '(progn
      (setq js-indent-level 2)))
@@ -123,55 +125,54 @@
 (eval-after-load "projectile"
   '(eval-after-load "f"
      '(progn
-	(message "loading gnu global configuration")
+	      ;; (message "loading gnu global configuration")
+	      (message "loading ctags configuration")
 
-        (defun gtags-exists-p (root)
-          (require 'f)
-          (-contains-p  (f-files root)
-                        (f-join root "GTAGS")))
+	      (defun horellana/ctags-exists-p (root)
+		(require 'f)
+		(-contains-p  (f-files root)
+                              (f-join root "tags")))
         
-        (defun async-gtags-create ()
-          (message "async-gtags-create")
-          (call-process "gtags" nil 0 nil))
+	      (defun horellana/sync-ctags-create (project-root)
+	        (let* ((default-directory project-root)
+                       (output-file (format "'%s%s'" project-root "tags"))
+		       (cmd "ctags-generate.sh"))
+
+	          (message "sync-gtags-create")
+		  (start-process "ctags" nil cmd output-file)))
         
-        (defun async-gtags-update ()
-          (message "async-gtags-update")
-          (call-process "global" nil 0 nil "-u"))
-        
-        (defun async-gtags (root)
-          (if (gtags-exists-p root)
-              (async-gtags-update)
-            (let ((default-directory root))
-              (async-gtags-create))))
-        
-        (defvar *gtags-modes*)
-        (setf *gtags-modes*
-              '(web-mode
-                php-mode
-                cperl-mode
-                ruby-mode
-                c++-mode))
-
-
-        (add-hook 'after-save-hook
-                  (lambda ()
-		                (message "gnu global after-save-hook")
-                    (require 'projectile)
-                    (let ((generate-tags-p (member major-mode *gtags-modes*))
-                          (project-root (projectile-project-root)))
-
-                      (message "project root: %s" project-root)
-
-                      (when (and generate-tags-p
-                                 project-root)
-                        (async-gtags project-root))))))))
+              (defun horellana/sync-ctags-update (project-root)
+		(message "sync-ctags-update")
+		(horellana/sync-ctags-create project-root))
+	      
+	      (defun horellana/sync-ctags (root)
+		(if (horellana/ctags-exists-p root)
+		    (horellana/sync-ctags-update root)
+		  (let ((default-directory root))
+		    (horellana/sync-ctags-create root))))
+              
+	      (defvar *horellana/ctags-modes*)
+              
+              (setf *horellana/ctags-modes*
+		    '(c++-mode))
+              
+              (add-hook 'after-save-hook
+			(lambda ()
+	                  (message "ctags after-save-hook")
+			  (require 'projectile)
+			  (let ((generate-tags-p (member major-mode *horellana/ctags-modes*))
+				(project-root (projectile-project-root)))
+			    (when (and generate-tags-p
+                                       project-root)
+		              (message "project root: %s" project-root)
+                              (horellana/sync-ctags project-root))))))))
 
 (eval-after-load "python"
   '(progn
      (add-hook 'inferior-python-mode-hook
                (lambda ()
                  (python-shell-send-string "__name__ = None")))
-
+     
      (add-hook 'after-save-hook
 	             (lambda ()
 		             (when (eq major-mode 'python-mode)
@@ -183,7 +184,7 @@
 (eval-after-load "org"
   '(progn
      (setq org-agenda-files (list "~/emacs-org/todos.org"))
-
+     
      (define-key global-map "\C-Ca" 'org-agenda)
      (org-babel-do-load-languages 'org-babel-load-languages '((plantuml . t)))))
 
@@ -304,8 +305,12 @@
          (global-company-mode)
          
          (add-hook 'prog-mode-hook
-                   (lambda () (setq company-backends '(company-capf))))
-         )))
+                   (lambda ()
+		     (if (eq major-mode 'c++-mode)
+			 (progn
+			   (message "c++-mode company-backends")
+			   (setq-local company-backends '((company-ctags company-capf))))
+                       (setq-local company-backends '(company-capf))))))))
 
 (defvar *no-smartparens-list*
   '(haskell-mode))
@@ -523,14 +528,14 @@
   :config (progn
       (counsel-projectile-mode)))
 
-(req-package ggtags
-  :ensure t
-  :config (progn
-            (eval-after-load "company"
-              '(progn
-                 (add-hook 'c++-mode-hook
-                           (lambda ()
-                             (setq-local company-backends '((company-capf company-dabbrev-code company-gtags)))))))))
+(req-package company-ctags
+  :ensure t)
+  ;; :config (progn
+  ;;           (eval-after-load "company"
+  ;;             '(progn
+  ;;                (add-hook 'c++-mode-hook
+  ;;                          (lambda ()
+  ;;                            (setq-local company-backends '((company-capf company-dabbrev-code company-ctags)))))))))
 
 (req-package yaml-mode
   :ensure t
@@ -576,10 +581,9 @@
   :config (progn
 	    ;; (require 'lsp-clients)
 
-	    (add-hook 'lsp-mode-hook
-		      (lambda ()
-			      (setq company-backends '(company-capf))))
-	    
+	    ;; (add-hook 'lsp-mode-hook
+	    ;; 	      (lambda ()
+	    ;; 		      (setq company-backends '(company-capf))))
 
 	    (add-hook 'c++-mode-hook
 		      (lambda ()
@@ -721,6 +725,9 @@
 (req-package yasnippet
   :ensure t)
 
+(req-package company-ctags
+  :ensure t)
+
 (req-package-finish)
 
 (add-hook 'python-mode-hook
@@ -763,7 +770,7 @@
  '(jdee-db-spec-breakpoint-face-colors (cons "#19181A" "#727072"))
  '(objed-cursor-color "#CC6666")
  '(package-selected-packages
-   '(cyberpunk minsk-theme leuven-theme lsp-ui yasnippet pipenv company-prescient ivy-prescient prescient mood-line minimal-theme ccls wakatime-mode no-littering org-journal arc-dark-theme company-box treemacs-evil treemacs-projectile treemacs spacemacs spacemacs-them spacemacs-theme vscode-dark-plus-theme dracula-theme badger-theme moe-theme tao-theme doom-theme feebleline cyberpunk-theme doom-themes exec-path-from-shell slime haskell-mode platformio-mode company-irony flycheck-irony irony-eldoc irony elixir-mode typescript-mode company-lsp lsp-mode smart-jump doom-modeline ox-twbs yaml-mode ggtags counsel-projectile counsel-etags cider color-theme-approximate rust-mode js2-mode web-mode evil-lisp-state evil-leader evil-god-state evil-commentary evil-smartparens evil smartparens company iedit flycheck-package flycheck pyvenv magit req-package use-package el-get))
+   '(company-ctags cyberpunk minsk-theme leuven-theme lsp-ui yasnippet pipenv company-prescient ivy-prescient prescient mood-line minimal-theme ccls wakatime-mode no-littering org-journal arc-dark-theme company-box treemacs-evil treemacs-projectile treemacs spacemacs spacemacs-them spacemacs-theme vscode-dark-plus-theme dracula-theme badger-theme moe-theme tao-theme doom-theme feebleline cyberpunk-theme doom-themes exec-path-from-shell slime haskell-mode platformio-mode company-irony flycheck-irony irony-eldoc irony elixir-mode typescript-mode company-lsp lsp-mode smart-jump doom-modeline ox-twbs yaml-mode ggtags counsel-projectile counsel-etags cider color-theme-approximate rust-mode js2-mode web-mode evil-lisp-state evil-leader evil-god-state evil-commentary evil-smartparens evil smartparens company iedit flycheck-package flycheck pyvenv magit req-package use-package el-get))
  '(pdf-view-midnight-colors (cons "#FCFCFA" "#2D2A2E"))
  '(rustic-ansi-faces
    ["#2D2A2E" "#CC6666" "#A9DC76" "#FFD866" "#78DCE8" "#FF6188" "#78DCE8" "#FCFCFA"])
