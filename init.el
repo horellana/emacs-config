@@ -8,19 +8,17 @@
 
 (setq gc-cons-threshold 100000000)
 (setq read-process-output-max (* 1024 1024))
-(setq comp-deferred-compilation t)
+(setq comp-deferred-compilation nil)
 
 (require 'package)
 
-;; (package-initialize)
-
 (progn
   (setq package-archives
-  '(("melpa" . "https://melpa.org/packages/")
-    ("gnu" . "https://elpa.gnu.org/packages/")
-    ("org" . "https://orgmode.org/elpa/"))))
+        '(("melpa" . "https://melpa.org/packages/")
+          ("gnu" . "https://elpa.gnu.org/packages/")
+          ("org" . "https://orgmode.org/elpa/"))))
 (when (or (not (package-installed-p 'use-package))
-    (not (package-installed-p 'req-package)))
+          (not (package-installed-p 'req-package)))
 
   (package-refresh-contents)
   (package-install 'el-get)
@@ -43,23 +41,15 @@
 (use-package f
   :ensure t)
 
-(use-package cyberpunk-theme
-  :disabled t
+(use-package tron-legacy-theme
   :ensure t
   :config (progn
-	    (load-theme 'cyberpunk t)))
+	    (load-theme 'tron-legacy t)))
 
-(use-package minsk-theme
-  :ensure t
-  :config (progn
-	    ;; (load-theme 'leuven )
-	    (load-theme 'minsk t)))
-
-(use-package minimal-theme
-  :disabled t
-  :ensure t
-  :config (progn
-	    (load-theme 'minimal-black t)))
+;; (use-package vs-dark-theme
+;;   :ensure t
+;;   :config (progn
+;; 	    (load-theme 'vs-dark t)))
 
 (setq ccls-executable "/usr/bin/ccls")
 (setq js-indent-level 2)
@@ -83,12 +73,12 @@
   (eval-after-load "cperl-mode"
     '(progn
        (setf cperl-electric-parens nil
-       cperl-electric-keywords nil
-       cperl-electric-lbrace-space nil))))
+             cperl-electric-keywords nil
+             cperl-electric-lbrace-space nil))))
 
 (set-face-attribute 'fringe nil
-  :foreground (face-foreground 'default)
-  :background (face-background 'default))
+                    :foreground (face-foreground 'default)
+                    :background (face-background 'default))
 
 (fset 'yes-or-no-p 'y-or-n-p)
 
@@ -99,10 +89,10 @@
 
 
 (add-hook 'after-save-hook
-    (lambda ()
-      (let ((init-file (expand-file-name "~/.emacs.d/init.el")))
-  (when (equal (buffer-file-name) init-file)
-    (byte-compile-file init-file)))))
+          (lambda ()
+            (let ((init-file (expand-file-name "~/.emacs.d/init.el")))
+              (when (equal (buffer-file-name) init-file)
+                (byte-compile-file init-file)))))
 
 (defun transparency (value)
   "Sets the transparency of the frame window. 0=transparent/100=opaque"
@@ -113,10 +103,10 @@
   "Return t if running in WSL."
   (not
    (null (string-match-p "Microsoft"
-       (shell-command-to-string "uname -a")))))
+                         (shell-command-to-string "uname -a")))))
 
 (add-to-list 'display-buffer-alist
-  (cons "\\*Async Shell Command\\*.*" (cons #'display-buffer-no-window nil)))
+             (cons "\\*Async Shell Command\\*.*" (cons #'display-buffer-no-window nil)))
 
 (eval-after-load "js-mode"
   '(progn
@@ -128,44 +118,50 @@
 	      ;; (message "loading gnu global configuration")
 	      (message "loading ctags configuration")
 
+        (defvar *horellana/ctags-process-running-p*)
+
 	      (defun horellana/ctags-exists-p (root)
-		(require 'f)
-		(-contains-p  (f-files root)
-                              (f-join root "tags")))
+	        (require 'f)
+	        (-contains-p  (f-files root)
+                        (f-join root "tags")))
         
 	      (defun horellana/sync-ctags-create (project-root)
 	        (let* ((default-directory project-root)
-                       (output-file (format "'%s%s'" project-root "tags"))
-		       (cmd "ctags-generate.sh"))
+                 (output-file (format "'%s%s'" project-root "tags"))
+		             (cmd "ctags-generate.sh"))
 
-	          (message "sync-gtags-create")
-		  (start-process "ctags" nil cmd output-file)))
+	          (unless *horellana/ctags-process-running-p*
+	            (setq-local *horellana/ctags-process-running-p* t)
+	            (async-start-process "ctags-generate"
+				                           "ctags-generate.sh"
+				                           (lambda () (setq-local *horellana/ctags-process-running-p* nil))
+				                           output-file))))
         
-              (defun horellana/sync-ctags-update (project-root)
-		(message "sync-ctags-update")
-		(horellana/sync-ctags-create project-root))
+        (defun horellana/sync-ctags-update (project-root)
+	        (message "sync-ctags-update")
+	        (horellana/sync-ctags-create project-root))
 	      
 	      (defun horellana/sync-ctags (root)
-		(if (horellana/ctags-exists-p root)
-		    (horellana/sync-ctags-update root)
-		  (let ((default-directory root))
-		    (horellana/sync-ctags-create root))))
-              
+	        (if (horellana/ctags-exists-p root)
+	            (horellana/sync-ctags-update root)
+	          (let ((default-directory root))
+	            (horellana/sync-ctags-create root))))
+        
 	      (defvar *horellana/ctags-modes*)
-              
-              (setf *horellana/ctags-modes*
-		    '(c++-mode))
-              
-              (add-hook 'after-save-hook
-			(lambda ()
+        
+        (setf *horellana/ctags-modes*
+	            '(c++-mode))
+        
+        (add-hook 'after-save-hook
+		              (lambda ()
 	                  (message "ctags after-save-hook")
-			  (require 'projectile)
-			  (let ((generate-tags-p (member major-mode *horellana/ctags-modes*))
-				(project-root (projectile-project-root)))
-			    (when (and generate-tags-p
-                                       project-root)
-		              (message "project root: %s" project-root)
-                              (horellana/sync-ctags project-root))))))))
+		                (require 'projectile)
+		                (let ((generate-tags-p (member major-mode *horellana/ctags-modes*))
+			                    (project-root (projectile-project-root)))
+		                  (when (and generate-tags-p
+                                 project-root)
+		                    (message "project root: %s" project-root)
+                        (horellana/sync-ctags project-root))))))))
 
 (eval-after-load "python"
   '(progn
@@ -188,7 +184,7 @@
      (define-key global-map "\C-Ca" 'org-agenda)
      (org-babel-do-load-languages 'org-babel-load-languages '((plantuml . t)))))
 
-(set-frame-font "Hack-10")
+(set-frame-font "UbuntuMono-12")
 
 (eval-after-load "bind-key"
   '(progn
@@ -205,9 +201,9 @@
   "Find the python project env directory, inside PROJECT-ROOT."
   (require 'projectile)
   (car (-intersection
-	(mapcar (lambda (path) (f-join project-root path))
-		(list "env" ".env"))
-	(f-directories project-root))))
+	      (mapcar (lambda (path) (f-join project-root path))
+		            (list "env" ".env"))
+	      (f-directories project-root))))
 
 (req-package magit
   :defer t
@@ -238,33 +234,33 @@
   :defer t
 
   :config (progn
-	    (setq flycheck-perlcritic-severity 5)
-	    (setq flycheck-ghc-args (list
-				     "-fwarn-tabs"
-				     "-fwarn-type-defaults"
-				     "-fwarn-unused-do-bind"
-				     "-fwarn-incomplete-uni-patterns"
-				     "-fwarn-incomplete-patterns"
-				     "-fwarn-incomplete-record-updates"
-				     "-fwarn-monomorphism-restriction"
-				     "-fwarn-auto-orphans"
-				     "-fwarn-implicit-prelude"
-				     "-fwarn-missing-exported-sigs"
-				     "-fwarn-identities"
-				     "-Wall"))
+	          (setq flycheck-perlcritic-severity 5)
+	          (setq flycheck-ghc-args (list
+				                             "-fwarn-tabs"
+				                             "-fwarn-type-defaults"
+				                             "-fwarn-unused-do-bind"
+				                             "-fwarn-incomplete-uni-patterns"
+				                             "-fwarn-incomplete-patterns"
+				                             "-fwarn-incomplete-record-updates"
+				                             "-fwarn-monomorphism-restriction"
+				                             "-fwarn-auto-orphans"
+				                             "-fwarn-implicit-prelude"
+				                             "-fwarn-missing-exported-sigs"
+				                             "-fwarn-identities"
+				                             "-Wall"))
 
-	    (custom-set-faces
-	     '(flycheck-error ((t (:underline "Red1"))))
-	     '(flycheck-info ((t (:underline "ForestGreen"))))
-	     '(flycheck-warning ((t (:underline "DarkOrange"))))
-	     )
-	    
-	    (setq-default flycheck-disabled-checkers
-			  '(ruby-rubylint))
-	    
-	    (add-hook 'python-mode-hook
-		      (lambda ()
-			(flycheck-mode)))))
+	          (custom-set-faces
+	           '(flycheck-error ((t (:underline "Red1"))))
+	           '(flycheck-info ((t (:underline "ForestGreen"))))
+	           '(flycheck-warning ((t (:underline "DarkOrange"))))
+	           )
+	          
+	          (setq-default flycheck-disabled-checkers
+			                    '(ruby-rubylint))
+	          
+	          (add-hook 'python-mode-hook
+		                  (lambda ()
+			                  (flycheck-mode)))))
 
 (req-package flycheck-package
   :ensure t
@@ -273,16 +269,16 @@
 (req-package bind-key
   :ensure t
   :config (eval-after-load "bind-key"
-      '(progn
-   (bind-key (kbd "M--") 'hippie-expand)
-   (bind-key (kbd "M-g M-g")
-       '(lambda ()
-    (interactive)
-    (unwind-protect
-  (progn
-    (linum-mode t)
-    (call-interactively 'goto-line))
-      (linum-mode -1)))))))
+            '(progn
+               (bind-key (kbd "M--") 'hippie-expand)
+               (bind-key (kbd "M-g M-g")
+                         '(lambda ()
+                            (interactive)
+                            (unwind-protect
+                                (progn
+                                  (linum-mode t)
+                                  (call-interactively 'goto-line))
+                              (linum-mode -1)))))))
 
 (req-package iedit
   :ensure t
@@ -296,21 +292,21 @@
   :ensure t
   :defer 5
   :config (eval-after-load "company"
-      '(progn
-         (setf company-minimum-prefix-length 3)
-         (setf company-show-numbers t)
-         (setf company-idle-delay 0.5)
-         (setf company-quickhelp-delay 1)
-         
-         (global-company-mode)
-         
-         (add-hook 'prog-mode-hook
-                   (lambda ()
-		     (if (eq major-mode 'c++-mode)
-			 (progn
-			   (message "c++-mode company-backends")
-			   (setq-local company-backends '((company-ctags company-capf))))
-                       (setq-local company-backends '(company-capf))))))))
+            '(progn
+               (setf company-minimum-prefix-length 3)
+               (setf company-show-numbers t)
+               (setf company-idle-delay 0.5)
+               (setf company-quickhelp-delay 1)
+               
+               (global-company-mode)
+               
+               (add-hook 'prog-mode-hook
+                         (lambda ()
+		           (if (eq major-mode 'c++-mode)
+			       (progn
+			         (message "c++-mode company-backends")
+			         (setq-local company-backends '((company-gtags company-ctags company-capf))))
+                             (setq-local company-backends '(company-capf))))))))
 
 (defvar *no-smartparens-list*
   '(haskell-mode))
@@ -319,74 +315,74 @@
   :ensure t
   :config (progn
 
-      (sp-local-pair '(emacs-lisp-mode
-     lisp-mode
-     slime-repl-mode)
-   "`" nil :actions nil)
-      (sp-local-pair '(emacs-lisp-mode
-     lisp-mode
-     slime-repl-mode)
-   "'" nil :actions nil)
-      (add-to-list 'sp-no-reindent-after-kill-modes 'haskell-mode)
+            (sp-local-pair '(emacs-lisp-mode
+                             lisp-mode
+                             slime-repl-mode)
+                           "`" nil :actions nil)
+            (sp-local-pair '(emacs-lisp-mode
+                             lisp-mode
+                             slime-repl-mode)
+                           "'" nil :actions nil)
+            (add-to-list 'sp-no-reindent-after-kill-modes 'haskell-mode)
 
-      (add-hook 'prog-mode-hook
-    (lambda ()
-      (unless (-contains? *no-smartparens-list* major-mode)
-  (smartparens-mode))))
+            (add-hook 'prog-mode-hook
+                      (lambda ()
+                        (unless (-contains? *no-smartparens-list* major-mode)
+                          (smartparens-mode))))
 
-      (add-hook 'web-mode-hook
-    (lambda () (require 'smartparens-html)))
+            (add-hook 'web-mode-hook
+                      (lambda () (require 'smartparens-html)))
 
-      (add-hook 'rust-mode-hook
-    (lambda () (require 'smartparens-rust)))
+            (add-hook 'rust-mode-hook
+                      (lambda () (require 'smartparens-rust)))
 
-      (add-hook 'python-mode-hook
-    (lambda () (require 'smartparens-python)))
+            (add-hook 'python-mode-hook
+                      (lambda () (require 'smartparens-python)))
 
-      (add-hook 'ruby-mode-hook
-    (lambda () (require 'smartparens-ruby)))))
+            (add-hook 'ruby-mode-hook
+                      (lambda () (require 'smartparens-ruby)))))
 
 (req-package evil
   :ensure t
   :requires bind-key
   :config (eval-after-load "evil"
-      '(progn
-	 (custom-set-variables
-	  '(evil-undo-system 'undo-redo))
+            '(progn
+	             (custom-set-variables
+	              '(evil-undo-system 'undo-redo))
 
 
-	 (bind-key "<tab>" 'indent-region evil-visual-state-map)
-	 (bind-key "C-<tab>" 'indent-whole-buffer evil-normal-state-map)
+	             (bind-key "<tab>" 'indent-region evil-visual-state-map)
+	             (bind-key "C-<tab>" 'indent-whole-buffer evil-normal-state-map)
 
-	 (bind-key [return] (lambda ()
-			      (interactive)
-			      (save-excursion
-				(newline)))
-		   evil-normal-state-map)
+	             (bind-key [return] (lambda ()
+			                              (interactive)
+			                              (save-excursion
+				                              (newline)))
+		                     evil-normal-state-map)
 
-	 (setf evil-move-cursor-back nil)
-	 
-	 (cl-loop for mode in '(haskell-interactive-mode
-				haskell-presentation-mode
-				haskell-error-mode
-				sql-interactive-mode
-				inferior-emacs-lisp-mode
-				erc-mode
-				parparadox-menu-mode
-				comint-mode
-				eshell-mode
-				slime-repl-mode
-				slime-macroexpansion-minor-mode-hook
-				geiser-repl-mode
-				cider-repl-mode
-				inferior-python-mode
-				intero-repl-mode
-				inf-ruby-mode
-				org-mode
-				magit-mode)
-		  do (evil-set-initial-state mode 'emacs))
+	             (setf evil-move-cursor-back nil)
+	             
+	             (cl-loop for mode in '(haskell-interactive-mode
+				                              haskell-presentation-mode
+				                              haskell-error-mode
+				                              sql-interactive-mode
+				                              inferior-emacs-lisp-mode
+				                              erc-mode
+				                              parparadox-menu-mode
+				                              comint-mode
+				                              eshell-mode
+				                              slime-repl-mode
+				                              slime-macroexpansion-minor-mode-hook
+				                              geiser-repl-mode
+				                              cider-repl-mode
+				                              inferior-python-mode
+				                              intero-repl-mode
+				                              inf-ruby-mode
+				                              org-mode
+				                              magit-mode)
+		                    do (evil-set-initial-state mode 'emacs))
 
-	 (evil-mode))))
+	             (evil-mode))))
 
 (req-package evil-smartparens
   :ensure t
@@ -398,7 +394,7 @@
   :ensure t
   :requires (evil)
   :config (progn
-      (evil-commentary-mode)))
+            (evil-commentary-mode)))
 
 (req-package evil-god-state
   :ensure t
@@ -408,81 +404,81 @@
   :ensure t
   :requires evil
   :config (progn
-      (setf evil-leader/leader (kbd ","))
-      (evil-leader/set-key
-  "f" 'counsel-find-file
-  "b" 'ivy-switch-buffer
-  "g" 'counsel-M-x
-  "k" 'kill-buffer
-  "," 'evil-execute-in-emacs-state
-  ";" 'comment-dwim
-  "e" 'eval-last-sexp
-  "w" 'save-buffer
-  ;; "." 'ggtags-find-tag-dwim
-  "hs" 'swiper
-  "hP"  'counsel-projectile
-  "hpa" 'counsel-projectile-ag
-  "hpg" 'counsel-projectile-grep
-  "ptp" 'projectile-test-project
-  "mgb" 'magit-branch
-  "mgc" 'magit-checkout
-  "mgc" 'magit-checkout
-  "mgl" 'magit-log
-  "mgs" 'magit-status
-  "mgpl" 'magit-pull
-  "mgps" 'magit-push)
+            (setf evil-leader/leader (kbd ","))
+            (evil-leader/set-key
+              "f" 'counsel-find-file
+              "b" 'ivy-switch-buffer
+              "g" 'counsel-M-x
+              "k" 'kill-buffer
+              "," 'evil-execute-in-emacs-state
+              ";" 'comment-dwim
+              "e" 'eval-last-sexp
+              "w" 'save-buffer
+              ;; "." 'ggtags-find-tag-dwim
+              "hs" 'swiper
+              "hP"  'counsel-projectile
+              "hpa" 'counsel-projectile-ag
+              "hpg" 'counsel-projectile-grep
+              "ptp" 'projectile-test-project
+              "mgb" 'magit-branch
+              "mgc" 'magit-checkout
+              "mgc" 'magit-checkout
+              "mgl" 'magit-log
+              "mgs" 'magit-status
+              "mgpl" 'magit-pull
+              "mgps" 'magit-push)
 
-      (evil-leader/set-key-for-mode 'haskell-mode "H" 'haskell-hoogle)
-      (evil-leader/set-key-for-mode 'emacs-lisp-mode "ma" 'pp-macroexpand-last-sexp)
-      (evil-leader/set-key-for-mode 'lisp-interaction-mode "ma" 'pp-macroexpand-last-sexp)
+            (evil-leader/set-key-for-mode 'haskell-mode "H" 'haskell-hoogle)
+            (evil-leader/set-key-for-mode 'emacs-lisp-mode "ma" 'pp-macroexpand-last-sexp)
+            (evil-leader/set-key-for-mode 'lisp-interaction-mode "ma" 'pp-macroexpand-last-sexp)
 
-      (evil-leader/set-key-for-mode 'lisp-mode "cl" 'slime-load-file)
-      (evil-leader/set-key-for-mode 'lisp-mode "e" 'slime-eval-last-expression)
-      (evil-leader/set-key-for-mode 'lisp-mode "me" 'slime-macroexpand-1)
-      (evil-leader/set-key-for-mode 'lisp-mode "ma" 'slime-macroexpand-all)
-      (evil-leader/set-key-for-mode 'lisp-mode "sds" 'slime-disassemble-symbol)
-      (evil-leader/set-key-for-mode 'lisp-mode "sdd" 'slime-disassemble-definition)
-      (evil-leader/set-key-for-mode 'cider-mode "e" 'cider-eval-last-sexp)
-      (global-evil-leader-mode)))
+            (evil-leader/set-key-for-mode 'lisp-mode "cl" 'slime-load-file)
+            (evil-leader/set-key-for-mode 'lisp-mode "e" 'slime-eval-last-expression)
+            (evil-leader/set-key-for-mode 'lisp-mode "me" 'slime-macroexpand-1)
+            (evil-leader/set-key-for-mode 'lisp-mode "ma" 'slime-macroexpand-all)
+            (evil-leader/set-key-for-mode 'lisp-mode "sds" 'slime-disassemble-symbol)
+            (evil-leader/set-key-for-mode 'lisp-mode "sdd" 'slime-disassemble-definition)
+            (evil-leader/set-key-for-mode 'cider-mode "e" 'cider-eval-last-sexp)
+            (global-evil-leader-mode)))
 
 (req-package web-mode
   :ensure t
   :hook (html-mode . web-mode)
   :mode (("\\.blade\\.php\\'" . web-mode))
   :config (eval-after-load "web-mode"
-      '(progn
-   (add-hook 'web-mode-hook #'turn-off-smartparens-mode)
+            '(progn
+               (add-hook 'web-mode-hook #'turn-off-smartparens-mode)
 
-   (add-hook 'web-mode-hook
-       (lambda ()
-   (setf web-mode-enable-auto-pairing t)
-   (setf web-mode-enable-css-colorization t)
-   (setf web-mode-enable-block-face t)
-   (setf web-mode-enable-heredoc-fontification t)
-   (setf web-mode-enable-current-element-highlight nil)
-   (setf web-mode-enable-current-column-highlight nil)
-   (setf web-mode-code-indent-offset 2)
-   (setf web-mode-markup-indent-offset 2)
-   (setf web-mode-css-indent-offset 2)))
+               (add-hook 'web-mode-hook
+                         (lambda ()
+                           (setf web-mode-enable-auto-pairing t)
+                           (setf web-mode-enable-css-colorization t)
+                           (setf web-mode-enable-block-face t)
+                           (setf web-mode-enable-heredoc-fontification t)
+                           (setf web-mode-enable-current-element-highlight nil)
+                           (setf web-mode-enable-current-column-highlight nil)
+                           (setf web-mode-code-indent-offset 2)
+                           (setf web-mode-markup-indent-offset 2)
+                           (setf web-mode-css-indent-offset 2)))
 
-   (cl-loop
-    for extension in '("\\.blade\\.php\\'"
-     "\\.ejs\\'"
-     "\\.phtml\\'"
-     "\\.tpl\\.php\\'"
-     "\\.[agj]sp\\'"
-     "\\.as[cp]x\\'"
-     "\\.erb\\'"
-     "\\.mustache\\'"
-     "\\.djhtml\\'"
-     "\\.html\\'"
-     "\\.html\\.erb\\'"
-     "\\html\\.twig\\'"
-     "\\html\\.jinja\\'"
-     "\\pdf\\.twig\\'"
-     "\\.jsx\\'"
-     "\\.blade\\.php\\'")
-    do (add-to-list 'auto-mode-alist `(,extension . web-mode))))))
+               (cl-loop
+                for extension in '("\\.blade\\.php\\'"
+                                   "\\.ejs\\'"
+                                   "\\.phtml\\'"
+                                   "\\.tpl\\.php\\'"
+                                   "\\.[agj]sp\\'"
+                                   "\\.as[cp]x\\'"
+                                   "\\.erb\\'"
+                                   "\\.mustache\\'"
+                                   "\\.djhtml\\'"
+                                   "\\.html\\'"
+                                   "\\.html\\.erb\\'"
+                                   "\\html\\.twig\\'"
+                                   "\\html\\.jinja\\'"
+                                   "\\pdf\\.twig\\'"
+                                   "\\.jsx\\'"
+                                   "\\.blade\\.php\\'")
+                do (add-to-list 'auto-mode-alist `(,extension . web-mode))))))
 
 
 (req-package rust-mode
@@ -493,8 +489,8 @@
 (req-package color-theme-approximate
   :ensure t
   :config (eval-after-load "color-theme-approximate"
-      '(progn
-   (color-theme-approximate-on))))
+            '(progn
+               (color-theme-approximate-on))))
 
 (req-package cider
   :ensure t
@@ -506,19 +502,19 @@
   :commands (counsel-etags-find-tag-at-point)
   :requires (evil ivy)
   :config (eval-after-load "counsel-etags"
-      '(progn
-   (evil-define-key 'evil-emacs-state prog-mode-map (kbd "M-.") #'counsel-etags-find-tag-at-point))))
+            '(progn
+               (evil-define-key 'evil-emacs-state prog-mode-map (kbd "M-.") #'counsel-etags-find-tag-at-point))))
 
 (req-package ivy
   :ensure t
   ;; :commands (counsel-M-x counsel-find-file counsel-describe-function ivy-switch-buffer)
   :bind (("M-x" . counsel-M-x)
-   ("C-x C-f" . counsel-find-file)
-   ("C-h f" . counsel-describe-function)
-   ("C-x b" . ivy-switch-buffer))
+         ("C-x C-f" . counsel-find-file)
+         ("C-h f" . counsel-describe-function)
+         ("C-x b" . ivy-switch-buffer))
   :config (progn
-      (ivy-mode 1)
-      (counsel-mode 1))
+            (ivy-mode 1)
+            (counsel-mode 1))
   )
 
 (req-package counsel-projectile
@@ -526,16 +522,16 @@
   :commands (counsel-projectile counsel-projectile-ag counsel-projectile-grep)
   :bind (("C-c p p" . counsel-projectile-switch-project))
   :config (progn
-      (counsel-projectile-mode)))
+            (counsel-projectile-mode)))
 
 (req-package company-ctags
   :ensure t)
-  ;; :config (progn
-  ;;           (eval-after-load "company"
-  ;;             '(progn
-  ;;                (add-hook 'c++-mode-hook
-  ;;                          (lambda ()
-  ;;                            (setq-local company-backends '((company-capf company-dabbrev-code company-ctags)))))))))
+;; :config (progn
+;;           (eval-after-load "company"
+;;             '(progn
+;;                (add-hook 'c++-mode-hook
+;;                          (lambda ()
+;;                            (setq-local company-backends '((company-capf company-dabbrev-code company-ctags)))))))))
 
 (req-package yaml-mode
   :ensure t
@@ -550,60 +546,32 @@
   :ensure t
   :require evil evil-leader bind-key
   :init (progn
-    (setf evil-lisp-state-global t)
-    (setf evil-lisp-state-enter-lisp-state-on-command nil))
+          (setf evil-lisp-state-global t)
+          (setf evil-lisp-state-enter-lisp-state-on-command nil))
 
   :config (eval-after-load "evil-lisp-state"
-      '(progn
-   (bind-key "L" 'evil-lisp-state evil-normal-state-map))))
+            '(progn
+               (bind-key "L" 'evil-lisp-state evil-normal-state-map))))
 
 (req-package mood-line
   :ensure t
   :config (progn
-	    (mood-line-mode)))
+	          (mood-line-mode)))
 
 
 (req-package smart-jump
   :ensure t
   :bind (:map evil-normal-state-map
-  ("M-." . smart-jump-go)
-  ("M-," . smart-jump-back))
+              ("M-." . smart-jump-go)
+              ("M-," . smart-jump-back))
   :config (progn
-      (smart-jump-setup-default-registers)))
-
-(req-package lsp-mode
-  :ensure t
-  :init (progn
-	  (add-hook 'c++-mode-hook 'lsp)
-          (add-hook 'python-mode-hook 'lsp)
-          (add-hook 'python-mode-hook 'flycheck-mode)
-
-  :config (progn
-	    ;; (require 'lsp-clients)
-
-	    ;; (add-hook 'lsp-mode-hook
-	    ;; 	      (lambda ()
-	    ;; 		      (setq company-backends '(company-capf))))
-
-	    (add-hook 'c++-mode-hook
-		      (lambda ()
-			(setq-local lsp-diagnostic-package :none)))
-
-	    (setq lsp-idle-delay 0.250)
-	    (setq lsp-prefer-flymake nil)
-	    (setq lsp-enable-snippet nil)
-	    (setq lsp-completion-provider :capf))))
-
-(req-package lsp-ui
-  :ensure t
-  :config (progn
-	    ))
+            (smart-jump-setup-default-registers)))
 
 (req-package typescript-mode
   :ensure t
   :mode "\\.ts\\'"
   :config (progn
-      (setq-default typescript-indent-level 2)))
+            (setq-default typescript-indent-level 2)))
 
 (req-package elixir-mode
   :mode "\\.ex\\'"
@@ -611,11 +579,11 @@
 
 (defun horellana/platformio-configure-include-paths ()
   (let* ((cmd (format "find %s%s"
-    (projectile-project-root)
-    ".pio/libdeps/nano -maxdepth 1 -not -iname '*nano'"))
+                      (projectile-project-root)
+                      ".pio/libdeps/nano -maxdepth 1 -not -iname '*nano'"))
 
-   (paths (split-string (shell-command-to-string cmd)))
-   (ld-library-path (string-join paths "/:")))
+         (paths (split-string (shell-command-to-string cmd)))
+         (ld-library-path (string-join paths "/:")))
 
     (message ld-library-path)
     (setenv "LD_LIBRARY_PATH" ld-library-path)))
@@ -625,9 +593,9 @@
   :requires irony
   :defer t
   :config (progn
-	    (add-hook 'c++-mode-hook
-		      (lambda ()
-			(platformio-conditionally-enable)))))
+	          (add-hook 'c++-mode-hook
+		                  (lambda ()
+			                  (platformio-conditionally-enable)))))
 
 (req-package haskell-mode
   :ensure t
@@ -637,29 +605,29 @@
   :ensure t
   :defer t
   :config (progn
-      ))
+            ))
 
 (req-package feebleline
   :ensure t
   :defer t
   :config (progn
-      (feebleline-mode 1)))
+            (feebleline-mode 1)))
 
 (req-package company-jedi
   :ensure t
   :defer t
   :config (progn
-      (add-hook 'python-mode-hook
-	  (lambda ()
-      (setq-local company-backends '(company-jedi))))))
+            (add-hook 'python-mode-hook
+	                    (lambda ()
+                        (setq-local company-backends '(company-jedi))))))
 
 
 (req-package treemacs
   :ensure t
   :defer t
   :config (progn
-           (with-eval-after-load 'winum
-             (define-key winum-keymap (kbd "M-0") #'treemacs-select-window)) ))
+            (with-eval-after-load 'winum
+              (define-key winum-keymap (kbd "M-0") #'treemacs-select-window)) ))
 
 (req-package treemacs-evil
   :ensure t
@@ -675,16 +643,16 @@
   :ensure t
   :defer t
   :config (progn
-	    (setq auto-save-file-name-transforms
-		  `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))))
+	          (setq auto-save-file-name-transforms
+		              `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))))
 
 (defconst emacs-tmp-dir (expand-file-name (format "emacs%d" (user-uid)) temporary-file-directory))
-    (setq backup-directory-alist
-        `((".*" . ,emacs-tmp-dir)))
-    (setq auto-save-file-name-transforms
-        `((".*" ,emacs-tmp-dir t)))
-    (setq auto-save-list-file-prefix
-        emacs-tmp-dir)
+(setq backup-directory-alist
+      `((".*" . ,emacs-tmp-dir)))
+(setq auto-save-file-name-transforms
+      `((".*" ,emacs-tmp-dir t)))
+(setq auto-save-list-file-prefix
+      emacs-tmp-dir)
 
 (setq create-lockfiles nil)
 
@@ -692,7 +660,7 @@
   :ensure t
   :defer t
   :config (progn
-	    (global-wakatime-mode)))
+	          (global-wakatime-mode)))
 
 (req-package org-journal
   :defer t
@@ -718,8 +686,8 @@
   :ensure t
   :hook (python-mode . pipenv-mode)
   :config (progn
-	    (defun pipenv-shell ()
-	      (message "(pipenv-shell) STUB"))
+	          (defun pipenv-shell ()
+	            (message "(pipenv-shell) STUB"))
 	          (setq pipenv-projectile-after-switch-function #'pipenv-projectile-after-switch-extended)))
 
 (req-package yasnippet
@@ -728,13 +696,15 @@
 (req-package company-ctags
   :ensure t)
 
+(req-package async
+  :ensure t)
+
 (req-package-finish)
 
 (add-hook 'python-mode-hook
-	  (lambda ()
-	    (pipenv-mode)
-	    (pipenv-activate)
-	    (lsp)))
+	        (lambda ()
+	          (pipenv-mode)
+	          (pipenv-activate)))
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -770,7 +740,7 @@
  '(jdee-db-spec-breakpoint-face-colors (cons "#19181A" "#727072"))
  '(objed-cursor-color "#CC6666")
  '(package-selected-packages
-   '(company-ctags cyberpunk minsk-theme leuven-theme lsp-ui yasnippet pipenv company-prescient ivy-prescient prescient mood-line minimal-theme ccls wakatime-mode no-littering org-journal arc-dark-theme company-box treemacs-evil treemacs-projectile treemacs spacemacs spacemacs-them spacemacs-theme vscode-dark-plus-theme dracula-theme badger-theme moe-theme tao-theme doom-theme feebleline cyberpunk-theme doom-themes exec-path-from-shell slime haskell-mode platformio-mode company-irony flycheck-irony irony-eldoc irony elixir-mode typescript-mode company-lsp lsp-mode smart-jump doom-modeline ox-twbs yaml-mode ggtags counsel-projectile counsel-etags cider color-theme-approximate rust-mode js2-mode web-mode evil-lisp-state evil-leader evil-god-state evil-commentary evil-smartparens evil smartparens company iedit flycheck-package flycheck pyvenv magit req-package use-package el-get))
+   '(tron-legacy-theme melancholy-theme melacholy-theme vs-dark-theme emacs-async emacs-asyn company-ctags cyberpunk minsk-theme leuven-theme yasnippet pipenv company-prescient ivy-prescient prescient mood-line minimal-theme ccls wakatime-mode no-littering org-journal arc-dark-theme company-box treemacs-evil treemacs-projectile treemacs spacemacs spacemacs-them spacemacs-theme vscode-dark-plus-theme dracula-theme badger-theme moe-theme tao-theme doom-theme feebleline cyberpunk-theme doom-themes exec-path-from-shell slime haskell-mode platformio-mode company-irony flycheck-irony irony-eldoc irony elixir-mode typescript-mode smart-jump doom-modeline ox-twbs yaml-mode ggtags counsel-projectile counsel-etags cider color-theme-approximate rust-mode js2-mode web-mode evil-lisp-state evil-leader evil-god-state evil-commentary evil-smartparens evil smartparens company iedit flycheck-package flycheck pyvenv magit req-package use-package el-get))
  '(pdf-view-midnight-colors (cons "#FCFCFA" "#2D2A2E"))
  '(rustic-ansi-faces
    ["#2D2A2E" "#CC6666" "#A9DC76" "#FFD866" "#78DCE8" "#FF6188" "#78DCE8" "#FCFCFA"])
@@ -797,7 +767,8 @@
     (cons 360 "#4C4A4D")))
  '(vc-annotate-very-old-color nil)
  '(wakatime-cli-path "/usr/bin/wakatime")
- '(wakatime-python-bin nil))
+ '(wakatime-python-bin nil)
+ '(warning-suppress-types '((comp))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
