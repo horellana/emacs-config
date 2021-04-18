@@ -14,11 +14,11 @@
 
 (progn
   (setq package-archives
-	'(("melpa" . "https://melpa.org/packages/")
-	  ("gnu" . "https://elpa.gnu.org/packages/")
-	  ("org" . "https://orgmode.org/elpa/"))))
+  '(("melpa" . "https://melpa.org/packages/")
+    ("gnu" . "https://elpa.gnu.org/packages/")
+    ("org" . "https://orgmode.org/elpa/"))))
 (when (or (not (package-installed-p 'use-package))
-	  (not (package-installed-p 'req-package)))
+    (not (package-installed-p 'req-package)))
 
   (package-refresh-contents)
   (package-install 'el-get)
@@ -36,148 +36,43 @@
   (column-number-mode 1)
   ;; (global-hl-line-mode)
   (show-paren-mode 1)
-  (eldoc-mode t))
+  (eldoc-mode t)
+  (setq ccls-executable "/usr/bin/ccls")
+  (setq js-indent-level 2)
+  (setf tab-width 2)
+  (setf tramp-default-method "ssh")
+  (setf indent-tabs-mode nil)
+  (setf inhibit-startup-message t)
+  (setf browse-url-generic-program "firefox")
+  (setf browse-url-browser-function 'browse-url-firefox)
+  (setf ring-bell-function 'ignore)
+  (setf org-plantuml-jar-path "/usr/share/plantuml/plantuml.jar")
+  (setf *no-smartparens-list* '(haskell-mode))
+  (setf emacs-tmp-dir (expand-file-name (format "emacs%d" (user-uid)) temporary-file-directory))
+  (setq create-lockfiles nil)
+  (setf backup-by-copying t      ; don't clobber symlinks
+  backup-directory-alist '(("~/.emacs.d/saves"))    ; don't litter my fs tree
+  delete-old-versions t
+  kept-new-versions 6
+  kept-old-versions 2
+  version-control t)
+  (add-hook 'prog-mode-hook 'hs-minor-mode)
+  (add-hook 'prog-mode-hook 'outline-minor-mode)
 
-(use-package f
-  :ensure t)
+  (add-hook 'after-save-hook 'whitespace-cleanup)
 
-(use-package tron-legacy-theme
-  :ensure t
-  :config (progn
-	    (load-theme 'tron-legacy t)))
-
-;; (use-package vs-dark-theme
-;;   :ensure t
-;;   :config (progn
-;;	    (load-theme 'vs-dark t)))
-
-(setq ccls-executable "/usr/bin/ccls")
-(setq js-indent-level 2)
-(setf tab-width 2)
-(setf tramp-default-method "ssh")
-(setf indent-tabs-mode nil)
-(setf inhibit-startup-message t)
-(setf browse-url-generic-program "firefox")
-(setf browse-url-browser-function 'browse-url-firefox)
-(setf ring-bell-function 'ignore)
-(setf org-plantuml-jar-path "/usr/share/plantuml/plantuml.jar")
-(setf backup-by-copying t      ; don't clobber symlinks
-      backup-directory-alist '(("~/.emacs.d/saves"))    ; don't litter my fs tree
-      delete-old-versions t
-      kept-new-versions 6
-      kept-old-versions 2
-      version-control t)
-
-(progn
-  (defalias 'perl-mode 'cperl-mode)
-  (eval-after-load "cperl-mode"
-    '(progn
-       (setf cperl-electric-parens nil
-	     cperl-electric-keywords nil
-	     cperl-electric-lbrace-space nil))))
+  (add-hook 'after-save-hook
+      (lambda ()
+	(let ((init-file (expand-file-name "~/.emacs.d/init.el")))
+    (when (equal (buffer-file-name) init-file)
+      (byte-compile-file init-file)))))
+  )
 
 (set-face-attribute 'fringe nil
-		    :foreground (face-foreground 'default)
-		    :background (face-background 'default))
+	:foreground (face-foreground 'default)
+	:background (face-background 'default))
 
 (fset 'yes-or-no-p 'y-or-n-p)
-
-(add-hook 'doc-view-minor-mode-hook 'auto-revert-mode)
-
-(add-hook 'prog-mode-hook 'hs-minor-mode)
-(add-hook 'prog-mode-hook 'outline-minor-mode)
-
-
-(add-hook 'after-save-hook 'whitespace-cleanup)
-
-(add-hook 'after-save-hook
-	  (lambda ()
-	    (let ((init-file (expand-file-name "~/.emacs.d/init.el")))
-	      (when (equal (buffer-file-name) init-file)
-		(byte-compile-file init-file)))))
-
-(defun transparency (value)
-  "Sets the transparency of the frame window. 0=transparent/100=opaque"
-  (interactive "nTransparency Value 0 - 100 opaque:")
-  (set-frame-parameter (selected-frame) 'alpha value))
-
-(defun windows-subsystem-linux-p ()
-  "Return t if running in WSL."
-  (not
-   (null (string-match-p "Microsoft"
-			 (shell-command-to-string "uname -a")))))
-
-(add-to-list 'display-buffer-alist
-	     (cons "\\*Async Shell Command\\*.*" (cons #'display-buffer-no-window nil)))
-
-(eval-after-load "js-mode"
-  '(progn
-     (setq js-indent-level 2)))
-
-(eval-after-load "projectile"
-  '(eval-after-load "f"
-     '(progn
-	      ;; (message "loading gnu global configuration")
-	      (message "loading ctags configuration")
-
-	(defvar *horellana/ctags-process-running-p*)
-
-	      (defun horellana/ctags-exists-p (root)
-		(require 'f)
-		(-contains-p  (f-files root)
-			(f-join root "tags")))
-
-	      (defun horellana/sync-ctags-create (project-root)
-		(let* ((default-directory project-root)
-		 (output-file (format "'%s%s'" project-root "tags"))
-			     (cmd "ctags-generate.sh"))
-
-		  (unless *horellana/ctags-process-running-p*
-		    (setq-local *horellana/ctags-process-running-p* t)
-		    (async-start-process "ctags-generate"
-							   "ctags-generate.sh"
-							   (lambda () (setq-local *horellana/ctags-process-running-p* nil))
-							   output-file))))
-
-	(defun horellana/sync-ctags-update (project-root)
-		(message "sync-ctags-update")
-		(horellana/sync-ctags-create project-root))
-
-	      (defun horellana/sync-ctags (root)
-		(if (horellana/ctags-exists-p root)
-		    (horellana/sync-ctags-update root)
-		  (let ((default-directory root))
-		    (horellana/sync-ctags-create root))))
-
-	      (defvar *horellana/ctags-modes*)
-
-	(setf *horellana/ctags-modes*
-		    '(c++-mode))
-
-	(add-hook 'after-save-hook
-			      (lambda ()
-			  (message "ctags after-save-hook")
-				(require 'projectile)
-				(let ((generate-tags-p (member major-mode *horellana/ctags-modes*))
-					    (project-root (projectile-project-root)))
-				  (when (and generate-tags-p
-				 project-root)
-				    (message "project root: %s" project-root)
-			(horellana/sync-ctags project-root))))))))
-
-(eval-after-load "python"
-  '(progn
-     (add-hook 'inferior-python-mode-hook
-	       (lambda ()
-		 (python-shell-send-string "__name__ = None")))
-
-     (add-hook 'after-save-hook
-		     (lambda ()
-			     (when (eq major-mode 'python-mode)
-			       (let ((process (python-shell-get-process)))
-				 (when process
-				   (python-shell-send-file (buffer-file-name (current-buffer))
-									     process))))))))
 
 (eval-after-load "org"
   '(progn
@@ -188,80 +83,27 @@
 
 (set-frame-font "UbuntuMono-12")
 
-(eval-after-load "bind-key"
-  '(progn
-     (bind-key "<f8>" 'compile)))
+(use-package tron-legacy-theme
+  :ensure t
+  :config (progn
+      (load-theme 'tron-legacy t)))
 
 (require 'req-package)
-
-(use-package benchmark-init
-  :disabled t
-  :ensure t
-  :config (add-hook 'after-init-hook 'benchmark-init/deactivate))
-
-(defun juiko/python-find-env (project-root)
-  "Find the python project env directory, inside PROJECT-ROOT."
-  (require 'projectile)
-  (car (-intersection
-	      (mapcar (lambda (path) (f-join project-root path))
-			    (list "env" ".env"))
-	      (f-directories project-root))))
 
 (req-package magit
   :defer t
   :ensure t)
 
-(req-package pyvenv
-  :ensure t
-  :disabled t
-  :init (progn
-	  (defvar *python-current-env* ""))
-  :config (progn
-	    (add-hook 'python-mode-hook
-		      (lambda ()
-			(message "Configuring python-env")
-			(require 'projectile)
-			(let* ((root (projectile-project-root))
-			       (env (juiko/python-find-env root)))
-			  (when (and env
-				     (not (equal env *python-current-env*)))
-			    (progn
-			      (setf *python-current-env* env)
-			      (pyvenv-activate env)
-			      (message "Current python env: %s" *python-current-env*))
-			    ))))))
-
 (req-package flycheck
   :ensure t
   :defer t
-
   :config (progn
-	    (setq flycheck-perlcritic-severity 5)
-	    (setq flycheck-ghc-args (list
-				     "-fwarn-tabs"
-				     "-fwarn-type-defaults"
-				     "-fwarn-unused-do-bind"
-				     "-fwarn-incomplete-uni-patterns"
-				     "-fwarn-incomplete-patterns"
-				     "-fwarn-incomplete-record-updates"
-				     "-fwarn-monomorphism-restriction"
-				     "-fwarn-auto-orphans"
-				     "-fwarn-implicit-prelude"
-				     "-fwarn-missing-exported-sigs"
-				     "-fwarn-identities"
-				     "-Wall"))
+      (custom-set-faces
+       '(flycheck-error ((t (:underline "Red1"))))
+       '(flycheck-info ((t (:underline "ForestGreen"))))
+       '(flycheck-warning ((t (:underline "DarkOrange")))))
 
-	    (custom-set-faces
-	     '(flycheck-error ((t (:underline "Red1"))))
-	     '(flycheck-info ((t (:underline "ForestGreen"))))
-	     '(flycheck-warning ((t (:underline "DarkOrange"))))
-	     )
-
-	    (setq-default flycheck-disabled-checkers
-			  '(ruby-rubylint))
-
-	    (global-flycheck-mode)))
-
+      (global-flycheck-mode)))
 
 (req-package flycheck-package
   :ensure t
@@ -270,16 +112,16 @@
 (req-package bind-key
   :ensure t
   :config (eval-after-load "bind-key"
-	    '(progn
-	       (bind-key (kbd "M--") 'hippie-expand)
-	       (bind-key (kbd "M-g M-g")
-			 '(lambda ()
-			    (interactive)
-			    (unwind-protect
-				(progn
-				  (linum-mode t)
-				  (call-interactively 'goto-line))
-			      (linum-mode -1)))))))
+      '(progn
+	 (bind-key (kbd "M--") 'hippie-expand)
+	 (bind-key (kbd "M-g M-g")
+       '(lambda ()
+	  (interactive)
+	  (unwind-protect
+	(progn
+	  (linum-mode t)
+	  (call-interactively 'goto-line))
+	    (linum-mode -1)))))))
 
 (req-package iedit
   :ensure t
@@ -293,109 +135,66 @@
   :ensure t
   :defer 5
   :config (eval-after-load "company"
-	    '(progn
-	       (setf company-minimum-prefix-length 3)
-	       (setf company-show-numbers t)
-	       (setf company-idle-delay 0.5)
-	       (setf company-quickhelp-delay 1)
+      '(progn
+	 (setf company-minimum-prefix-length 3)
+	 (setf company-show-numbers t)
+	 (setf company-idle-delay 0.5)
+	 (setf company-quickhelp-delay 1)
 
-	       (global-company-mode)
+	 (global-company-mode))))
 
-	       (add-hook 'prog-mode-hook
-			 (lambda ()
-			   (if (eq major-mode 'c++-mode)
-			       (progn
-				 (message "c++-mode company-backends")
-				 (setq-local company-backends '((company-gtags company-ctags company-capf))))
-			     (setq-local company-backends '(company-capf))))))))
-
-(defvar *no-smartparens-list*
-  '(haskell-mode))
-
-(req-package smartparens
-  :ensure t
-  :config (progn
-
-	    (sp-local-pair '(emacs-lisp-mode
-			     lisp-mode
-			     slime-repl-mode)
-			   "`" nil :actions nil)
-	    (sp-local-pair '(emacs-lisp-mode
-			     lisp-mode
-			     slime-repl-mode)
-			   "'" nil :actions nil)
-	    (add-to-list 'sp-no-reindent-after-kill-modes 'haskell-mode)
-
-	    (add-hook 'prog-mode-hook
-		      (lambda ()
-			(unless (-contains? *no-smartparens-list* major-mode)
-			  (smartparens-mode))))
-
-	    (add-hook 'web-mode-hook
-		      (lambda () (require 'smartparens-html)))
-
-	    (add-hook 'rust-mode-hook
-		      (lambda () (require 'smartparens-rust)))
-
-	    (add-hook 'python-mode-hook
-		      (lambda () (require 'smartparens-python)))
-
-	    (add-hook 'ruby-mode-hook
-		      (lambda () (require 'smartparens-ruby)))))
 
 (req-package evil
   :ensure t
   :requires bind-key
   :config (eval-after-load "evil"
-	    '(progn
-		     (custom-set-variables
-		      '(evil-undo-system 'undo-redo))
+      '(progn
+	 (custom-set-variables
+	  '(evil-undo-system 'undo-redo))
 
+	 (bind-key "<tab>" 'indent-region evil-visual-state-map)
+	 (bind-key "C-<tab>" 'indent-whole-buffer evil-normal-state-map)
 
-		     (bind-key "<tab>" 'indent-region evil-visual-state-map)
-		     (bind-key "C-<tab>" 'indent-whole-buffer evil-normal-state-map)
+	 (bind-key [return] (lambda ()
+	    (interactive)
+	    (save-excursion
+	      (newline)))
+	     evil-normal-state-map)
 
-		     (bind-key [return] (lambda ()
-						      (interactive)
-						      (save-excursion
-							      (newline)))
-				     evil-normal-state-map)
+	 (setf evil-move-cursor-back nil)
 
-		     (setf evil-move-cursor-back nil)
+	 (cl-loop for mode in '(haskell-interactive-mode
+	      haskell-presentation-mode
+	      haskell-error-mode
+	      sql-interactive-mode
+	      inferior-emacs-lisp-mode
+	      erc-mode
+	      parparadox-menu-mode
+	      comint-mode
+	      eshell-mode
+	      slime-repl-mode
+	      slime-macroexpansion-minor-mode-hook
+	      geiser-repl-mode
+	      cider-repl-mode
+	      inferior-python-mode
+	      intero-repl-mode
+	      inf-ruby-mode
+	      org-mode
+	      magit-mode)
+	    do (evil-set-initial-state mode 'emacs))
 
-		     (cl-loop for mode in '(haskell-interactive-mode
-							      haskell-presentation-mode
-							      haskell-error-mode
-							      sql-interactive-mode
-							      inferior-emacs-lisp-mode
-							      erc-mode
-							      parparadox-menu-mode
-							      comint-mode
-							      eshell-mode
-							      slime-repl-mode
-							      slime-macroexpansion-minor-mode-hook
-							      geiser-repl-mode
-							      cider-repl-mode
-							      inferior-python-mode
-							      intero-repl-mode
-							      inf-ruby-mode
-							      org-mode
-							      magit-mode)
-				    do (evil-set-initial-state mode 'emacs))
-
-		     (evil-mode))))
+	 (evil-mode))))
 
 (req-package evil-smartparens
   :ensure t
   :requires (evil smartparens)
-  :hook (smartparens-mode . evil-smartparens-mode)
-  )
+  :hook (smartparens-mode . evil-smartparens-mode))
 
 (req-package evil-commentary
   :ensure t
   :requires (evil)
   :config (progn
-	    (evil-commentary-mode)))
+      (evil-commentary-mode)))
 
 (req-package evil-god-state
   :ensure t
@@ -405,117 +204,91 @@
   :ensure t
   :requires evil
   :config (progn
-	    (setf evil-leader/leader (kbd ","))
-	    (evil-leader/set-key
-	      "f" 'counsel-find-file
-	      "b" 'ivy-switch-buffer
-	      "g" 'counsel-M-x
-	      "k" 'kill-buffer
-	      "," 'evil-execute-in-emacs-state
-	      ";" 'comment-dwim
-	      "e" 'eval-last-sexp
-	      "w" 'save-buffer
-	      ;; "." 'ggtags-find-tag-dwim
-	      "hs" 'swiper
-	      "hP"  'counsel-projectile
-	      "hpa" 'counsel-projectile-ag
-	      "hpg" 'counsel-projectile-grep
-	      "ptp" 'projectile-test-project
-	      "mgb" 'magit-branch
-	      "mgc" 'magit-checkout
-	      "mgc" 'magit-checkout
-	      "mgl" 'magit-log
-	      "mgs" 'magit-status
-	      "mgpl" 'magit-pull
-	      "mgps" 'magit-push)
+      (setf evil-leader/leader (kbd ","))
+      (evil-leader/set-key
+	"f" 'counsel-find-file
+	"b" 'ivy-switch-buffer
+	"g" 'counsel-M-x
+	"k" 'kill-buffer
+	"," 'evil-execute-in-emacs-state
+	";" 'comment-dwim
+	"e" 'eval-last-sexp
+	"w" 'save-buffer
+	"hs" 'swiper
+	"hP"  'counsel-projectile
+	"hpa" 'counsel-projectile-ag
+	"hpg" 'counsel-projectile-grep
+	"ptp" 'projectile-test-project
+	"mgb" 'magit-branch
+	"mgc" 'magit-checkout
+	"mgc" 'magit-checkout
+	"mgl" 'magit-log
+	"mgs" 'magit-status
+	"mgpl" 'magit-pull
+	"mgps" 'magit-push)
 
-	    (evil-leader/set-key-for-mode 'haskell-mode "H" 'haskell-hoogle)
-	    (evil-leader/set-key-for-mode 'emacs-lisp-mode "ma" 'pp-macroexpand-last-sexp)
-	    (evil-leader/set-key-for-mode 'lisp-interaction-mode "ma" 'pp-macroexpand-last-sexp)
+      (evil-leader/set-key-for-mode 'haskell-mode "H" 'haskell-hoogle)
+      (evil-leader/set-key-for-mode 'emacs-lisp-mode "ma" 'pp-macroexpand-last-sexp)
+      (evil-leader/set-key-for-mode 'lisp-interaction-mode "ma" 'pp-macroexpand-last-sexp)
 
-	    (evil-leader/set-key-for-mode 'lisp-mode "cl" 'slime-load-file)
-	    (evil-leader/set-key-for-mode 'lisp-mode "e" 'slime-eval-last-expression)
-	    (evil-leader/set-key-for-mode 'lisp-mode "me" 'slime-macroexpand-1)
-	    (evil-leader/set-key-for-mode 'lisp-mode "ma" 'slime-macroexpand-all)
-	    (evil-leader/set-key-for-mode 'lisp-mode "sds" 'slime-disassemble-symbol)
-	    (evil-leader/set-key-for-mode 'lisp-mode "sdd" 'slime-disassemble-definition)
-	    (evil-leader/set-key-for-mode 'cider-mode "e" 'cider-eval-last-sexp)
-	    (global-evil-leader-mode)))
+      (evil-leader/set-key-for-mode 'lisp-mode "cl" 'slime-load-file)
+      (evil-leader/set-key-for-mode 'lisp-mode "e" 'slime-eval-last-expression)
+      (evil-leader/set-key-for-mode 'lisp-mode "me" 'slime-macroexpand-1)
+      (evil-leader/set-key-for-mode 'lisp-mode "ma" 'slime-macroexpand-all)
+      (evil-leader/set-key-for-mode 'lisp-mode "sds" 'slime-disassemble-symbol)
+      (evil-leader/set-key-for-mode 'lisp-mode "sdd" 'slime-disassemble-definition)
+      (evil-leader/set-key-for-mode 'cider-mode "e" 'cider-eval-last-sexp)
+      (global-evil-leader-mode)))
 
 (req-package web-mode
   :ensure t
   :hook (html-mode . web-mode)
   :mode (("\\.blade\\.php\\'" . web-mode))
   :config (eval-after-load "web-mode"
-	    '(progn
-	       (add-hook 'web-mode-hook #'turn-off-smartparens-mode)
+      '(progn
+	 (add-hook 'web-mode-hook #'turn-off-smartparens-mode)
 
-	       (add-hook 'web-mode-hook
-			 (lambda ()
-			   (setf web-mode-enable-auto-pairing t)
-			   (setf web-mode-enable-css-colorization t)
-			   (setf web-mode-enable-block-face t)
-			   (setf web-mode-enable-heredoc-fontification t)
-			   (setf web-mode-enable-current-element-highlight nil)
-			   (setf web-mode-enable-current-column-highlight nil)
-			   (setf web-mode-code-indent-offset 2)
-			   (setf web-mode-markup-indent-offset 2)
-			   (setf web-mode-css-indent-offset 2)))
+	 (add-hook 'web-mode-hook
+       (lambda ()
+	 (setf web-mode-enable-auto-pairing t)
+	 (setf web-mode-enable-css-colorization t)
+	 (setf web-mode-enable-block-face t)
+	 (setf web-mode-enable-heredoc-fontification t)
+	 (setf web-mode-enable-current-element-highlight nil)
+	 (setf web-mode-enable-current-column-highlight nil)
+	 (setf web-mode-code-indent-offset 2)
+	 (setf web-mode-markup-indent-offset 2)
+	 (setf web-mode-css-indent-offset 2)))
 
-	       (cl-loop
-		for extension in '("\\.blade\\.php\\'"
-				   "\\.ejs\\'"
-				   "\\.phtml\\'"
-				   "\\.tpl\\.php\\'"
-				   "\\.[agj]sp\\'"
-				   "\\.as[cp]x\\'"
-				   "\\.erb\\'"
-				   "\\.mustache\\'"
-				   "\\.djhtml\\'"
-				   "\\.html\\'"
-				   "\\.html\\.erb\\'"
-				   "\\html\\.twig\\'"
-				   "\\html\\.jinja\\'"
-				   "\\pdf\\.twig\\'"
-				   "\\.jsx\\'"
-				   "\\.blade\\.php\\'")
-		do (add-to-list 'auto-mode-alist `(,extension . web-mode))))))
-
-
-(req-package rust-mode
-  :ensure t
-  :mode "\\.rs\\'"
-  )
-
-(req-package color-theme-approximate
-  :ensure t
-  :config (eval-after-load "color-theme-approximate"
-	    '(progn
-	       (color-theme-approximate-on))))
-
-(req-package cider
-  :ensure t
-  :hook (clojure-mode . cider-mode)
-  )
-
-(req-package counsel-etags
-  :ensure t
-  :commands (counsel-etags-find-tag-at-point)
-  :requires (evil ivy)
-  :config (eval-after-load "counsel-etags"
-	    '(progn
-	       (evil-define-key 'evil-emacs-state prog-mode-map (kbd "M-.") #'counsel-etags-find-tag-at-point))))
+	 (cl-loop
+    for extension in '("\\.blade\\.php\\'"
+	   "\\.ejs\\'"
+	   "\\.phtml\\'"
+	   "\\.tpl\\.php\\'"
+	   "\\.[agj]sp\\'"
+	   "\\.as[cp]x\\'"
+	   "\\.erb\\'"
+	   "\\.mustache\\'"
+	   "\\.djhtml\\'"
+	   "\\.html\\'"
+	   "\\.html\\.erb\\'"
+	   "\\html\\.twig\\'"
+	   "\\html\\.jinja\\'"
+	   "\\pdf\\.twig\\'"
+	   "\\.jsx\\'"
+	   "\\.blade\\.php\\'")
+    do (add-to-list 'auto-mode-alist `(,extension . web-mode))))))
 
 (req-package ivy
   :ensure t
   ;; :commands (counsel-M-x counsel-find-file counsel-describe-function ivy-switch-buffer)
   :bind (("M-x" . counsel-M-x)
-	 ("C-x C-f" . counsel-find-file)
-	 ("C-h f" . counsel-describe-function)
-	 ("C-x b" . ivy-switch-buffer))
+   ("C-x C-f" . counsel-find-file)
+   ("C-h f" . counsel-describe-function)
+   ("C-x b" . ivy-switch-buffer))
   :config (progn
-	    (ivy-mode 1)
-	    (counsel-mode 1))
+      (ivy-mode 1)
+      (counsel-mode 1))
   )
 
 (req-package counsel-projectile
@@ -523,80 +296,41 @@
   :commands (counsel-projectile counsel-projectile-ag counsel-projectile-grep)
   :bind (("C-c p p" . counsel-projectile-switch-project))
   :config (progn
-	    (counsel-projectile-mode)))
-
-(req-package company-ctags
-  :ensure t)
-;; :config (progn
-;;           (eval-after-load "company"
-;;             '(progn
-;;                (add-hook 'c++-mode-hook
-;;                          (lambda ()
-;;                            (setq-local company-backends '((company-capf company-dabbrev-code company-ctags)))))))))
+      (counsel-projectile-mode)))
 
 (req-package yaml-mode
   :ensure t
   :mode ("\\.yml\\'" "\\.yaml\\'"))
 
-(req-package ox-twbs
-  :ensure t
-  :ensure t
-  :requires (org))
-
 (req-package evil-lisp-state
   :ensure t
   :require evil evil-leader bind-key
   :init (progn
-	  (setf evil-lisp-state-global t)
-	  (setf evil-lisp-state-enter-lisp-state-on-command nil))
+    (setf evil-lisp-state-global t)
+    (setf evil-lisp-state-enter-lisp-state-on-command nil))
 
   :config (eval-after-load "evil-lisp-state"
-	    '(progn
-	       (bind-key "L" 'evil-lisp-state evil-normal-state-map))))
+      '(progn
+	 (bind-key "L" 'evil-lisp-state evil-normal-state-map))))
 
 (req-package mood-line
   :ensure t
   :config (progn
-		  (mood-line-mode)))
-
+      (mood-line-mode)))
 
 (req-package smart-jump
   :ensure t
   :bind (:map evil-normal-state-map
-	      ("M-." . smart-jump-go)
-	      ("M-," . smart-jump-back))
+	("M-." . smart-jump-go)
+	("M-," . smart-jump-back))
   :config (progn
-	    (smart-jump-setup-default-registers)))
+      (smart-jump-setup-default-registers)))
 
 (req-package typescript-mode
   :ensure t
   :mode "\\.ts\\'"
   :config (progn
-	    (setq-default typescript-indent-level 2)))
-
-(req-package elixir-mode
-  :mode "\\.ex\\'"
-  :ensure t)
-
-(defun horellana/platformio-configure-include-paths ()
-  (let* ((cmd (format "find %s%s"
-		      (projectile-project-root)
-		      ".pio/libdeps/nano -maxdepth 1 -not -iname '*nano'"))
-
-	 (paths (split-string (shell-command-to-string cmd)))
-	 (ld-library-path (string-join paths "/:")))
-
-    (message ld-library-path)
-    (setenv "LD_LIBRARY_PATH" ld-library-path)))
-
-(req-package platformio-mode
-  :ensure t
-  :requires irony
-  :defer t
-  :config (progn
-		  (add-hook 'c++-mode-hook
-				  (lambda ()
-					  (platformio-conditionally-enable)))))
+      (setq-default typescript-indent-level 2)))
 
 (req-package haskell-mode
   :ensure t
@@ -606,106 +340,30 @@
   :ensure t
   :defer t
   :config (progn
-	    ))
-
-(req-package feebleline
-  :ensure t
-  :defer t
-  :config (progn
-	    (feebleline-mode 1)))
-
-(req-package company-jedi
-  :ensure t
-  :defer t
-  :config (progn
-	    (add-hook 'python-mode-hook
-			    (lambda ()
-			(setq-local company-backends '(company-jedi))))))
-
-
-(req-package treemacs
-  :ensure t
-  :defer t
-  :config (progn
-	    (with-eval-after-load 'winum
-	      (define-key winum-keymap (kbd "M-0") #'treemacs-select-window)) ))
-
-(req-package treemacs-evil
-  :ensure t
-  :defer t
-  :require (treemacs evil))
-
-(req-package treemacs-projectile
-  :ensure t
-  :defer t
-  :require (treemacs projectile))
+      ))
 
 (req-package no-littering
   :ensure t
   :defer t
   :config (progn
-		  (setq auto-save-file-name-transforms
-			      `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))))
+      (setq auto-save-file-name-transforms
+	    `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))))
 
-(defconst emacs-tmp-dir (expand-file-name (format "emacs%d" (user-uid)) temporary-file-directory))
-(setq backup-directory-alist
-      `((".*" . ,emacs-tmp-dir)))
-(setq auto-save-file-name-transforms
-      `((".*" ,emacs-tmp-dir t)))
-(setq auto-save-list-file-prefix
-      emacs-tmp-dir)
-
-(setq create-lockfiles nil)
-
-(req-package wakatime-mode
-  :ensure t
-  :defer t
-  :config (progn
-		  (global-wakatime-mode)))
-
-(req-package org-journal
-  :defer t
-  :ensure t)
-
-(req-package ccls
-  :ensure t)
-
-(req-package prescient
-  :ensure t)
-
-(req-package ivy-prescient
-  :ensure t
-  :config (progn
-	    (ivy-prescient-mode)))
-
-(req-package company-prescient
-  :ensure t
-  :config (progn
-	    (company-prescient-mode)))
 
 (req-package pipenv
   :ensure t
   :hook (python-mode . pipenv-mode)
   :config (progn
-		  (defun pipenv-shell ()
-		    (message "(pipenv-shell) STUB"))
-		  (setq pipenv-projectile-after-switch-function #'pipenv-projectile-after-switch-extended)))
-
-(req-package yasnippet
-  :ensure t)
-
-(req-package company-ctags
-  :ensure t)
-
-(req-package async
-  :ensure t)
+      (defun pipenv-shell ()
+	(message "(pipenv-shell) STUB"))
+      (setq pipenv-projectile-after-switch-function #'pipenv-projectile-after-switch-extended)))
 
 (req-package-finish)
 
 (add-hook 'python-mode-hook
-		(lambda ()
-		  (pipenv-mode)
-		  (pipenv-activate)))
+    (lambda ()
+      (pipenv-mode)
+      (pipenv-activate)))
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
