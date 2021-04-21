@@ -16,3 +16,5 @@ saves/*
 auto-save-list/*
 *.elc
 *.eld
+*~*
+*#*
