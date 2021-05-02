@@ -1,4 +1,4 @@
-(req-package typescript-mode
+(use-package typescript-mode
   :ensure t
   :mode "\\.ts\\'"
   :config (progn

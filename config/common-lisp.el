@@ -1,4 +1,4 @@
-(req-package slime
+(use-package slime
   :ensure t
   :defer t
   :config (progn

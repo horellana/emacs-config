@@ -1,4 +1,4 @@
-(req-package bind-key
+(use-package bind-key
   :ensure t
   :config (eval-after-load "bind-key"
       '(progn

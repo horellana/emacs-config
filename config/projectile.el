@@ -1,4 +1,4 @@
-(req-package projectile
+(use-package projectile
   :ensure t)
 
 (eval-after-load "evil-leader"

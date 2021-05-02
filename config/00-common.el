@@ -55,7 +55,7 @@
 (fset 'yes-or-no-p 'y-or-n-p)
 (set-frame-font "UbuntuMono-12")
 
-(req-package no-littering
+(use-package no-littering
   :ensure t
   :defer t
   :config (progn

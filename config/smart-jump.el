@@ -1,4 +1,4 @@
-(req-package smart-jump
+(use-package smart-jump
   :ensure t
   :bind (("M-." . smart-jump-go)
 	 ("M-," . smart-jump-back)

@@ -1,4 +1,4 @@
-(req-package company
+(use-package company
   :ensure t
   :defer 5
   :config (eval-after-load "company"

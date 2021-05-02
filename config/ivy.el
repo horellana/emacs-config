@@ -1,4 +1,4 @@
-(req-package ivy
+(use-package ivy
   :ensure t
   ;; :commands (counsel-M-x counsel-find-file counsel-describe-function ivy-switch-buffer)
   :bind (("M-x" . counsel-M-x)
@@ -10,7 +10,7 @@
 	    (counsel-mode 1))
   )
 
-(req-package counsel-projectile
+(use-package counsel-projectile
   :ensure t
   :commands (counsel-projectile counsel-projectile-ag counsel-projectile-grep)
   :bind (("C-c p p" . counsel-projectile-switch-project))

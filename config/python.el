@@ -1,4 +1,4 @@
-(req-package pipenv
+(use-package pipenv
   :ensure t
   :hook (python-mode . pipenv-mode)
   :config (progn

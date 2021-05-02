@@ -1,4 +1,4 @@
-(req-package magit
+(use-package magit
   :defer t
   :ensure t)
 

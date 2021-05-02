@@ -1,4 +1,7 @@
-(req-package evil
+(use-package bind-key
+  :ensure t)
+
+(use-package evil
   :ensure t
   :requires bind-key
   :config (eval-after-load "evil"
@@ -39,22 +42,22 @@
 
 	       (evil-mode))))
 
-(req-package evil-smartparens
+(use-package evil-smartparens
   :ensure t
   :requires (evil smartparens)
   :hook (smartparens-mode . evil-smartparens-mode))
 
-(req-package evil-commentary
+(use-package evil-commentary
   :ensure t
   :requires (evil)
   :config (progn
 	    (evil-commentary-mode)))
 
-(req-package evil-god-state
+(use-package evil-god-state
   :ensure t
   :commands (evil-execute-in-emacs-state))
 
-(req-package evil-leader
+(use-package evil-leader
   :ensure t
   :requires evil
   :config (progn
@@ -69,9 +72,8 @@
 	    (evil-leader/set-key-for-mode 'emacs-lisp-mode "ma" 'pp-macroexpand-last-sexp)
 	    (global-evil-leader-mode)))
 
-(req-package evil-lisp-state
+(use-package evil-lisp-state
   :ensure t
-  :require evil evil-leader bind-key
   :init (progn
 	  (setf evil-lisp-state-global t)
 	  (setf evil-lisp-state-enter-lisp-state-on-command nil))

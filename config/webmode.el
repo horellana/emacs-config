@@ -1,4 +1,4 @@
-(req-package web-mode
+(use-package web-mode
   :ensure t
   :hook (html-mode . web-mode)
   :mode (("\\.blade\\.php\\'" . web-mode))

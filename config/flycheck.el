@@ -1,4 +1,4 @@
-(req-package flycheck
+(use-package flycheck
   :ensure t
   :defer t
   :config (progn
@@ -9,6 +9,6 @@
 
 	    (global-flycheck-mode)))
 
-(req-package flycheck-package
+(use-package flycheck-package
   :ensure t
   :requires flycheck)

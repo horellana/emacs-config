@@ -1,5 +1,5 @@
-(req-package lsp-mode
+(use-package lsp-mode
   :ensure t)
 
-(req-package lsp-ui
+(use-package lsp-ui
   :ensure t)
