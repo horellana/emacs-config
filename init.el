@@ -1,4 +1,4 @@
-					; -*- lexical-binding: t -*-
+          ; -*- lexical-binding: t -*-
 
 (setq lexical-binding t)
 
@@ -14,11 +14,11 @@
 
 (progn
   (setq package-archives
-	'(("melpa" . "https://melpa.org/packages/")
-	  ("gnu" . "https://elpa.gnu.org/packages/")
-	  ("org" . "https://orgmode.org/elpa/"))))
+  '(("melpa" . "https://melpa.org/packages/")
+    ("gnu" . "https://elpa.gnu.org/packages/")
+    ("org" . "https://orgmode.org/elpa/"))))
 (when (or (not (package-installed-p 'use-package))
-	  (not (package-installed-p 'req-package)))
+          (not (package-installed-p 'req-package)))
 
   (package-refresh-contents)
   (package-install 'el-get)
@@ -26,17 +26,18 @@
   (package-install 'req-package)
   (package-install 'f))
 
-
-(require 'req-package)
+;; (require 'req-package)
 
 (cl-loop
  for file in (split-string
-	      (shell-command-to-string "find ~/.emacs.d/config -type f -iname '*.el'") "\n" t)
- do (progn
-      (load-file file)))
+        (shell-command-to-string "find ~/.emacs.d/config -type f -iname '*.el'") "\n" t)
+ do (condition-case nil
+  (progn
+    (message "Loading file: %s" file)
+    (load-file file))
+  (error (message "Could not load file: %s" file))))
 
-
-(req-package-finish)
+;(req-package-finish)
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -76,6 +77,9 @@
  '(pdf-view-midnight-colors (cons "#FCFCFA" "#2D2A2E"))
  '(rustic-ansi-faces
    ["#2D2A2E" "#CC6666" "#A9DC76" "#FFD866" "#78DCE8" "#FF6188" "#78DCE8" "#FCFCFA"])
+ '(safe-local-variable-values
+   '((venv-directory . "/home/hector/trabajo/proyectos/octopull-alas-integration")
+     (venv-directory . "/home/hector/.local/share/virtualenvs/octopull-alas-integration-yCvdeJyf/bin/activate")))
  '(vc-annotate-background "#2D2A2E")
  '(vc-annotate-color-map
    (list
@@ -109,6 +113,5 @@
  '(flycheck-error ((t (:underline "Red1"))))
  '(flycheck-info ((t (:underline "ForestGreen"))))
  '(flycheck-warning ((t (:underline "DarkOrange")))))
-
 
 (message "Done loading init.el")

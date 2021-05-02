@@ -8,4 +8,6 @@
 	       (setf company-idle-delay 0.5)
 	       (setf company-quickhelp-delay 1)
 
+	       (setq company-backends '(company-etags (company-dabbrev-code company-capf)))
+
 	       (global-company-mode))))

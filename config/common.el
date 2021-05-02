@@ -1,4 +1,10 @@
 (progn
+  (setq package-native-compile t)
+  (setq backup-directory-alist
+	`((".*" . ,temporary-file-directory)))
+  (setq auto-save-file-name-transforms
+	`((".*" ,temporary-file-directory t)))
+
   (blink-cursor-mode -1)
 
   (when (not (eq system-type 'darwin))
@@ -29,6 +35,7 @@
 	kept-new-versions 6
 	kept-old-versions 2
 	version-control t)
+
   (add-hook 'prog-mode-hook 'hs-minor-mode)
   (add-hook 'prog-mode-hook 'outline-minor-mode)
 
