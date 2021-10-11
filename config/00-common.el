@@ -1,4 +1,7 @@
 (progn
+  (add-to-list 'global-mode-string '(" %i"))
+
+  (setq read-process-output-max (* 1024 1024))
   (setq package-native-compile t)
   (setq backup-directory-alist
 	`((".*" . ,temporary-file-directory)))
@@ -32,14 +35,12 @@
   (setf backup-by-copying t      ; don't clobber symlinks
 	backup-directory-alist '(("~/.emacs.d/saves"))    ; don't litter my fs tree
 	delete-old-versions t
-	kept-new-versions 6
+	kept-new-versions 1
 	kept-old-versions 2
 	version-control t)
 
   (add-hook 'prog-mode-hook 'hs-minor-mode)
   (add-hook 'prog-mode-hook 'outline-minor-mode)
-
-  (add-hook 'after-save-hook 'whitespace-cleanup)
 
   (add-hook 'after-save-hook
 	    (lambda ()
@@ -53,7 +54,6 @@
 		    :background (face-background 'default))
 
 (fset 'yes-or-no-p 'y-or-n-p)
-(set-frame-font "UbuntuMono-12")
 
 (use-package no-littering
   :ensure t
@@ -61,3 +61,7 @@
   :config (progn
 	    (setq auto-save-file-name-transforms
 		  `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))))
+
+
+(defmacro horellana/with-eval-after-load-many (files &body )
+  )

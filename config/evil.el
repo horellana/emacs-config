@@ -36,7 +36,6 @@
 				      inferior-python-mode
 				      intero-repl-mode
 				      inf-ruby-mode
-				      org-mode
 				      magit-mode)
 			do (evil-set-initial-state mode 'emacs))
 

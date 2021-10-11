@@ -9,6 +9,16 @@
 
 (eval-after-load "lsp"
   '(progn
+     (message "Loading LSP config for python mode")
+
+     (use-package lsp-jedi
+       :ensure t
+       :config
+       (with-eval-after-load "lsp-mode"
+	 (add-to-list 'lsp-enabled-clients 'pyls)
+	 (add-to-list 'lsp-enabled-clients 'pylsp)
+	 (add-to-list 'lsp-disabled-clients 'jedi)))
+
      (add-hook 'python-mode-hook 'lsp)
      (add-hook 'python-mode-hook
 	       (lambda ()

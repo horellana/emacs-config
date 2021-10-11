@@ -11,3 +11,9 @@
 	       (setq company-backends '(company-etags (company-dabbrev-code company-capf)))
 
 	       (global-company-mode))))
+
+(use-package company-postframe
+  :ensure t
+  :disabled t
+  :config (progn
+	    (company-postframe-mode 1)))
