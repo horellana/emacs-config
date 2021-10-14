@@ -1,3 +1,11 @@
+(use-package evil-org
+  :requires (evil)
+  :config (progn
+	    (add-hook 'org-mode-hook 'evil-org-mode)
+	    (evil-org-set-key-theme '(navigation insert textobjects additional calendar))
+	    (require 'evil-org-agenda)
+	    (evil-org-agenda-set-keys)))
+
 (use-package org-roam
   :ensure t
   :custom

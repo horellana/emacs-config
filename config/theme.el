@@ -2,12 +2,11 @@
 
 (use-package doom-themes
   :ensure t
-  :disabled t
   :config
   ;; Global settings (defaults)
   (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
 	doom-themes-enable-italic t) ; if nil, italics is universally disabled
-  (load-theme 'doom-dark+ t)
+  (load-theme 'doom-badger t)
 
   ;; Enable flashing mode-line on errors
   (doom-themes-visual-bell-config)
@@ -56,6 +55,7 @@
 
 (use-package tao-theme
   :ensure t
+  :disabled t
   :config (progn
 	    (load-theme 'tao-yin)))
 
