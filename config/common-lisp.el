@@ -1,6 +1,6 @@
 (use-package slime
   :ensure t
-  :defer t
+  :mode "\\.lisp\\'"
   :config (progn
       ))
 

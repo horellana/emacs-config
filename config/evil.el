@@ -41,19 +41,14 @@
 
 	       (evil-mode))))
 
-(use-package evil-smartparens
-  :ensure t
-  :requires (evil smartparens)
-  :hook (smartparens-mode . evil-smartparens-mode))
-
 (use-package evil-commentary
   :ensure t
-  :requires (evil)
   :config (progn
 	    (evil-commentary-mode)))
 
 (use-package evil-god-state
   :ensure t
+  :defer t
   :commands (evil-execute-in-emacs-state))
 
 (use-package evil-leader
@@ -73,10 +68,11 @@
 
 (use-package evil-lisp-state
   :ensure t
+  :bind (:map evil-normal-state-map ("L" . evil-lisp-state))
   :init (progn
 	  (setf evil-lisp-state-global t)
-	  (setf evil-lisp-state-enter-lisp-state-on-command nil))
+	  (setf evil-lisp-state-enter-lisp-state-on-command nil)))
 
-  :config (eval-after-load "evil-lisp-state"
-	    '(progn
-	       (bind-key "L" 'evil-lisp-state evil-normal-state-map))))
+  ;; :config (eval-after-load "evil-lisp-state"
+	    ;; '(progn
+	       ;; (bind-key "L" 'evil-lisp-state evil-normal-state-map))))

@@ -1,4 +1,5 @@
 (use-package evil-org
+  :ensure t
   :requires (evil)
   :config (progn
 	    (add-hook 'org-mode-hook 'evil-org-mode)
@@ -7,6 +8,7 @@
 	    (evil-org-agenda-set-keys)))
 
 (use-package org-roam
+  :disabled t
   :ensure t
   :custom
   (org-roam-directory (file-truename "/home/hector/Documents/org-files/"))
@@ -19,13 +21,12 @@
          ("C-c n j" . org-roam-dailies-capture-today))
   :config
   (org-roam-db-autosync-mode)
-  ;; If using org-roam-protocol
-  ;; (require 'org-roam-protocol)
   )
 
 (eval-after-load "org"
   '(progn
-     (setq org-agenda-files (list "~/emacs-org/todos.org"))
+     (setq org-agenda-files (list "~/trabajo/todo.org"))
+     (setq org-log-done 'time)
 
      (define-key global-map "\C-Ca" 'org-agenda)
      (org-babel-do-load-languages 'org-babel-load-languages '((plantuml . t)))))

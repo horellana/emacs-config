@@ -3,12 +3,16 @@
   :defer 5
   :config (eval-after-load "company"
 	    '(progn
-	       (setf company-minimum-prefix-length 3)
-	       (setf company-show-numbers t)
+	       (setf company-minimum-prefix-length 1)
+	       (setf company-show-numbers nil)
 	       (setf company-idle-delay 0.5)
-	       (setf company-quickhelp-delay 1)
+	       (setf company-quickhelp-delay 0.1)
 
-	       (setq company-backends '(company-etags (company-dabbrev-code company-capf)))
+	       (setq company-backends '((company-capf company-dabbrev-code company-dabbrev)))
+
+	       (add-hook 'css-mode-hook
+			 (lambda ()
+			   (setq-local company-backends '((company-css company-capf)))))
 
 	       (global-company-mode))))
 

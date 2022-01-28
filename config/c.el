@@ -1,4 +1,4 @@
-(require 'projectile)
+;; (require 'projectile)
 
 (use-package platformio-mode
   :ensure t
@@ -7,21 +7,20 @@
 				       (platformio-conditionally-enable)))))
 
 
-(defun horellana/c-mode-update-tags ()
-  (progn
-    (when (and (eq major-mode 'c++-mode)
-	       (projectile-project-root))
+;; (defun horellana/c-mode-update-tags ()
+;;   (progn
+;;     (when (and (eq major-mode 'c++-mode)
+;; 	       (projectile-project-root))
 
-      (let* ((default-directory (projectile-project-root)))
-	(message "updating tags")
-	(message "tags updated")))))
+;;       (let* ((default-directory (projectile-project-root)))
+;; 	(message "updating tags")
+;; 	(message "tags updated")))))
 
-(defun horellana/platformio-update-tags ()
-  )
+;; (defun horellana/platformio-update-tags ()
+;;   )
 
-(with-eval-after-load "lsp-mode"
-  (add-to-list 'lsp-enabled-clients 'clangd)
-  (add-to-list 'lsp-enabled-clients 'ccls))
+;; (with-eval-after-load "lsp-mode"
+  ;; (add-to-list 'lsp-enabled-clients 'ccls))
 
-(add-hook 'after-save-hook 'horellana/c-mode-update-tags)
-(add-hook 'after-save-hook 'horellana/platformio-update-tags)
+;; (add-hook 'after-save-hook 'horellana/c-mode-update-tags)
+;; (add-hook 'after-save-hook 'horellana/platformio-update-tags)

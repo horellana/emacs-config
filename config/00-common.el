@@ -1,7 +1,6 @@
 (progn
   (add-to-list 'global-mode-string '(" %i"))
 
-  (setq read-process-output-max (* 1024 1024))
   (setq package-native-compile t)
   (setq backup-directory-alist
 	`((".*" . ,temporary-file-directory)))
@@ -9,7 +8,8 @@
 	`((".*" ,temporary-file-directory t)))
 
   (blink-cursor-mode -1)
-
+  (pixel-scroll-precision-mode)
+  
   (when (not (eq system-type 'darwin))
     (menu-bar-mode -1))
 
@@ -65,3 +65,15 @@
 
 (defmacro horellana/with-eval-after-load-many (files &body )
   )
+
+
+(use-package smartparens
+  :ensure t
+  :config (progn
+	    (require 'smartparens-config)
+	    (add-hook 'prog-mode-hook #'smartparens-mode)))
+
+(use-package which-key
+  :ensure t
+  :config (progn
+	    (which-key-mode)))

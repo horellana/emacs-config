@@ -1,7 +1,10 @@
 (use-package projectile
-  :ensure t)
+  :disabled t
+  :ensure t
+  :config (progn
+	(eval-after-load "evil-leader"
+	  '(progn
+	     (evil-leader/set-key
+	       "ptp" 'projectile-test-project)))))
 
-(eval-after-load "evil-leader"
-  '(progn
-     (evil-leader/set-key
-       "ptp" 'projectile-test-project)))
+

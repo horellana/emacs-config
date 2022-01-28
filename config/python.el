@@ -7,23 +7,21 @@
 	    (setq pipenv-projectile-after-switch-function #'pipenv-projectile-after-switch-extended)
 	    (add-hook 'python-mode-hook 'pipenv-activate)))
 
-(eval-after-load "lsp"
-  '(progn
-     (message "Loading LSP config for python mode")
+(use-package lsp-jedi
+  :ensure t
+  :config (progn
+    (add-to-list 'lsp-enabled-clients 'pyls)
+    (add-to-list 'lsp-enabled-clients 'pylsp)
+    (add-to-list 'lsp-disabled-clients 'jedi)
+    (add-hook 'python-mode-hook 'lsp-deferred)
+    (add-hook 'python-mode-hook
+	      (lambda ()
+		(setq-local company-backends '(company-capf))))))
 
-     (use-package lsp-jedi
-       :ensure t
-       :config
-       (with-eval-after-load "lsp-mode"
-	 (add-to-list 'lsp-enabled-clients 'pyls)
-	 (add-to-list 'lsp-enabled-clients 'pylsp)
-	 (add-to-list 'lsp-disabled-clients 'jedi)))
-
-     (add-hook 'python-mode-hook 'lsp)
-     (add-hook 'python-mode-hook
-	       (lambda ()
-		 (setq-local company-backends '(company-capf))))))
-
+(use-package python-black
+  :ensure t
+  :after python
+  :hook (python-mode . python-black-on-save-mode-enable-dwim))
 
 (defun horellana/setup-project-pipenv ()
   (if venv-directory
