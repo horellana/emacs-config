@@ -4,25 +4,35 @@
 
 (require 'use-package)
 
-(use-package doom-themes
+(use-package doom-modeline
+  :ensure t
+  :hook (after-init . doom-modeline-mode)
+  :config (progn
+            (setq doom-modeline-buffer-file-name-style 'buffer-name)
+            (doom-modeline-set-modeline 'main)
+            (setq doom-modeline-display-default-persp-name t)
+            (setq doom-modeline-enable-wordcount t)))
+
+
+(use-package immaterial-theme
   :ensure t
   :disabled t
   :config (progn
-	 (setq doom-themes-enable-bold t
-	       doom-themes-enable-italic t)
+            (load-theme 'immaterial-dark t)))
 
-	 (load-theme 'doom-dracula t)
-
-	 (doom-themes-visual-bell-config)
-	 (doom-themes-neotree-config)
-	 (setq doom-themes-treemacs-theme "doom-colors") ; use the colorful treemacs theme
-	 (doom-themes-treemacs-config)
-	 (doom-themes-org-config)))
-
-
-(use-package tao-theme
+(use-package ef-themes
   :ensure t
   :config (progn
-	    (load-theme 'tao-yin t)))
+            (load-theme 'ef-dark t)))
+
+;; (load-theme 'wombat t)
 
 (set-frame-font "JetBrains Mono-11")
+
+(setq line-number-mode t)
+(setq column-number-mode t)
+(size-indication-mode 1)
+
+(set-face-attribute 'fringe nil
+                    :foreground (face-foreground 'default)
+                    :background (face-background 'default))

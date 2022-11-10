@@ -1,5 +1,6 @@
 (use-package flycheck
   :ensure t
+  :disabled t
   :commands (flycheck-mode)
   :config (progn
 	    (custom-set-faces
@@ -9,4 +10,5 @@
 
 (use-package flycheck-package
   :ensure t
+  :after (flycheck)
   :commands (flycheck-mode))

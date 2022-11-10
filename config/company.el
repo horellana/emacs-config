@@ -1,4 +1,5 @@
 (use-package company
+  :disabled t
   :ensure t
   :defer 5
   :config (eval-after-load "company"
@@ -7,8 +8,7 @@
 	       (setf company-show-numbers nil)
 	       (setf company-idle-delay 0.5)
 	       (setf company-quickhelp-delay 0.1)
-
-	       (setq company-backends '((company-capf company-dabbrev-code company-dabbrev)))
+	       (setq company-backends '((company-capf company-dabbrev-code)))
 
 	       (add-hook 'css-mode-hook
 			 (lambda ()

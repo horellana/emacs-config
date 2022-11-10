@@ -1,7 +1,5 @@
-(use-package counsel
-  :ensure t)
-  
 (use-package ivy
+  :disabled t
   :ensure t
   :bind (("M-x" . counsel-M-x)
 	 ("C-x C-f" . counsel-find-file)
@@ -27,9 +25,26 @@
 	    (ivy-mode 1)
 	    (counsel-mode 1)))
 
+(use-package counsel
+  :after (ivy)
+  :ensure t)
+
 (use-package counsel-projectile
   :disabled t
   :commands (counsel-projectile counsel-projectile-ag counsel-projectile-grep)
   :bind (("C-c p p" . counsel-projectile-switch-project))
+  :after (ivy counsel projectile)
   :config (progn
 	    (counsel-projectile-mode)))
+
+(use-package ivy-rich
+  :ensure t
+  :after (ivy)
+  :config (progn
+	    (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line)
+	    (ivy-rich-mode 1)))
+
+(use-package all-the-icons-ivy-rich
+  :ensure t
+  :after (ivy ivy-rich)
+  :init (all-the-icons-ivy-rich-mode 1))
