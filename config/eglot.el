@@ -4,8 +4,7 @@
          (c++-mode . eglot-ensure)
          (sh-mode . eglot-ensure)
          (rust-mode . eglot-ensure)
-         (python-mode . eglot-ensure)
-         (web-mode . eglot-ensure))
+         (python-mode . eglot-ensure))
   :config (progn
             (setq eglot-sync-connect 0)
             (add-to-list 'eglot-server-programs
