@@ -156,7 +156,7 @@
       kept-new-versions 1
       kept-old-versions 2
       version-control t)
-(setq native-comp-async-jobs-number 1)
+(setq native-comp-async-jobs-number 8)
 
 (add-hook 'prog-mode-hook 'hs-minor-mode)
 (add-hook 'prog-mode-hook 'outline-minor-mode)
@@ -305,7 +305,7 @@
    consult-bookmark consult-recent-file consult-xref
    consult--source-bookmark consult--source-recent-file
    consult--source-project-recent-file
-   :preview-key (kbd "M-."))
+   :preview-key "M-.")
 
   ;; Optionally configure the narrowing key.
   ;; Both < and C-+ work reasonably well.
