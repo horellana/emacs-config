@@ -26,7 +26,7 @@
      ("\\?\\?\\?+" . "#dc752f")))
  '(org-agenda-files nil)
  '(package-selected-packages
-   '(0blayout yasnippets eldoc-box helpful kind-icon cape corfu marginalia orderless consult-project-extra gcmh base16-theme avk-emacs-themes brutalist-theme calmer-forest-theme color-theme-modern constant-theme eziam-themes sublime-themes atom-dark-theme atom-one-dark-theme magit-section vertico embark-consult embark eglot all-the-icons-ivy-rich ivy-rich notmuch nano-modeline nano-theme quelpa-use-package which-key python-black php-mode evil-nerd-commenter project counsel-rg pass dart-mode evil-org org-roam smart-mode-line smart-modeline melancholy company-postframe modus-operandi-theme yasnippet-snippets all-the-icons jinja2-mode tron-legacy-theme melancholy-theme melacholy-theme vs-dark-theme emacs-async emacs-asyn company-ctags cyberpunk minsk-theme leuven-theme yasnippet pipenv company-prescient ivy-prescient prescient mood-line minimal-theme ccls wakatime-mode no-littering org-journal arc-dark-theme company-box treemacs-evil treemacs-projectile treemacs spacemacs spacemacs-them spacemacs-theme vscode-dark-plus-theme dracula-theme badger-theme moe-theme tao-theme doom-theme feebleline cyberpunk-theme doom-themes exec-path-from-shell slime haskell-mode platformio-mode company-irony flycheck-irony irony-eldoc irony elixir-mode typescript-mode smart-jump doom-modeline ox-twbs yaml-mode ggtags counsel-projectile counsel-etags cider color-theme-approximate rust-mode web-mode evil-lisp-state evil-leader evil-god-state evil-commentary evil-smartparens evil smartparens company iedit flycheck-package flycheck pyvenv magit req-package use-package el-get))
+   '(counsel 0blayout yasnippets eldoc-box helpful kind-icon cape corfu marginalia orderless consult-project-extra gcmh base16-theme avk-emacs-themes brutalist-theme calmer-forest-theme color-theme-modern constant-theme eziam-themes sublime-themes atom-dark-theme atom-one-dark-theme magit-section vertico embark-consult embark eglot all-the-icons-ivy-rich ivy-rich notmuch nano-modeline nano-theme quelpa-use-package which-key python-black php-mode evil-nerd-commenter project counsel-rg pass dart-mode evil-org org-roam smart-mode-line smart-modeline melancholy company-postframe modus-operandi-theme yasnippet-snippets all-the-icons jinja2-mode tron-legacy-theme melancholy-theme melacholy-theme vs-dark-theme emacs-async emacs-asyn company-ctags cyberpunk minsk-theme leuven-theme yasnippet pipenv company-prescient ivy-prescient prescient mood-line minimal-theme ccls wakatime-mode no-littering org-journal arc-dark-theme company-box treemacs-evil treemacs-projectile treemacs spacemacs spacemacs-them spacemacs-theme vscode-dark-plus-theme dracula-theme badger-theme moe-theme tao-theme doom-theme feebleline cyberpunk-theme doom-themes exec-path-from-shell slime haskell-mode platformio-mode company-irony flycheck-irony irony-eldoc irony elixir-mode typescript-mode smart-jump doom-modeline ox-twbs yaml-mode ggtags counsel-projectile counsel-etags cider color-theme-approximate rust-mode web-mode evil-lisp-state evil-leader evil-god-state evil-commentary evil-smartparens evil smartparens company iedit flycheck-package flycheck pyvenv magit req-package use-package el-get))
  '(safe-local-variable-values
    '((c-file-offsets
       (block-close . 0)
@@ -65,9 +65,9 @@
 
 (progn
   (setq package-archives
-  '(("melpa" . "https://melpa.org/packages/")
-    ("gnu" . "https://elpa.gnu.org/packages/")
-    ("org" . "https://orgmode.org/elpa/"))))
+        '(("melpa" . "https://melpa.org/packages/")
+          ("gnu" . "https://elpa.gnu.org/packages/")
+          ("org" . "https://orgmode.org/elpa/"))))
 
 (when (or (not (package-installed-p 'use-package)))
   (package-refresh-contents)
@@ -100,12 +100,10 @@
   (mapc #'disable-theme custom-enabled-themes))
 
 (add-hook 'after-save-hook 'whitespace-cleanup)
-;; (set-frame-font "JetBrains Mono-11")
-(set-frame-font "Ubuntu mono-14")
+(set-frame-font "Hack-12")
 
 (put 'upcase-region 'disabled nil)
 (put 'downcase-region 'disabled nil)
-
 
 (message "Set gc-cons-threshold to %s" gc-cons-threshold)
 
@@ -131,7 +129,6 @@
 (setq package-native-compile t)
 
 (blink-cursor-mode -1)
-(pixel-scroll-precision-mode)
 
 (when (not (eq system-type 'darwin))
   (menu-bar-mode -1))
@@ -156,7 +153,7 @@
       kept-new-versions 1
       kept-old-versions 2
       version-control t)
-(setq native-comp-async-jobs-number 8)
+(setq native-comp-async-jobs-number 12)
 
 (add-hook 'prog-mode-hook 'hs-minor-mode)
 (add-hook 'prog-mode-hook 'outline-minor-mode)
@@ -267,8 +264,9 @@
   ;; relevant when you use the default completion UI.
   :hook (completion-list-mode . consult-preview-at-point-mode)
 
-  ;; The :init configuration is always executed (Not lazy)
-  :init
+  ;; Configure other variables and modes in the :config section,
+  ;; after lazily loading the package.
+  :config
 
   ;; Optionally configure the register formatting. This improves the register
   ;; preview for `consult-register', `consult-register-load',
@@ -280,16 +278,11 @@
   ;; This adds thin lines, sorting and hides the mode line of the window.
   (advice-add #'register-preview :override #'consult-register-window)
 
-  ;; Optionally replace `completing-read-multiple' with an enhanced version.
-  (advice-add #'completing-read-multiple :override #'consult-completing-read-multiple)
-
   ;; Use Consult to select xref locations with preview
   (setq xref-show-xrefs-function #'consult-xref
         xref-show-definitions-function #'consult-xref)
 
-  ;; Configure other variables and modes in the :config section,
-  ;; after lazily loading the package.
-  :config
+
 
   ;; Optionally configure preview. The default value
   ;; is 'any, such that any key triggers the preview.
@@ -334,7 +327,7 @@
 (use-package marginalia
   ;; Either bind `marginalia-cycle` globally or only in the minibuffer
   :bind (:map minibuffer-local-map
-         ("M-A" . marginalia-cycle))
+              ("M-A" . marginalia-cycle))
 
   ;; The :init configuration is always executed (Not lazy!)
   :init
@@ -469,7 +462,7 @@
          ("C-c p k" . cape-keyword)
          ("C-c p s" . cape-symbol)
          ("C-c p a" . cape-abbrev)
-         ("C-c p i" . cape-ispell)
+         ("C-c p i" . cape-dict)
          ("C-c p l" . cape-line)
          ("C-c p w" . cape-dict)
          ("C-c p \\" . cape-tex)
@@ -490,7 +483,7 @@
   ;;(add-to-list 'completion-at-point-functions #'cape-dict)
   ;;(add-to-list 'completion-at-point-functions #'cape-symbol)
   ;;(add-to-list 'completion-at-point-functions #'cape-line)
-)
+  )
 
 (use-package kind-icon
   :ensure t
@@ -639,20 +632,19 @@
   :ensure t
   :after (evil)
   :hook (org-mode-hook . evil-org-mode)
+  :bind (("C-C a" . org-agenda))
+  :custom
+  (org-agenda-files (list "~/trabajo/todo.org"))
+  (org-log-done 'time)
+
   :config (progn
-            (message "Loading evil org config")
             (evil-org-set-key-theme '(navigation insert textobjects additional calendar))
-            (require 'evil-org-agenda)
-            (evil-org-agenda-set-keys)
 
-            (eval-after-load "org"
-              '(progn
-                 (setq org-agenda-files (list "~/trabajo/todo.org"))
-                 (setq org-log-done 'time)
+            (org-babel-do-load-languages 'org-babel-load-languages '((plantuml . t)))))
 
-                 (define-key global-map "\C-Ca" 'org-agenda)
-                 (org-babel-do-load-languages 'org-babel-load-languages '((plantuml . t)))))))
-
+(use-package evil-org-agenda
+  :hook (org-agenda-mode . evil-org-agenda-set-keys)
+  :bind (("C-C a" . org-agenda)))
 
 (use-package org-journal
   :ensure t
@@ -663,8 +655,8 @@
   :ensure t
   :hook (clojure-mode . cider-mode)
   :config (eval-after-load "evil-lisp-state"
-               '(progn
-                  (evil-leader/set-key-for-mode 'cider-mode "e" 'cider-eval-last-sexp))))
+            '(progn
+               (evil-leader/set-key-for-mode 'cider-mode "e" 'cider-eval-last-sexp))))
 
 (eval-after-load "evil-leader"
   '(progn
@@ -749,13 +741,11 @@
 (use-package eldoc-box
   :ensure t
   :after (eldoc)
-  :bind (("C-c K" . eldoc-box-eglot-help-at-point)))
+  :bind (("C-c K" . eldoc-box-help-at-point)))
 
 (use-package go-mode
   :ensure t
   :mode ("\\.go..'"))
-
-
 
 (use-package all-the-icons
   :ensure t)
@@ -763,7 +753,7 @@
 (use-package doom-themes
   :ensure t
   :config (progn
-            (load-theme 'doom-1337 t)))
+            (load-theme 'doom-outrun-electric t)))
 
 (use-package doom-modeline
   :ensure t
@@ -820,15 +810,27 @@
   :custom (tsx-ts-helper-mode-auto-close-tags nil)
   :hook (tsx-ts-mode . tsx-ts-helper-mode))
 
+(use-package prisma-mode
+  :load-path "~/.emacs.d/vendor/emacs-prisma-mode"
+  :mode ("\\.prisma\\'"))
+
 (use-package magit
   :ensure t)
 
 (use-package yasnippet
   :ensure t
+  :disabled t
   :config (progn
             (yas-global-mode 1)))
 
 (use-package yasnippet-snippets
-  :ensure t)
+  :ensure t
+  :after yasnippet)
+
+(with-eval-after-load 'js-ts-mode
+ '(progn
+    (message "Loading js-ts-mode config")
+    (customize-set-variable 'js-indent-level 2)))
+
 
 (message "Done loading init.el")
