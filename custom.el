@@ -6,7 +6,23 @@
  '(ansi-color-faces-vector
    [default default default italic underline success warning error])
  '(custom-safe-themes
-   '("dc8285f7f4d86c0aebf1ea4b448842a6868553eded6f71d1de52f3dcbc960039"
+   '("2a9eb9743efe8a3602a90ef564b763f76cc9ecba73ea1f075ce3981bef7fa653"
+     "1175341268a5d362c2564ece56194026f693efc368bc00c816144f6534bcd3b5"
+     "b26f6686aca9bc0d2dc303a8d821dc2b01449c5e1ce9638f1fce80db7e261bea"
+     "54dfd03eab9edebfb8c5e66b1912dad789ed2a9a0ce43e8ac11ee6cc45731e66"
+     "355c156b6dbeacadfab0d79b64e116c0b1b7cf1a7405268120de0563f18e8641"
+     "e0c83f70bf0fcac1e47c7cafc8defc258be5e90b2b9b7668741c150aa7be1326"
+     "4fe4a418bb02cda8df3fe5dad1c1d177fd517c1ea20871a2e8fce329edd3952d"
+     "eee1e4b3207b70de3d9ea8e9b6c78b4be6f86955b0a0917a48675fe3964ed374"
+     "d11e54ae9e37d61deb2c92c74bc52a27462f62d2ff68c5d01119b0cc30377042"
+     "d56660b0de7ba56e61e076b802b71893981f940c8e611650b03b8dadc41d2ace"
+     "4b0c6453047e26395cd601f9c9d034bd34e943d8f5f08f5126edd48c39d42837"
+     "553a6676b68142a652c034cfe2179a2271240bc1e33611c2de3a7207ce7608ca"
+     "ed3b4cacc4e8f7fc8846f5d13813c13862af94dc3391bbaa92d95099a9a24885"
+     "d8cfa4889d522b103089bb3986dffdfabb3562c835cef6f63e494512f7337558"
+     "e9b951ae0237ceddd378edfc4ffeb3419c1d220c43b446f724148d04f3dd5dbe"
+     "eb3141ffdf8f8070f447e51b085ef4d1e6074c47e9cae84b103a9256dca9ed56"
+     "dc8285f7f4d86c0aebf1ea4b448842a6868553eded6f71d1de52f3dcbc960039"
      "2853dd90f0d49439ebd582a8cbb82b9b3c2a02593483341b257f88add195ad76"
      "5586a5db9dadef93b6b6e72720205a4fa92fd60e4ccfd3a5fa389782eab2371b"
      "683b3fe1689da78a4e64d3ddfce90f2c19eb2d8ab1bab1738a63d8263119c3f4"
@@ -355,17 +371,18 @@
      ("FIXME" . "#dc752f") ("XXX+" . "#dc752f")
      ("\\?\\?\\?+" . "#dc752f")))
  '(package-selected-packages
-   '(all-the-icons-ivy-rich cape cider consult-project-extra corfu
-                            corfu-doc counsel doom-modeline
-                            doom-themes ef-themes eldoc-box
-                            embark-consult evil-commentary
-                            evil-god-state evil-leader evil-lisp-state
-                            evil-org gcmh go-mode haskell-mode helpful
-                            k8s-mode kind-icon magit marginalia
-                            no-littering orderless org-journal
-                            platformio-mode quelpa-use-package
-                            rust-mode sly treesit-auto vertico
-                            which-key yaml-mode yasnippet-snippets))
+   '(all-the-icons-ivy-rich almost-mono-themes cape cider
+                            consult-project-extra corfu corfu-doc
+                            counsel doom-modeline doom-themes
+                            ef-themes eldoc-box embark-consult
+                            evil-commentary evil-god-state evil-leader
+                            evil-lisp-state evil-org gcmh go-mode
+                            haskell-mode helpful k8s-mode kind-icon
+                            magit marginalia no-littering orderless
+                            org-journal platformio-mode
+                            quelpa-use-package rust-mode sly
+                            treesit-auto vertico which-key yaml-mode
+                            yasnippet-snippets))
  '(safe-local-variable-values
    '((c-file-offsets (block-close . 0) (brace-list-close . 0)
                      (brace-list-entry . 0) (brace-list-intro . +)

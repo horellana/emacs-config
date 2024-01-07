@@ -602,7 +602,6 @@
 
 (use-package eglot
   :ensure t
-  :load-path "~/.emacs.d/vendor/eglot/"
   :bind (:map eglot-mode-map
               ("M-." . xref-find-definitions))
   :hook ((c-mode . eglot-ensure)
@@ -666,14 +665,12 @@
 
 (use-package doom-themes
   :ensure t
-  :disabled t
-  :config (progn
-            (load-theme 'doom-material-dark t)))
+  :config (progn))
 
 (use-package ef-themes
   :ensure t
   :config (progn
-            (load-theme 'ef-cherie t)))
+            (load-theme 'ef-night t)))
 
 (use-package doom-modeline
   :ensure t
@@ -687,10 +684,7 @@
             (smartparens-global-mode)))
 
 (use-package almost-mono-themes
-  :ensure t
-  :disabled t
-  :config (progn
-            (load-theme 'almost-mono-gray t)))
+  :ensure t)
 
 (use-package rust-mode
   :ensure t
@@ -715,7 +709,6 @@
 
 (use-package yasnippet
   :ensure t
-  :disabled t
   :config (progn
             (yas-global-mode 1)))
 
@@ -725,8 +718,8 @@
 
 (use-package treesit-auto
   :ensure t
-  :config
-  (global-treesit-auto-mode))
+  :config (progn
+            (global-treesit-auto-mode)))
 
 (add-to-list 'auto-mode-alist '("Dockerfile" . dockerfile-ts-mode))
 (add-to-list 'auto-mode-alist '("\\.py\\'" . python-ts-mode))
