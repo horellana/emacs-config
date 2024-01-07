@@ -364,8 +364,8 @@
                             k8s-mode kind-icon magit marginalia
                             no-littering orderless org-journal
                             platformio-mode quelpa-use-package
-                            rust-mode sly vertico which-key yaml-mode
-                            yasnippet-snippets))
+                            rust-mode sly treesit-auto vertico
+                            which-key yaml-mode yasnippet-snippets))
  '(safe-local-variable-values
    '((c-file-offsets (block-close . 0) (brace-list-close . 0)
                      (brace-list-entry . 0) (brace-list-intro . +)
