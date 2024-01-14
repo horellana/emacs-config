@@ -9,7 +9,7 @@
 (progn
   (setq package-archives
         '(("melpa" . "https://melpa.org/packages/")
-          ("gnu" . "https://elpa.gnu.org/packages/")
+          ("gnu-devel" . "https://elpa.gnu.org/devel/")
           ("org" . "https://orgmode.org/elpa/"))))
 
 (when (or (not (package-installed-p 'use-package)))
@@ -44,9 +44,14 @@
 
 (eval-after-load "eldoc"
   '(progn
-     (message "Loading eldoc config")
+     (add-hook 'prog-mode-hook
+               (lambda ()
+                 (eldoc-box-hover-mode t)))
+
      (setq eldoc-echo-area-prefer-doc-buffer 'maybe)
-     (setq eldoc-echo-area-use-multiline-p 1)))
+     (setq eldoc-echo-area-use-multiline-p 1)
+
+     (message "Loaded eldoc config")))
 
 (message "Loading emacs config")
 
@@ -55,12 +60,12 @@
   (mapc #'disable-theme custom-enabled-themes))
 
 (add-hook 'after-save-hook 'whitespace-cleanup)
-(set-frame-font "Hack-12")
+;; (set-frame-font "Hack-12")
 
 (put 'upcase-region 'disabled nil)
 (put 'downcase-region 'disabled nil)
 
-(setq read-process-output-max (* 5 1024 1024))
+(setq read-process-output-max (* 10 1024 1024))
 
 (setq eldoc-idle-delay 0.75)
 (setq flymake-no-changes-timeout 0.5)
@@ -68,6 +73,8 @@
 (setq line-number-mode t)
 (setq column-number-mode t)
 (size-indication-mode 1)
+
+;; (load-theme 'modus-vivendi-tinted t)
 
 (set-face-attribute 'fringe nil
                     :foreground (face-foreground 'default)
@@ -381,6 +388,7 @@
 
 (use-package corfu
   :ensure t
+  :defer t
   :custom
   (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
   (corfu-auto t)                 ;; Enable auto completion
@@ -392,14 +400,9 @@
   (corfu-on-exact-match nil)     ;; Configure handling of exact matches
   (corfu-echo-documentation nil) ;; Disable documentation in the echo area
   (corfu-scroll-margin 5)        ;; Use scroll margin
+  (corfu-auto-delay 0.5)
   :init (progn
           (global-corfu-mode)))
-
-(use-package corfu-doc
-  :ensure t
-  :disabled t
-  :config (progn
-            (add-hook 'corfu-mode-hook #'corfu-doc-mode)))
 
 ;; Add extensions
 (use-package cape
@@ -426,64 +429,20 @@
   (add-to-list 'completion-at-point-functions #'cape-tex)
   (add-to-list 'completion-at-point-functions #'cape-dabbrev)
   (add-to-list 'completion-at-point-functions #'cape-keyword)
-  ;;(add-to-list 'completion-at-point-functions #'cape-sgml)
-  ;;(add-to-list 'completion-at-point-functions #'cape-rfc1345)
-  ;;(add-to-list 'completion-at-point-functions #'cape-abbrev)
-  ;;(add-to-list 'completion-at-point-functions #'cape-ispell)
-  ;;(add-to-list 'completion-at-point-functions #'cape-dict)
-  ;;(add-to-list 'completion-at-point-functions #'cape-symbol)
-  ;;(add-to-list 'completion-at-point-functions #'cape-line)
-  )
+  (add-to-list 'completion-at-point-functions #'cape-sgml)
+  (add-to-list 'completion-at-point-functions #'cape-rfc1345)
+  (add-to-list 'completion-at-point-functions #'cape-abbrev)
+  (add-to-list 'completion-at-point-functions #'cape-ispell)
+  (add-to-list 'completion-at-point-functions #'cape-dict)
+  (add-to-list 'completion-at-point-functions #'cape-symbol)
+  (add-to-list 'completion-at-point-functions #'cape-line))
 
 (use-package kind-icon
   :ensure t
-  :after corfu
+  :after (corfu)
   :custom (kind-icon-default-face 'corfu-default) ; to compute blended backgrounds correctly
   :config (progn
             (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter)))
-
-(use-package ivy
-  :disabled t
-  :ensure t
-  :bind (("M-x" . counsel-M-x)
-         ("C-x C-f" . counsel-find-file)
-         ("<f1> f" . counsel-describe-function)
-         ("<f1> v" . counsel-describe-variable)
-         ("<f1> o" . counsel-describe-symbol)
-         ("<f1> l" . counsel-find-library)
-         ("<f2> i" . counsel-info-lookup-symbol)
-         ("<f2> u" . counsel-unicode-char)
-         ("C-c g" . counsel-git)
-         ("C-c j" . counsel-git-grep)
-         ("C-c k" . counsel-rg)
-         ("C-x l" . counsel-locate)
-         ("C-x p p" . project-switch-project)
-         ("C-x b" . ivy-switch-buffer)
-         ("C-s" . swiper))
-
-  :config (progn
-            (setq ivy-use-virtual-buffers t)
-            (setq ivy-display-style 'fancy)
-            (setq ivy-height 10)
-            (setq enable-recursive-minibuffers t)
-            (ivy-mode 1)
-            (counsel-mode 1)))
-
-(use-package counsel
-  :after (ivy)
-  :ensure t)
-
-(use-package ivy-rich
-  :ensure t
-  :after (ivy)
-  :config (progn
-            (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line)
-            (ivy-rich-mode 1)))
-
-(use-package all-the-icons-ivy-rich
-  :ensure t
-  :after (ivy ivy-rich)
-  :init (all-the-icons-ivy-rich-mode 1))
 
 (use-package evil
   :ensure t
@@ -643,7 +602,6 @@
 
 (use-package eglot
   :ensure t
-  :load-path "~/.emacs.d/vendor/eglot/"
   :bind (:map eglot-mode-map
               ("M-." . xref-find-definitions))
   :hook ((c-mode . eglot-ensure)
@@ -707,8 +665,12 @@
 
 (use-package doom-themes
   :ensure t
+  :config (progn))
+
+(use-package ef-themes
+  :ensure t
   :config (progn
-            (load-theme 'doom-solarized-dark t)))
+            (load-theme 'ef-night t)))
 
 (use-package doom-modeline
   :ensure t
@@ -723,20 +685,11 @@
             (smartparens-global-mode)))
 
 (use-package almost-mono-themes
-  :ensure t
-  :disabled t
-  :config (progn
-            (load-theme 'almost-mono-gray t)))
+  :ensure t)
 
 (use-package rust-mode
   :ensure t
   :mode ("\\.rs\\'"))
-
-(use-package treesit-auto
-  :ensure t
-  :config (progn
-            (treesit-auto-add-to-auto-mode-alist 'all)
-            (global-treesit-auto-mode)))
 
 (use-package sgml-mode
   :hook (tsx-ts-mode . sgml-electric-tag-pair-mode)
@@ -757,7 +710,6 @@
 
 (use-package yasnippet
   :ensure t
-  :disabled t
   :config (progn
             (yas-global-mode 1)))
 
@@ -765,10 +717,31 @@
   :ensure t
   :after yasnippet)
 
-(with-eval-after-load 'js-ts-mode
- '(progn
-    (message "Loading js-ts-mode config")
-    (setq js-indent-level 2)))
+(use-package treesit-auto
+  :ensure t
+  :config (progn
+            (global-treesit-auto-mode)))
+
+(add-to-list 'auto-mode-alist '("Dockerfile" . dockerfile-ts-mode))
+(add-to-list 'auto-mode-alist '("\\.py\\'" . python-ts-mode))
+(add-to-list 'auto-mode-alist '("\\.sh\\'" . bash-ts-mode))
+(add-to-list 'auto-mode-alist '("\\.json\\'" . json-ts-mode))
+(add-to-list 'auto-mode-alist '("\\.toml\\'" . toml-ts-mode))
+(add-to-list 'auto-mode-alist '("\\.go\\'" . go-ts-mode))
+
+(add-to-list 'auto-mode-alist '("\\.c\\'" . c-ts-mode))
+(add-to-list 'auto-mode-alist '("\\.h\\'" . c-ts-mode))
+
+(add-to-list 'auto-mode-alist '("\\.cpp\\'" . c++-ts-mode))
+(add-to-list 'auto-mode-alist '("\\.hpp\\'" . c++-ts-mode))
+
+(add-to-list 'auto-mode-alist '("\\.js\\'" . js-ts-mode))
+(add-to-list 'auto-mode-alist '("\\.jsx\\'" . tsx-ts-mode))
+
+(add-to-list 'auto-mode-alist '("\\.ts\\'" . typescript-ts-mode))
+(add-to-list 'auto-mode-alist '("\\.tsx\\'" . tsx-ts-mode))
+
+(setq js-indent-level 2)
 
 (garbage-collect)
 
