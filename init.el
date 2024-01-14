@@ -708,10 +708,11 @@
 (use-package doom-themes
   :ensure t
   :config (progn
-            (load-theme 'doom-ir-black t)))
+            (load-theme 'doom-solarized-dark t)))
 
 (use-package doom-modeline
   :ensure t
+  :disabled t
   :after (all-the-icons)
   :config (progn
             (doom-modeline-mode)))
@@ -731,28 +732,11 @@
   :ensure t
   :mode ("\\.rs\\'"))
 
-(use-package treesit
-  :init (progn
-          (setq treesit-extra-load-path
-                (list (format "%s/.emacs.d/vendor/tree-sitter-module/dist" (getenv "HOME")))))
+(use-package treesit-auto
+  :ensure t
   :config (progn
-            (add-to-list 'auto-mode-alist '("\\.py\\'" . python-ts-mode))
-            (add-to-list 'auto-mode-alist '("\\.sh\\'" . bash-ts-mode))
-            (add-to-list 'auto-mode-alist '("\\.json\\'" . json-ts-mode))
-            (add-to-list 'auto-mode-alist '("\\.toml\\'" . toml-ts-mode))
-            (add-to-list 'auto-mode-alist '("\\.go\\'" . go-ts-mode))
-
-            (add-to-list 'auto-mode-alist '("\\.c\\'" . c-ts-mode))
-            (add-to-list 'auto-mode-alist '("\\.h\\'" . c-ts-mode))
-
-            (add-to-list 'auto-mode-alist '("\\.cpp\\'" . c++-ts-mode))
-            (add-to-list 'auto-mode-alist '("\\.hpp\\'" . c++-ts-mode))
-
-            (add-to-list 'auto-mode-alist '("\\.js\\'" . js-ts-mode))
-            (add-to-list 'auto-mode-alist '("\\.jsx\\'" . tsx-ts-mode))
-
-            (add-to-list 'auto-mode-alist '("\\.ts\\'" . typescript-ts-mode))
-            (add-to-list 'auto-mode-alist '("\\.tsx\\'" . tsx-ts-mode))))
+            (treesit-auto-add-to-auto-mode-alist 'all)
+            (global-treesit-auto-mode)))
 
 (use-package sgml-mode
   :hook (tsx-ts-mode . sgml-electric-tag-pair-mode)
