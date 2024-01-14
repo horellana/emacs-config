@@ -60,7 +60,7 @@
   (mapc #'disable-theme custom-enabled-themes))
 
 (add-hook 'after-save-hook 'whitespace-cleanup)
-;; (set-frame-font "Hack-12")
+(set-frame-font "Hack-12")
 
 (put 'upcase-region 'disabled nil)
 (put 'downcase-region 'disabled nil)
