@@ -65,7 +65,7 @@
                     :background (face-background 'default)))
 
 (add-hook 'after-save-hook 'whitespace-cleanup)
-;; (set-frame-font "Hack-12")
+(set-frame-font "Hack-12")
 
 (put 'upcase-region 'disabled nil)
 (put 'downcase-region 'disabled nil)
@@ -678,6 +678,7 @@
 
 (use-package doom-modeline
   :ensure t
+  :disabled t
   :after (all-the-icons)
   :config (progn
             (doom-modeline-mode)))
