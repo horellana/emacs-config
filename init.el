@@ -416,7 +416,7 @@
   (corfu-on-exact-match nil)     ;; Configure handling of exact matches
   (corfu-echo-documentation nil) ;; Disable documentation in the echo area
   (corfu-scroll-margin 5)        ;; Use scroll margin
-  (corfu-auto-delay 0.5)
+  (corfu-auto-delay 1.0)
   :init (progn
           (global-corfu-mode)))
 
