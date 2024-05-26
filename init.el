@@ -60,7 +60,14 @@
 
 (eval-after-load "go-ts-mode"
   '(progn
-     (setq go-ts-mode-indent-offset 2)))
+     (defun eglot-gopls-before-save-hook ()
+       (add-hook 'before-save-hook #'eglot-format-buffer -10 t)
+       (lambda ()
+         (call-interactively 'eglot-code-action-organize-imports)))
+
+     (setq go-ts-mode-indent-offset 2)
+
+     (add-hook 'before-save-hook #'eglot-format-buffer-on-save)))
 
 (message "Loading emacs config")
 
