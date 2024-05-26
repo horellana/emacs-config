@@ -371,18 +371,17 @@
      ("FIXME" . "#dc752f") ("XXX+" . "#dc752f")
      ("\\?\\?\\?+" . "#dc752f")))
  '(package-selected-packages
-   '(all-the-icons-ivy-rich almost-mono-themes cape cider
-                            consult-project-extra corfu corfu-doc
-                            counsel doom-modeline doom-themes
-                            ef-themes eldoc-box embark-consult
-                            evil-commentary evil-god-state evil-leader
-                            evil-lisp-state evil-org gcmh go-mode
-                            haskell-mode helpful k8s-mode kind-icon
-                            magit marginalia no-littering orderless
-                            org-journal platformio-mode
-                            quelpa-use-package rust-mode sly
-                            treesit-auto vertico which-key yaml-mode
-                            yasnippet-snippets))
+   '(ac-haskell-process all-the-icons-ivy-rich almost-mono-themes cape
+                        cider consult-project-extra corfu corfu-doc
+                        counsel doom-modeline doom-themes ef-themes
+                        eldoc-box embark-consult evil-commentary
+                        evil-god-state evil-leader evil-lisp-state
+                        evil-org gcmh go-mode haskell-mode helpful
+                        k8s-mode kind-icon kotlin-mode magit
+                        marginalia no-littering orderless org-journal
+                        platformio-mode quelpa-use-package rust-mode
+                        sly treesit-auto vertico which-key yaml-mode
+                        yasnippet-snippets))
  '(safe-local-variable-values
    '((c-file-offsets (block-close . 0) (brace-list-close . 0)
                      (brace-list-entry . 0) (brace-list-intro . +)
