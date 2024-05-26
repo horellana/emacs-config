@@ -1,3 +1,5 @@
+;; -*- lexical-binding: t;-*-
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -490,27 +492,17 @@
      ("FIXME" . "#dc752f") ("XXX+" . "#dc752f")
      ("\\?\\?\\?+" . "#dc752f")))
  '(org-agenda-files
-   '("/home/hector/Documents/org-mode/claudio.org"
-     "/home/hector/Documents/org-mode/departamentos.org"
-     "/home/hector/Documents/org-mode/excon.org"
-     "/home/hector/Documents/org-mode/gpt-prompts.org"
-     "/home/hector/Documents/org-mode/integradores.org"
-     "/home/hector/Documents/org-mode/kubernetes.org"
-     "/home/hector/Documents/org-mode/lase.org"
-     "/home/hector/Documents/org-mode/mongodb.org"
-     "/home/hector/Documents/org-mode/rabbitmq.org"
-     "/home/hector/Documents/org-mode/servidores.org"
-     "/home/hector/Documents/org-mode/tickets.org") nil nil "Customized with use-package evil-org")
+   (list "~/Documents/org-mode" "~/trabajo/todo.org"
+         "~/Documents/org-mode/journal") nil nil "Customized with use-package evil-org")
  '(package-selected-packages
-   '(0blayout 0x0 all-the-icons-ivy-rich almost-mono-themes cape cider
-              consult-project-extra corfu corfu-doc counsel
-              doom-modeline doom-themes ef-themes eglot eglot-booster
-              eldoc-box embark-consult evil-commentary evil-god-state
-              evil-leader evil-lisp-state evil-org f gcmh go-mode
-              haskell-mode helpful k8s-mode kind-icon magit marginalia
-              no-littering orderless org-journal platformio-mode
-              quelpa-use-package rust-mode sly treesit-auto vertico
-              which-key yaml-mode yasnippet-snippets))
+   '(all-the-icons cape cider consult-project-extra corfu ef-themes
+                   eglot-booster eldoc-box embark-consult
+                   evil-god-state evil-leader evil-lisp-state evil-org
+                   gcmh go-mode haskell-mode helpful kind-icon
+                   kotlin-mode magit marginalia no-littering orderless
+                   org-journal platformio-mode quelpa-use-package
+                   rust-mode sly treesit-auto vertico which-key
+                   yaml-mode yasnippet-snippets))
  '(package-vc-selected-packages
    '((eglot-booster :vc-backend Git :url
                     "https://github.com/jdtsmith/eglot-booster")))
@@ -533,15 +525,3 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
-
-
-
-
-
-
-
-
-
-
-
-

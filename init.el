@@ -1,3 +1,5 @@
+;; -*- lexical-binding: t;-*-
+
 (message "Set gc-cons-threshold to %s" gc-cons-threshold)
 (setq gc-cons-threshold 100000000)
 
@@ -44,9 +46,12 @@
 
 (eval-after-load "eldoc"
   '(progn
-     (add-hook 'prog-mode-hook
-               (lambda ()
-                 (eldoc-box-hover-mode t)))
+     (use-package eldoc-box
+       :ensure t
+       :config (progn
+                 (add-hook 'prog-mode-hook
+                           (lambda ()
+                             (eldoc-box-hover-mode t)))))
 
      (setq eldoc-echo-area-prefer-doc-buffer 'maybe)
      (setq eldoc-echo-area-use-multiline-p 1)
@@ -65,8 +70,8 @@
 
 (define-advice load-theme (:after (&rest _args) theme-hide-fringe)
   (set-face-attribute 'fringe nil
-                    :foreground (face-foreground 'default)
-                    :background (face-background 'default)))
+                      :foreground (face-foreground 'default)
+                      :background (face-background 'default)))
 
 (add-hook 'after-save-hook 'whitespace-cleanup)
 (set-frame-font "Hack-12")
@@ -490,6 +495,7 @@
 
 (use-package evil-commentary
   :ensure t
+  :disabled t
   :hook (prog-mode . evil-commentary-mode))
 
 (use-package evil-god-state
@@ -619,10 +625,10 @@
          (js-ts-mode . eglot-ensure)
          (rust-mode . eglot-ensure)
          (go-mode . eglot-ensure))
-         (go-ts-mode . eglot-ensure))
+  (go-ts-mode . eglot-ensure)
   :config (progn
             (setq eglot-sync-connect 0
-                  eglot-events-buffer-size 0
+                  eglot-events-buffer-size '(:size 0 :format full)
                   eglot-ignored-server-capabilities '(:hoverProvider
                                                       :documentHighlightProvider)
                   eglot-autoshutdown t)
@@ -781,9 +787,9 @@
                          (message "Garbage Collector has run for %.06fsec"
                                   (k-time (garbage-collect))))))
 
- (add-function :after
-                  after-focus-change-function
-                  (lambda () (unless (frame-focus-state) (garbage-collect))))
+(add-function :after
+              after-focus-change-function
+              (lambda () (unless (frame-focus-state) (garbage-collect))))
 
 (garbage-collect)
 
