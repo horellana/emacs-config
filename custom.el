@@ -495,14 +495,15 @@
    (list "~/Documents/org-mode" "~/trabajo/todo.org"
          "~/Documents/org-mode/journal") nil nil "Customized with use-package evil-org")
  '(package-selected-packages
-   '(all-the-icons cape cider consult-project-extra corfu ef-themes
+   '(all-the-icons almost-mono-themes cape cider consult-project-extra
+                   corfu doom-modeline doom-themes ef-themes
                    eglot-booster eldoc-box embark-consult
-                   evil-god-state evil-leader evil-lisp-state evil-org
-                   gcmh go-mode haskell-mode helpful kind-icon
-                   kotlin-mode magit marginalia no-littering orderless
-                   org-journal platformio-mode quelpa-use-package
-                   rust-mode sly treesit-auto vertico which-key
-                   yaml-mode yasnippet-snippets))
+                   evil-commentary evil-god-state evil-leader
+                   evil-lisp-state evil-org gcmh go-mode haskell-mode
+                   helpful kind-icon kotlin-mode magit marginalia
+                   no-littering orderless org-journal platformio-mode
+                   quelpa-use-package rust-mode sly treesit-auto
+                   vertico which-key yaml-mode yasnippet-snippets))
  '(package-vc-selected-packages
    '((eglot-booster :vc-backend Git :url
                     "https://github.com/jdtsmith/eglot-booster")))

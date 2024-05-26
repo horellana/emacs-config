@@ -495,11 +495,12 @@
 
 (use-package evil-commentary
   :ensure t
-  :disabled t
+  :after (evil)
   :hook (prog-mode . evil-commentary-mode))
 
 (use-package evil-god-state
   :ensure t
+  :after (evil)
   :commands (evil-execute-in-emacs-state))
 
 (use-package evil-leader
@@ -676,22 +677,10 @@
   :ensure t)
 
 (use-package doom-themes
-  :ensure t
-  :disabled t
-  :config (progn
-            (load-theme 'doom-ir-black t)))
+  :ensure t)
 
 (use-package ef-themes
-  :ensure t
-  :config (progn
-            (load-theme 'ef-rosa t)))
-
-(use-package doom-modeline
-  :ensure t
-  :disabled t
-  :after (all-the-icons)
-  :config (progn
-            (doom-modeline-mode)))
+  :ensure t)
 
 (use-package smartparens-config
   :ensure smartparens
@@ -699,10 +688,7 @@
             (smartparens-global-mode)))
 
 (use-package almost-mono-themes
-  :ensure t
-  :disabled t
-  :config (progn
-            (load-theme 'almost-mono-black t)))
+  :ensure t)
 
 (use-package rust-mode
   :ensure t
@@ -749,7 +735,6 @@
   :after eglot
   :config	(eglot-booster-mode))
 
-
 (add-to-list 'auto-mode-alist '("Dockerfile" . dockerfile-ts-mode))
 (add-to-list 'auto-mode-alist '("\\.py\\'" . python-ts-mode))
 (add-to-list 'auto-mode-alist '("\\.sh\\'" . bash-ts-mode))
@@ -770,6 +755,8 @@
 (add-to-list 'auto-mode-alist '("\\.tsx\\'" . tsx-ts-mode))
 
 (setq js-indent-level 2)
+
+(load-theme 'almost-mono-black t)
 
 (defmacro k-time (&rest body)
   "Measure and return the time it takes evaluating BODY."
