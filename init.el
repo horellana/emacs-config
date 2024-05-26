@@ -625,8 +625,9 @@
          (tsx-ts-mode . eglot-ensure)
          (js-ts-mode . eglot-ensure)
          (rust-mode . eglot-ensure)
-         (go-mode . eglot-ensure))
-  (go-ts-mode . eglot-ensure)
+         (go-mode . eglot-ensure)
+         (go-ts-mode . eglot-ensure))
+
   :config (progn
             (setq eglot-sync-connect 0
                   eglot-events-buffer-size '(:size 0 :format full)
