@@ -63,6 +63,11 @@
   "Discard all themes before loading new."
   (mapc #'disable-theme custom-enabled-themes))
 
+(define-advice load-theme (:after (&rest _args) theme-hide-fringe)
+  (set-face-attribute 'fringe nil
+                    :foreground (face-foreground 'default)
+                    :background (face-background 'default)))
+
 (add-hook 'after-save-hook 'whitespace-cleanup)
 (set-frame-font "Hack-12")
 
@@ -78,15 +83,10 @@
 (setq column-number-mode t)
 (size-indication-mode 1)
 
-;; (load-theme 'modus-vivendi-tinted t)
-
-(set-face-attribute 'fringe nil
-                    :foreground (face-foreground 'default)
-                    :background (face-background 'default))
-
 (add-hook 'prog-mode-hook 'flymake-mode)
 
 (setq-default indent-tabs-mode nil)
+(setq-default tab-width 2)
 (setq make-backup-files nil)
 (add-to-list 'global-mode-string '(" %i"))
 
@@ -545,12 +545,11 @@
   :hook (org-mode . evil-org-mode)
   :bind (("C-C a" . org-agenda))
   :custom
-  (org-agenda-files (list "~/trabajo/todo.org"))
+  (org-agenda-files (list "~/Documents/org-mode" "~/trabajo/todo.org" "~/Documents/org-mode/journal"))
   (org-log-done 'time)
 
   :config (progn
             (evil-org-set-key-theme '(navigation insert textobjects additional calendar))
-
             (org-babel-do-load-languages 'org-babel-load-languages '((plantuml . t)))))
 
 (use-package evil-org-agenda
@@ -559,8 +558,10 @@
 
 (use-package org-journal
   :ensure t
-  :config (progn
-            (setq org-element-use-cache nil)))
+  :commands (org-journal-new-entry)
+  :custom
+  (org-journal-file-format "%Y%m%d.org")
+  (org-journal-dir "~/Documents/org-mode/journal"))
 
 (use-package cider
   :ensure t
@@ -618,7 +619,7 @@
          (js-ts-mode . eglot-ensure)
          (rust-mode . eglot-ensure)
          (go-mode . eglot-ensure))
-
+         (go-ts-mode . eglot-ensure))
   :config (progn
             (setq eglot-sync-connect 0
                   eglot-events-buffer-size 0
@@ -670,12 +671,14 @@
 
 (use-package doom-themes
   :ensure t
-  :config (progn))
+  :disabled t
+  :config (progn
+            (load-theme 'doom-ir-black t)))
 
 (use-package ef-themes
   :ensure t
   :config (progn
-            (load-theme 'ef-night t)))
+            (load-theme 'ef-rosa t)))
 
 (use-package doom-modeline
   :ensure t
@@ -690,7 +693,10 @@
             (smartparens-global-mode)))
 
 (use-package almost-mono-themes
-  :ensure t)
+  :ensure t
+  :disabled t
+  :config (progn
+            (load-theme 'almost-mono-black t)))
 
 (use-package rust-mode
   :ensure t
@@ -728,7 +734,15 @@
             (global-treesit-auto-mode)))
 
 (use-package kotlin-mode
+  :defer t
   :ensure t)
+
+(use-package eglot-booster
+  :ensure t
+  :quelpa (eglot-booster :fetcher github :repo "jdtsmith/eglot-booster")
+  :after eglot
+  :config	(eglot-booster-mode))
+
 
 (add-to-list 'auto-mode-alist '("Dockerfile" . dockerfile-ts-mode))
 (add-to-list 'auto-mode-alist '("\\.py\\'" . python-ts-mode))
@@ -750,6 +764,26 @@
 (add-to-list 'auto-mode-alist '("\\.tsx\\'" . tsx-ts-mode))
 
 (setq js-indent-level 2)
+
+(defmacro k-time (&rest body)
+  "Measure and return the time it takes evaluating BODY."
+  `(let ((time (current-time)))
+     ,@body
+     (float-time (time-since time))))
+
+;; Set garbage collection threshold to 1GB.
+(setq gc-cons-threshold #x40000000)
+
+;; When idle for 15sec run the GC no matter what.
+(defvar k-gc-timer
+  (run-with-idle-timer 15 t
+                       (lambda ()
+                         (message "Garbage Collector has run for %.06fsec"
+                                  (k-time (garbage-collect))))))
+
+ (add-function :after
+                  after-focus-change-function
+                  (lambda () (unless (frame-focus-state) (garbage-collect))))
 
 (garbage-collect)
 
