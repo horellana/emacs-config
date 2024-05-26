@@ -53,6 +53,10 @@
 
      (message "Loaded eldoc config")))
 
+(eval-after-load "go-ts-mode"
+  '(progn
+     (setq go-ts-mode-indent-offset 2)))
+
 (message "Loading emacs config")
 
 (define-advice load-theme (:before (&rest _args) theme-dont-propagate)
@@ -612,7 +616,8 @@
          (typescript-ts-mode . eglot-ensure)
          (tsx-ts-mode . eglot-ensure)
          (js-ts-mode . eglot-ensure)
-         (rust-mode . eglot-ensure))
+         (rust-mode . eglot-ensure)
+         (go-mode . eglot-ensure))
 
   :config (progn
             (setq eglot-sync-connect 0
@@ -721,6 +726,9 @@
   :ensure t
   :config (progn
             (global-treesit-auto-mode)))
+
+(use-package kotlin-mode
+  :ensure t)
 
 (add-to-list 'auto-mode-alist '("Dockerfile" . dockerfile-ts-mode))
 (add-to-list 'auto-mode-alist '("\\.py\\'" . python-ts-mode))
