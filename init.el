@@ -51,9 +51,9 @@
        :config (progn
                  (add-hook 'prog-mode-hook
                            (lambda ()
-                             (eldoc-box-hover-mode t)))))
+                             (eldoc-box-hover-mode 0)))))
 
-     (setq eldoc-echo-area-prefer-doc-buffer 'maybe)
+     (setq eldoc-echo-area-prefer-doc-buffer 0)
      (setq eldoc-echo-area-use-multiline-p 1)
 
      (message "Loaded eldoc config")))
@@ -88,8 +88,8 @@
 
 (setq read-process-output-max (* 10 1024 1024))
 
-(setq eldoc-idle-delay 0.75)
-(setq flymake-no-changes-timeout 0.5)
+(setq eldoc-idle-delay 0.1)
+(setq flymake-no-changes-timeout 1.0)
 
 (setq line-number-mode t)
 (setq column-number-mode t)
@@ -146,6 +146,10 @@
                     :background (face-background 'default))
 
 (fset 'yes-or-no-p 'y-or-n-p)
+
+(use-package doom-modeline
+  :ensure t
+  :init (doom-modeline-mode 1))
 
 (use-package bind-key
   :ensure t
@@ -407,16 +411,16 @@
   :defer t
   :custom
   (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
-  (corfu-auto t)                 ;; Enable auto completion
+  (corfu-auto nil)                 ;; Enable auto completion
   (corfu-separator ?\s)          ;; Orderless field separator
   (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
-  (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
+  (corfu-quit-no-match t)      ;; Never quit, even if there is no match
   (corfu-preview-current nil)    ;; Disable current candidate preview
   (corfu-preselect-first nil)    ;; Disable candidate preselection
   (corfu-on-exact-match nil)     ;; Configure handling of exact matches
   (corfu-echo-documentation nil) ;; Disable documentation in the echo area
   (corfu-scroll-margin 5)        ;; Use scroll margin
-  (corfu-auto-delay 1.0)
+  (corfu-auto-delay 0.5)
   :init (progn
           (global-corfu-mode)))
 
@@ -632,14 +636,14 @@
          (tsx-ts-mode . eglot-ensure)
          (js-ts-mode . eglot-ensure)
          (rust-mode . eglot-ensure)
+         (rust-ts-mode . eglot-ensure)
          (go-mode . eglot-ensure)
          (go-ts-mode . eglot-ensure))
 
   :config (progn
             (setq eglot-sync-connect 0
                   eglot-events-buffer-size '(:size 0 :format full)
-                  eglot-ignored-server-capabilities '(:hoverProvider
-                                                      :documentHighlightProvider)
+                  eglot-ignored-server-capabilities nil
                   eglot-autoshutdown t)
 
             (setq eldoc-echo-area-use-multiline-p nil)
@@ -685,10 +689,15 @@
   :ensure t)
 
 (use-package doom-themes
-  :ensure t)
+  :ensure t
+  :config (progn
+            ;; (load-theme 'doom-winter-is-coming-light t)
+            ))
 
 (use-package ef-themes
-  :ensure t)
+  :ensure t
+  :config (progn
+            (load-theme 'ef-winter t)))
 
 (use-package smartparens-config
   :ensure smartparens
@@ -729,12 +738,14 @@
   :after yasnippet)
 
 (use-package treesit-auto
-  :ensure t
-  :config (progn
-            (global-treesit-auto-mode)))
+  :custom
+  (treesit-auto-install 'prompt)
+  :config
+  (treesit-auto-add-to-auto-mode-alist 'all)
+  (global-treesit-auto-mode))
 
 (use-package kotlin-mode
-  :defer t
+  :mode ("\\.kt\\'")
   :ensure t)
 
 (use-package eglot-booster
@@ -764,7 +775,7 @@
 
 (setq js-indent-level 2)
 
-(load-theme 'almost-mono-black t)
+;; (load-theme 'ef-trio-light t)
 
 (defmacro k-time (&rest body)
   "Measure and return the time it takes evaluating BODY."
