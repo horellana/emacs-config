@@ -674,7 +674,18 @@
                          '(tsx-ts-mode . ("typescript-language-server" "--stdio")))
 
             (add-to-list 'eglot-server-programs
-                         '(web-mode . ("typescript-language-server" "--stdio")))))
+                         '(web-mode . ("typescript-language-server" "--stdio")))
+
+            (add-to-list 'eglot-server-programs '((js-mode typescript-mode (typescript-ts-base-mode :language-id "typescript")) . (eglot-deno "deno" "lsp")))
+
+            (defclass eglot-deno (eglot-lsp-server) ()
+              :documentation "A custom class for deno lsp.")
+
+            (cl-defmethod eglot-initialization-options ((server eglot-deno))
+              "Passes through required deno initialization options"
+              (list :enable t
+                    :lint t))
+            ))
 
 (use-package eldoc-box
   :ensure t
