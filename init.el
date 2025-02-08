@@ -49,14 +49,19 @@
      (use-package eldoc-box
        :ensure t
        :config (progn
-                 (add-hook 'prog-mode-hook
-                           (lambda ()
-                             (eldoc-box-hover-mode 0)))))
+                 (setq eldoc-echo-area-prefer-doc-buffer 0)
+                 (setq eldoc-echo-area-use-multiline-p 1)
 
-     (setq eldoc-echo-area-prefer-doc-buffer 0)
-     (setq eldoc-echo-area-use-multiline-p 1)
+                 (add-hook 'eldoc-box-buffer-setup-hook #'eldoc-box-prettify-ts-errors 0 t)
 
-     (message "Loaded eldoc config")))
+                 (set-face-attribute 'eldoc-box-body nil
+                                     :background "black"
+                                     :foreground "white") ; Adjust foreground if needed
+
+                 (set-face-attribute 'eldoc-box-border nil
+                                     :foreground "light blue")
+
+                 (message "Loaded eldoc config")))))
 
 (eval-after-load "go-ts-mode"
   '(progn
@@ -79,6 +84,9 @@
   (set-face-attribute 'fringe nil
                       :foreground (face-foreground 'default)
                       :background (face-background 'default)))
+
+;; (define-advice load-theme (:after (&rest _args) theme-transparent-background)
+;;   (set-terminal-color-background))
 
 (add-hook 'after-save-hook 'whitespace-cleanup)
 (set-frame-font "Hack-12")
@@ -146,6 +154,13 @@
                     :background (face-background 'default))
 
 (fset 'yes-or-no-p 'y-or-n-p)
+
+(use-package kaolin-themes
+  :ensure t)
+
+(use-package moe-theme
+  :disabled t
+  :ensure t)
 
 (use-package doom-modeline
   :ensure t
@@ -422,9 +437,27 @@
   (corfu-scroll-margin 5)        ;; Use scroll margin
   (corfu-auto-delay 0.5)
   :init (progn
-          (global-corfu-mode)))
+          (global-corfu-mode))
+  :config (progn
+            (custom-set-faces
+             '(corfu-default ((t (:background "#1e1e1e" :foreground "#dcdcdc")))) ; Match dark theme
+             '(corfu-current ((t (:background "#005f87" :foreground "#ffffff")))) ; Highlight current
+             '(corfu-border ((t (:background "#1e1e1e"))))                        ; Popup border
+             '(corfu-bar ((t (:background "#3e3e3e")))))))
 
-;; Add extensions
+(use-package popon
+  :disabled t
+  :load-path "~/.emacs.d/vendor/emacs-popon")
+
+(use-package corfu-terminal
+  :after (corfu popon)
+  :disabled t
+  :load-path "~/.emacs.d/vendor/emacs-corfu-terminal/"
+  :config (progn
+            (unless (display-graphic-p)
+              (corfu-terminal-mode +1))))
+
+;; addk extensions
 (use-package cape
   :ensure t
   ;; Bind dedicated completion commands
@@ -474,6 +507,12 @@
 
                (bind-key "<tab>" 'indent-region evil-visual-state-map)
                (bind-key "C-<tab>" 'indent-whole-buffer evil-normal-state-map)
+               (bind-key "<f1>" 'evil-normal-state evil-insert-state-map)
+               (bind-key "<f1>" 'evil-normal-state evil-insert-state-map)
+               (global-set-key (kbd "<f1>")
+                               (lambda ()
+                                 (interactive)
+                               (evil-force-normal-state)))
 
                (bind-key [return] (lambda ()
                                     (interactive)
@@ -581,6 +620,19 @@
   (org-journal-file-format "%Y%m%d.org")
   (org-journal-dir "~/Documents/org-mode/journal"))
 
+(progn
+  (cl-loop for roam-dep in '(das f s emacsql emacsql-sqlite magit-section)
+        do `(use-package ,roam-dep :ensure t))
+
+ (use-package org-roam
+  :ensure t
+  :requires (org dash f s emacsql emacsql-sqlite magit-section)
+  :config (progn
+            (make-directory "~/org-roam")
+            (setq org-roam-directory "~/org-roam")
+            (org-roam-db-autosync-mode))))
+
+
 (use-package cider
   :ensure t
   :hook (clojure-mode . cider-mode)
@@ -622,6 +674,21 @@
             (with-eval-after-load "counsel"
               (setq counsel-describe-function-function #'helpful-callable)
               (setq counsel-describe-variable-function #'helpful-variable))))
+
+;; (defun horellana/eglot-js-setup ()
+;;   "Setup deno or ts-lang-server based on project type (package.json or deno.json)"
+;;   (let ((project-root (or (project-root (project-current)) default-directory)))
+;;     (cond
+;;      ((file-exists-p (expand-file-name "deno.json" project-root))
+;;       (setq-local eglot-server-programs
+;;                   (append eglot-server-programs
+;;                           '((typescript-ts-mode . (eglot-deno "deno" "lsp"))
+;;                             (tsx-ts-mode . (eglot-deno "deno" "lsp"))))))
+;;      ((file-exists-p (expand-file-name "package.json" project-root))
+;;       (setq-local eglot-server-programs
+;;                   (append eglot-server-programs
+;;                           '((typescript-ts-mode . ("typescript-language-server" "--stdio"))
+;;                             (tsx-ts-mode . ("typescript-language-server" "--stdio")))))))))
 
 (use-package eglot
   :ensure t
@@ -676,15 +743,9 @@
             (add-to-list 'eglot-server-programs
                          '(web-mode . ("typescript-language-server" "--stdio")))
 
-            (add-to-list 'eglot-server-programs '((js-mode typescript-mode (typescript-ts-base-mode :language-id "typescript")) . (eglot-deno "deno" "lsp")))
-
-            (defclass eglot-deno (eglot-lsp-server) ()
-              :documentation "A custom class for deno lsp.")
-
-            (cl-defmethod eglot-initialization-options ((server eglot-deno))
-              "Passes through required deno initialization options"
-              (list :enable t
-                    :lint t))
+            ;; (with-eval-after-load "eldoc-box"
+            ;;   (progn
+            ;;     (add-hook 'eglot-managed-mode-hook #'eldoc-box-hover-mode 1)))
             ))
 
 (use-package eldoc-box
@@ -702,13 +763,13 @@
 (use-package doom-themes
   :ensure t
   :config (progn
-            ;; (load-theme 'doom-winter-is-coming-light t)
+            ;; (load-theme 'doom-ir-black t)
             ))
 
 (use-package ef-themes
   :ensure t
   :config (progn
-            (load-theme 'ef-winter t)))
+            ))
 
 (use-package smartparens-config
   :ensure smartparens
@@ -726,6 +787,9 @@
   :hook (tsx-ts-mode . sgml-electric-tag-pair-mode)
   :config (progn
             (add-hook 'tsx-ts-mode 'sgml-electric-tag-pair-mode)))
+
+(use-package wl-copy
+  :load-path "~/.emacs.d/wl-copy-el/")
 
 (use-package tsx-ts-helper-mode
   :load-path "~/.emacs.d/vendor/tsx-ts-helper-mode/"
@@ -749,6 +813,7 @@
   :after yasnippet)
 
 (use-package treesit-auto
+  :load-path "~/.emacs.d/vendor/treesit-auto"
   :custom
   (treesit-auto-install 'prompt)
   :config
@@ -757,6 +822,9 @@
 
 (use-package kotlin-mode
   :mode ("\\.kt\\'")
+  :ensure t)
+
+(use-package tao-theme
   :ensure t)
 
 (use-package eglot-booster
@@ -778,7 +846,7 @@
 (add-to-list 'auto-mode-alist '("\\.cpp\\'" . c++-ts-mode))
 (add-to-list 'auto-mode-alist '("\\.hpp\\'" . c++-ts-mode))
 
-(add-to-list 'auto-mode-alist '("\\.js\\'" . js-ts-mode))
+(add-to-list 'auto-mode-alist '("\\.js\\'" . typescript-ts-mode))
 (add-to-list 'auto-mode-alist '("\\.jsx\\'" . tsx-ts-mode))
 
 (add-to-list 'auto-mode-alist '("\\.ts\\'" . typescript-ts-mode))
@@ -786,27 +854,34 @@
 
 (setq js-indent-level 2)
 
-;; (load-theme 'ef-trio-light t)
-
-(defmacro k-time (&rest body)
-  "Measure and return the time it takes evaluating BODY."
-  `(let ((time (current-time)))
-     ,@body
-     (float-time (time-since time))))
-
-;; Set garbage collection threshold to 1GB.
-(setq gc-cons-threshold #x40000000)
-
-;; When idle for 15sec run the GC no matter what.
-(defvar k-gc-timer
-  (run-with-idle-timer 15 t
-                       (lambda ()
-                         (message "Garbage Collector has run for %.06fsec"
-                                  (k-time (garbage-collect))))))
-
 (add-function :after
               after-focus-change-function
-              (lambda () (unless (frame-focus-state) (garbage-collect))))
+              (lambda ()
+                (unless (frame-focus-state)
+                  (garbage-collect))))
+
+(defun horellana/set-terminal-color-background ()
+  (interactive)
+  (unless (display-graphic-p (selected-frame))
+    (set-face-background 'default "unspecified-bg" (selected-frame))))
+
+(defun horellana/set-terminal-mouse-scroll ()
+  (interactive)
+  (unless (display-graphic-p (selected-frame))
+    (xterm-mouse-mode 1)
+    (global-set-key (kbd "<mouse-4>") 'scroll-down-line)
+    (global-set-key (kbd "<mouse-5>") 'scroll-up-line)))
+
+(bind-key [f8] 'project-compile)
+(bind-key [f9] 'project-recompile)
+
+(horellana/set-terminal-mouse-scroll)
+(horellana/set-terminal-color-background)
+
+(load-theme 'ef-duo-dark t)
+
+(setq fringe-mode 0)
+(set-fringe-mode '(0 . 0))
 
 (garbage-collect)
 

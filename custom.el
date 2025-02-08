@@ -8,7 +8,27 @@
  '(ansi-color-faces-vector
    [default default default italic underline success warning error])
  '(custom-safe-themes
-   '("df9cbe907a315961f2166f6abc6b483c83129cf9689ae38d733ff06a35540438"
+   '("4edad12267c88bb57aab5a5c0d2e23740c6f552b6a36fb785dfb4e4725808eab"
+     "9f986dcc0de26c1c8b6dfd749eb7351b1a3c8db31b3330a7dfdd25be1b47cb22"
+     "7ed236688b971b70744d1410d4e86cebde9b2980e0568f38d22db4f319e8d135"
+     "1e6997bc08f0b11a2b5b6253525aed4e1eb314715076a0c0c2486bd97569f18a"
+     "918b39b12c40c780831aac53d3047af862c72f24fe65b18cbdf2cb6fe0d14923"
+     "e4a441d3cea911e8ef36de2eaed043cbe2079484c44c3f2bbab67a46f863a9f6"
+     "9d5a33a0097c43f44759530c846e1adf9c40171f232a4b2ae561feccc99a03c4"
+     "8d40363c10aae3e4a5b00095ed2b5c6a1d9e1514da432191cdeaf0eab1112aeb"
+     "21eb44ad0e958f71261c436a06577dc114b2850e5a82bc12314cf63c2d2d1db5"
+     "f3a2e269300b56300ce6fc25490e676f8ab26e03df3c0b0e18c1a2514445bdf4"
+     "c341518f5a80752f3113699a7f845dfc7299667311858e7cdfe64677d359d87e"
+     "3538194fff1b928df280dc08f041518a8d51ac3ff704c5e46d1517f5c4d8a0e0"
+     "9df4b113170b630d3c00cf3e67c59ecf4f007487f199cc46d54fb30efc8b79ce"
+     "4e9f0b64032736975e3a5bd5617c829510d5bf55687bf8e7ff90b0721274e032"
+     "5beb9cc517b24959e2ee7be47584270bbe11a7b210807fa419d41ede12174a26"
+     "ca2ce81d33e0b4bd0fdf20caefdde9cb617fec42eeeaf5cd79c80d630bd5cf6a"
+     "00d7122017db83578ef6fba39c131efdcb59910f0fac0defbe726da8072a0729"
+     "36c5acdaf85dda0dad1dd3ad643aacd478fb967960ee1f83981d160c52b3c8ac"
+     "b8bd60a23b9e2f08b0c437231ee84f2dacc70fdc4d5a0fb87229bb9926273fdd"
+     "acfe7ff6aacb9432f124cde4e35d6d2b4bc52916411de73a6ccded9750c9fa97"
+     "df9cbe907a315961f2166f6abc6b483c83129cf9689ae38d733ff06a35540438"
      "9ed206ff6874db89cb4a588c6cdc75a7b056fecbc9880e9758881bdef6d9d79a"
      "1b936ee8300fc66740604c3c2663bf9f0914b6c088f86e757607610c02d0199d"
      "9aa431bc3739422ffb91d9982b52d39cbf5fbe9b472fcdea3d6eccaafa65962f"
@@ -491,17 +511,17 @@
      ("KLUDGE" . "#b1951d") ("HACK" . "#b1951d") ("TEMP" . "#b1951d")
      ("FIXME" . "#dc752f") ("XXX+" . "#dc752f")
      ("\\?\\?\\?+" . "#dc752f")))
- '(org-agenda-files '("/home/hector/Documents/org-mode/journal/20240124.org") nil nil "Customized with use-package evil-org")
  '(package-selected-packages
-   '(0blayout 0x0 ac-html ahk-mode all-the-icons almost-mono-themes cape
-              cider consult-project-extra corfu doom-modeline
-              doom-themes ef-themes eglot-booster eldoc-box
-              embark-consult evil-commentary evil-god-state
-              evil-leader evil-lisp-state evil-org gcmh go-mode
-              haskell-mode helpful kind-icon kotlin-mode magit
-              marginalia no-littering orderless org-journal
-              platformio-mode quelpa-use-package rust-mode sly
-              treesit-auto vertico yaml-mode yasnippet-snippets))
+   '(all-the-icons almost-mono-themes base16-theme cape cider
+                   consult-project-extra corfu doom-modeline
+                   doom-themes ef-themes eglot-booster eldoc-box
+                   embark-consult evil-commentary evil-god-state
+                   evil-leader evil-lisp-state evil-org gcmh go-mode
+                   haskell-mode helpful kaolin-themes kind-icon
+                   kotlin-mode magit marginalia no-littering orderless
+                   org-journal org-roam platformio-mode
+                   quelpa-use-package rust-mode sly tao-theme vertico
+                   yaml-mode yasnippet-snippets))
  '(package-vc-selected-packages
    '((eglot-booster :vc-backend Git :url
                     "https://github.com/jdtsmith/eglot-booster")))
@@ -523,4 +543,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(corfu-bar ((t (:background "#3e3e3e"))))
+ '(corfu-border ((t (:background "#1e1e1e"))))
+ '(corfu-current ((t (:background "#005f87" :foreground "#ffffff"))))
+ '(corfu-default ((t (:background "#1e1e1e" :foreground "#dcdcdc")))))
