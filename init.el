@@ -1,7 +1,8 @@
 ;; -*- lexical-binding: t;-*-
 
-(message "Set gc-cons-threshold to %s" gc-cons-threshold)
+
 (setq gc-cons-threshold 100000000)
+(message "Set gc-cons-threshold to %s" gc-cons-threshold)
 
 (setq custom-file (concat user-emacs-directory "custom.el"))
 (load custom-file 'noerror)
@@ -816,6 +817,7 @@
   :load-path "~/.emacs.d/vendor/treesit-auto"
   :custom
   (treesit-auto-install 'prompt)
+  (treesit-extra-load-path '("~/.emacs.d/vendor/tree-sitter-jsdoc/"))
   :config
   (treesit-auto-add-to-auto-mode-alist 'all)
   (global-treesit-auto-mode))
@@ -846,7 +848,7 @@
 (add-to-list 'auto-mode-alist '("\\.cpp\\'" . c++-ts-mode))
 (add-to-list 'auto-mode-alist '("\\.hpp\\'" . c++-ts-mode))
 
-(add-to-list 'auto-mode-alist '("\\.js\\'" . typescript-ts-mode))
+(add-to-list 'auto-mode-alist '("\\.js\\'" . js-ts-mode))
 (add-to-list 'auto-mode-alist '("\\.jsx\\'" . tsx-ts-mode))
 
 (add-to-list 'auto-mode-alist '("\\.ts\\'" . typescript-ts-mode))
