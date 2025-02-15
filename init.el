@@ -877,8 +877,8 @@
 (bind-key [f8] 'project-compile)
 (bind-key [f9] 'project-recompile)
 
-(horellana/set-terminal-mouse-scroll)
-(horellana/set-terminal-color-background)
+(add-hook 'emacs-startup-hook 'horellana/set-terminal-mouse-scroll)
+(add-hook 'emacs-startup-hook 'horellana/set-terminal-color-background)
 
 (load-theme 'ef-duo-dark t)
 
