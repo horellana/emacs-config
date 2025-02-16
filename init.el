@@ -842,6 +842,10 @@
   :after eglot
   :config	(eglot-booster-mode))
 
+(use-package flymake-flycheck
+  :ensure t
+  :hook (flymake-mode . flymake-flycheck-auto))
+
 (add-to-list 'auto-mode-alist '("Dockerfile" . dockerfile-ts-mode))
 (add-to-list 'auto-mode-alist '("\\.py\\'" . python-ts-mode))
 (add-to-list 'auto-mode-alist '("\\.sh\\'" . bash-ts-mode))

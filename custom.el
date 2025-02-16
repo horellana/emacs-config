@@ -516,11 +516,12 @@
                    doom-themes ef-themes eglot-booster eldoc-box
                    embark-consult evil-commentary evil-god-state
                    evil-leader evil-lisp-state evil-org flymake-eslint
-                   gcmh go-mode haskell-mode helpful kaolin-themes
-                   kind-icon kotlin-mode magit marginalia no-littering
-                   orderless org-journal org-roam platformio-mode
-                   quelpa-use-package rust-mode sly tao-theme vertico
-                   yaml-mode yasnippet-snippets))
+                   flymake-flycheck gcmh go-mode haskell-mode helpful
+                   kaolin-themes kind-icon kotlin-mode magit
+                   marginalia no-littering orderless org-journal
+                   org-roam platformio-mode quelpa-use-package
+                   rust-mode sly tao-theme vertico yaml-mode
+                   yasnippet-snippets))
  '(package-vc-selected-packages
    '((eglot-booster :vc-backend Git :url
                     "https://github.com/jdtsmith/eglot-booster")))
