@@ -156,6 +156,16 @@
 
 (fset 'yes-or-no-p 'y-or-n-p)
 
+(use-package flymake-eslint
+  :ensure t
+  :custom
+  (flymake-eslint-executable-name "npx")
+  (flymake-eslint-executable-args "eslint")
+  (flymake-eslint-prefer-json-diagnostics t)
+  :hook (js-ts-mode . flymake-eslint-enable)
+  :hook (typescript-ts-mode . flymake-eslint-enable)
+  :hook (tsx-ts-mode . flymake-eslint-enable))
+
 (use-package kaolin-themes
   :ensure t)
 
@@ -501,19 +511,17 @@
 (use-package evil
   :ensure t
   :requires bind-key
-  :config (eval-after-load "evil"
-            '(progn
-               (custom-set-variables
-                '(evil-undo-system 'undo-redo))
+  :custom (evil-undo-system 'undo-redo)
+  :config (progn
+            (bind-key "<tab>" 'indent-region evil-visual-state-map)
 
-               (bind-key "<tab>" 'indent-region evil-visual-state-map)
                (bind-key "C-<tab>" 'indent-whole-buffer evil-normal-state-map)
                (bind-key "<f1>" 'evil-normal-state evil-insert-state-map)
-               (bind-key "<f1>" 'evil-normal-state evil-insert-state-map)
+
                (global-set-key (kbd "<f1>")
                                (lambda ()
                                  (interactive)
-                               (evil-force-normal-state)))
+                                 (evil-force-normal-state)))
 
                (bind-key [return] (lambda ()
                                     (interactive)
@@ -541,8 +549,7 @@
                                       inf-ruby-mode
                                       magit-mode)
                         do (evil-set-initial-state mode 'emacs))
-
-               (evil-mode))))
+               (evil-mode)))
 
 (use-package evil-commentary
   :ensure t

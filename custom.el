@@ -502,7 +502,6 @@
      "cbd014af7a08121d1d30388c519b7374496351743bbd59371c44786640056623"
      "bc836bf29eab22d7e5b4c142d201bcce351806b7c1f94955ccafab8ce5b20208"
      default))
- '(evil-undo-system 'undo-redo)
  '(go-ts-mode-indent-offset 2)
  '(hl-todo-keyword-faces
    '(("TODO" . "#dc752f") ("NEXT" . "#dc752f") ("THEM" . "#2d9574")
@@ -516,10 +515,10 @@
                    consult-project-extra corfu doom-modeline
                    doom-themes ef-themes eglot-booster eldoc-box
                    embark-consult evil-commentary evil-god-state
-                   evil-leader evil-lisp-state evil-org gcmh go-mode
-                   haskell-mode helpful kaolin-themes kind-icon
-                   kotlin-mode magit marginalia no-littering orderless
-                   org-journal org-roam platformio-mode
+                   evil-leader evil-lisp-state evil-org flymake-eslint
+                   gcmh go-mode haskell-mode helpful kaolin-themes
+                   kind-icon kotlin-mode magit marginalia no-littering
+                   orderless org-journal org-roam platformio-mode
                    quelpa-use-package rust-mode sly tao-theme vertico
                    yaml-mode yasnippet-snippets))
  '(package-vc-selected-packages
