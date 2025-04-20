@@ -33,6 +33,59 @@
    :url "https://github.com/quelpa/quelpa-use-package.git"))
 
 (require 'quelpa-use-package)
+
+(require 'use-package)
+
+(eval-after-load "flymake"
+  '(progn
+     (message "loading flymake config")
+     (setq flymake-no-changes-timeout 1)))
+
+(eval-after-load "tramp"
+  '(progn
+     (message "Loading tramp config")
+     (setq tramp-default-method "ssh")))
+
+(eval-after-load "eldoc"
+  '(progn
+     (use-package eldoc-box
+       :ensure t
+       :config (progn
+                 (setq eldoc-echo-area-prefer-doc-buffer 0)
+                 (setq eldoc-echo-area-use-multiline-p 1)
+
+                 (add-hook 'eldoc-box-buffer-setup-hook #'eldoc-box-prettify-ts-errors 0 t)
+
+                 (set-face-attribute 'eldoc-box-body nil
+                                     :background "black"
+                                     :foreground "white") ; Adjust foreground if needed
+
+                 (set-face-attribute 'eldoc-box-border nil
+                                     :foreground "light blue")
+
+                 (message "Loaded eldoc config")))))
+
+
+(setq gc-cons-threshold 100000000)
+(message "Set gc-cons-threshold to %s" gc-cons-threshold)
+
+(setq custom-file (concat user-emacs-directory "custom.el"))
+(load custom-file 'noerror)
+
+(require 'package)
+
+(progn
+  (setq package-archives
+        '(("melpa" . "https://melpa.org/packages/")
+          ("gnu-devel" . "https://elpa.gnu.org/devel/")
+          ("org" . "https://orgmode.org/elpa/"))))
+
+(when (or (not (package-installed-p 'use-package)))
+  (package-refresh-contents)
+  (package-install 'el-get)
+  (package-install 'use-package)
+  (package-install 'f))
+
 (require 'use-package)
 
 (eval-after-load "flymake"
@@ -86,11 +139,8 @@
                       :foreground (face-foreground 'default)
                       :background (face-background 'default)))
 
-;; (define-advice load-theme (:after (&rest _args) theme-transparent-background)
-;;   (set-terminal-color-background))
-
 (add-hook 'after-save-hook 'whitespace-cleanup)
-(set-frame-font "Hack-12")
+(set-frame-font "Menlo-18")
 
 (put 'upcase-region 'disabled nil)
 (put 'downcase-region 'disabled nil)
@@ -155,6 +205,12 @@
                     :background (face-background 'default))
 
 (fset 'yes-or-no-p 'y-or-n-p)
+
+(use-package exec-path-from-shell
+  :ensure t
+  :if (memq window-system '(mac ns x))
+  :config (progn
+            (exec-path-from-shell-initialize)))
 
 (use-package flymake-eslint
   :ensure t
@@ -621,25 +677,47 @@
   :hook (org-agenda-mode . evil-org-agenda-set-keys)
   :bind (("C-C a" . org-agenda)))
 
-(use-package org-journal
+(use-package org-roam
   :ensure t
-  :commands (org-journal-new-entry)
   :custom
-  (org-journal-file-format "%Y%m%d.org")
-  (org-journal-dir "~/Documents/org-mode/journal"))
+  (org-roam-directory (file-truename (concat (getenv "HOME") "/Documents/org-roam")))
+  :config
+  (org-roam-db-autosync-enable)
+  :bind (("C-c n f" . org-roam-node-find)
+         ("C-c n r" . org-roam-node-random)
+         (:map org-mode-map
+               (("C-c n i" . org-roam-node-insert)
+                ("C-c n o" . org-id-get-create)
+                ("C-c n t" . org-roam-tag-add)
+                ("C-c n a" . org-roam-alias-add)
+                ("C-c n l" . org-roam-buffer-toggle)))))
 
-(progn
-  (cl-loop for roam-dep in '(das f s emacsql emacsql-sqlite magit-section)
-        do `(use-package ,roam-dep :ensure t))
-
- (use-package org-roam
-  :ensure t
-  :requires (org dash f s emacsql emacsql-sqlite magit-section)
-  :config (progn
-            (make-directory "~/org-roam")
-            (setq org-roam-directory "~/org-roam")
-            (org-roam-db-autosync-mode))))
-
+(use-package consult-org-roam
+   :ensure t
+   :init
+   (require 'consult-org-roam)
+   ;; Activate the minor mode
+   (consult-org-roam-mode 1)
+   :custom
+   ;; Use `ripgrep' for searching with `consult-org-roam-search'
+   (consult-org-roam-grep-func #'consult-ripgrep)
+   ;; Configure a custom narrow key for `consult-buffer'
+   (consult-org-roam-buffer-narrow-key ?r)
+   ;; Display org-roam buffers right after non-org-roam buffers
+   ;; in consult-buffer (and not down at the bottom)
+   (consult-org-roam-buffer-after-buffers t)
+   :config
+   ;; Eventually suppress previewing for certain functions
+   (consult-customize
+    consult-org-roam-forward-links
+    :preview-key "M-.")
+   :bind
+   ;; Define some convenient keybindings as an addition
+   ("C-c n e" . consult-org-roam-file-find)
+   ("C-c n b" . consult-org-roam-backlinks)
+   ("C-c n B" . consult-org-roam-backlinks-recursive)
+   ("C-c n l" . consult-org-roam-forward-links)
+   ("C-c n r" . consult-org-roam-search))
 
 (use-package cider
   :ensure t
@@ -797,6 +875,7 @@
             (add-hook 'tsx-ts-mode 'sgml-electric-tag-pair-mode)))
 
 (use-package wl-copy
+  :if (not (display-graphic-p))
   :load-path "~/.emacs.d/wl-copy-el/")
 
 (use-package tsx-ts-helper-mode
@@ -821,7 +900,7 @@
   :after yasnippet)
 
 (use-package treesit-auto
-  :load-path "~/.emacs.d/vendor/treesit-auto"
+  :ensure t
   :custom
   (treesit-auto-install 'prompt)
   (treesit-extra-load-path '("~/.emacs.d/vendor/tree-sitter-jsdoc/"))
@@ -838,6 +917,7 @@
 
 (use-package eglot-booster
   :ensure t
+  :disabled t
   :quelpa (eglot-booster :fetcher github :repo "jdtsmith/eglot-booster")
   :after eglot
   :config	(eglot-booster-mode))
@@ -845,6 +925,43 @@
 (use-package flymake-flycheck
   :ensure t
   :hook (flymake-mode . flymake-flycheck-auto))
+
+(use-package ellama
+  :ensure t
+  :bind ("C-c e" . ellama)
+  ;; send last message in chat buffer with C-c C-c
+  :hook (org-ctrl-c-ctrl-c-final . ellama-chat-send-last-message)
+  :init
+  (setopt ellama-auto-scroll t)
+  (require 'llm-ollama)
+  (setopt ellama-provider
+          (make-llm-ollama
+           ;; this model should be pulled to use it
+           ;; value should be the same as you print in terminal during pull
+           :chat-model "gemma3"
+           :embedding-model "nomic-embed-text"
+       :default-chat-non-standard-params '(("num_ctx" . 8192))))
+
+  (setopt ellama-summarization-provider
+      (make-llm-ollama
+       :chat-model "gemma3"
+       :embedding-model "nomic-embed-text"
+       :default-chat-non-standard-params '(("num_ctx" . 32768))))
+
+  (setopt ellama-coding-provider
+      (make-llm-ollama
+       :chat-model "deepseek-r1"
+       :embedding-model "nomic-embed-text"
+       :default-chat-non-standard-params '(("num_ctx" . 32768))))
+  :config
+  ;; show ellama context in header line in all buffers
+  (ellama-context-header-line-global-mode +1)
+  ;; show ellama session id in header line in all buffers
+  (ellama-session-header-line-global-mode +1))
+
+(use-package hcl-mode
+  :mode "\\.hcl\\'"
+  :ensure t)
 
 (add-to-list 'auto-mode-alist '("Dockerfile" . dockerfile-ts-mode))
 (add-to-list 'auto-mode-alist '("\\.py\\'" . python-ts-mode))
@@ -891,7 +1008,7 @@
 (add-hook 'emacs-startup-hook 'horellana/set-terminal-mouse-scroll)
 (add-hook 'emacs-startup-hook 'horellana/set-terminal-color-background)
 
-(load-theme 'ef-duo-dark t)
+(load-theme 'ef-dark t)
 
 (setq fringe-mode 0)
 (set-fringe-mode '(0 . 0))
