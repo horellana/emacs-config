@@ -1,87 +1,39 @@
 ;;; -*- lexical-binding: t; -*-
 
-;;; Startup Performance Tweaks
-(setq gc-cons-threshold 100000000) ; 100 MB para evitar pausas frecuentes
+(load (expand-file-name "guix-config.el" user-emacs-directory) t)
+
+(setq gc-cons-threshold 100000000)
 (setq read-process-output-max (* 10 1024 1024))
-(setq native-comp-async-jobs-number 12)
+(setq native-comp-async-jobs-number 4)
 
-;;; User Interface Tweaks
-(menu-bar-mode -1)
-(tool-bar-mode -1)
-(scroll-bar-mode -1)
-(blink-cursor-mode -1)
-(show-paren-mode 1)
-(global-hl-line-mode 1)
-(setq inhibit-startup-message t)
-(set-frame-font "Menlo-18" nil t)
-(set-fringe-mode 0)
-(set-face-attribute 'fringe nil :foreground (face-foreground 'default) :background (face-background 'default))
+(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 
-(setq frame-resize-pixelwise t)
-(add-hook 'window-setup-hook #'toggle-frame-maximized)
+(when (file-exists-p custom-file)
+  (load custom-file))
 
-(add-to-list 'default-frame-alist '(undecorated . t))
+(require 'use-package)
 
-;;; File Behavior and Backups
-(setq make-backup-files nil
-      create-lockfiles nil
-      backup-by-copying t
-      delete-old-versions t
-      kept-new-versions 1
-      kept-old-versions 2
-      version-control t
-      backup-directory-alist '((".*" . "~/.emacs.d/saves")))
+(use-package envrc
+  :config
+  (envrc-global-mode))
 
+;; ... (Keep your existing use-package blocks) ...
+(use-package ef-themes :config (load-theme 'ef-winter))
+;; (use-package doom-themes :config (load-theme 'doom-laserwave t))
+;; (use-package doom-modeline :defer t :init (doom-modeline-mode 1))
+;; (use-package all-the-icons :after (doom-modeline) :if (display-graphic-p))
 
-;; https://www.reddit.com/r/emacs/comments/1mrqi6p/emacs_toggle_transparency_with_interactive/
-(defun horellana/toggle-frame-transparency ()
-  "Toggle frame transparency with user-specified opacity value.
-Prompts user whether to enable transparency. If yes, asks for opacity value (0-100).
-If no, restores full opacity. Only affects the active frame."
-  (set-frame-parameter nil 'alpha 80))
-
-;;; Package System
-(require 'package)
-(setq package-archives '(("melpa" . "https://melpa.org/packages/")
-                         ("gnu" . "https://elpa.gnu.org/packages/")
-                         ("org" . "https://orgmode.org/elpa/")))
-(package-initialize)
-(unless package-archive-contents (package-refresh-contents))
-
-;;; Bootstrap use-package
-(unless (package-installed-p 'use-package)
-  (package-install 'use-package))
-
-(eval-when-compile
-  (require 'use-package))
-(setq use-package-always-ensure t)
-
-;;; Better Garbage Collection Management
-(use-package gcmh
-  :init (gcmh-mode 1))
-
-;;; UI Enhancements
-(use-package doom-themes :config (load-theme 'doom-snazzy t))
-;; (use-package tao-theme :config (load-theme 'tao-yin t))
-;; (use-package ef-themes :ensure t :config (load-theme  'ef-night t))
-(use-package doom-modeline :defer t :init (doom-modeline-mode 1))
-(use-package all-the-icons :after (doom-modeline) :if (display-graphic-p))
-(use-package almost-mono-themes :defer t)
-
-;;; Completion & Minibuffer
+;; ... (Keep Vertico, Consult, etc.) ...
 (use-package vertico :init (vertico-mode))
 (use-package orderless
-  :ensure
-  :defer t
   :init
   (setq completion-styles '(orderless)
-        completion-category-defaults nil
-        completion-category-overrides '((file (styles partial-completion)))))
-
-(use-package marginalia :defer t :init (marginalia-mode))
-
+	completion-category-defaults nil
+	completion-category-overrides '((file (styles partial-completion)))))
+(use-package marginalia :init (marginalia-mode))
+;; Example configuration for Consult
 (use-package consult
-  :ensure
+  ;; Replace bindings. Lazily loaded by `use-package'.
   :bind (;; C-c bindings in `mode-specific-map'
          ("C-c M-x" . consult-mode-command)
          ("C-c h" . consult-history)
@@ -105,6 +57,7 @@ If no, restores full opacity. Only affects the active frame."
          ("M-y" . consult-yank-pop)                ;; orig. yank-pop
          ;; M-g bindings in `goto-map'
          ("M-g e" . consult-compile-error)
+         ("M-g r" . consult-grep-match)
          ("M-g f" . consult-flymake)               ;; Alternative: consult-flycheck
          ("M-g g" . consult-goto-line)             ;; orig. goto-line
          ("M-g M-g" . consult-goto-line)           ;; orig. goto-line
@@ -133,186 +86,242 @@ If no, restores full opacity. Only affects the active frame."
          ;; Minibuffer history
          :map minibuffer-local-map
          ("M-s" . consult-history)                 ;; orig. next-matching-history-element
-         ("M-r" . consult-history)))
+         ("M-r" . consult-history))                ;; orig. previous-matching-history-element
+
+  ;; Enable automatic preview at point in the *Completions* buffer. This is
+  ;; relevant when you use the default completion UI.
+  :hook (completion-list-mode . consult-preview-at-point-mode)
+
+  ;; The :init configuration is always executed (Not lazy)
+  :init
+
+  ;; Tweak the register preview for `consult-register-load',
+  ;; `consult-register-store' and the built-in commands.  This improves the
+  ;; register formatting, adds thin separator lines, register sorting and hides
+  ;; the window mode line.
+  (advice-add #'register-preview :override #'consult-register-window)
+  (setq register-preview-delay 0.5)
+
+  ;; Use Consult to select xref locations with preview
+  (setq xref-show-xrefs-function #'consult-xref
+        xref-show-definitions-function #'consult-xref)
+
+  ;; Configure other variables and modes in the :config section,
+  ;; after lazily loading the package.
+  :config
+
+  ;; Optionally configure preview. The default value
+  ;; is 'any, such that any key triggers the preview.
+  ;; (setq consult-preview-key 'any)
+  ;; (setq consult-preview-key "M-.")
+  ;; (setq consult-preview-key '("S-<down>" "S-<up>"))
+  ;; For some commands and buffer sources it is useful to configure the
+  ;; :preview-key on a per-command basis using the `consult-customize' macro.
+  (consult-customize
+   consult-theme :preview-key '(:debounce 0.2 any)
+   consult-ripgrep consult-git-grep consult-grep consult-man
+   consult-bookmark consult-recent-file consult-xref
+   consult-source-bookmark consult-source-file-register
+   consult-source-recent-file consult-source-project-recent-file
+   ;; :preview-key "M-."
+   :preview-key '(:debounce 0.4 any))
+
+  ;; Optionally configure the narrowing key.
+  ;; Both < and C-+ work reasonably well.
+  (setq consult-narrow-key "<")) ;; "C-+"
+
+  ;; Optionally make narrowing help available in the minibuffer.
+  ;; You may want to use `embark-prefix-help-command' or which-key instead.
+  ;; (keymap-set consult-narrow-map (concat consult-narrow-key " ?") #'consult-narrow-help)
 
 (use-package embark
-  :bind (("C-." . embark-act)
-         ("C-;" . embark-dwim)
-         ("C-h B" . embark-bindings))
+  :bind (("C-." . embark-act))
   :init (setq prefix-help-command #'embark-prefix-help-command))
 (use-package embark-consult)
 
 (use-package corfu
-  :ensure
-  ;; Optional customizations
-  ;; :custom
-  ;; (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
-  ;; (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
-  ;; (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
-  ;; (corfu-preview-current nil)    ;; Disable current candidate preview
-  ;; (corfu-preselect 'prompt)      ;; Preselect the prompt
-  ;; (corfu-on-exact-match nil)     ;; Configure handling of exact matches
+  :init (progn
+	  (global-corfu-mode)
+	  (corfu-history-mode)
+	  (corfu-popupinfo-mode)))
 
-  ;; Enable Corfu only for certain modes. See also `global-corfu-modes'.
-  ;; :hook ((prog-mode . corfu-mode)
-  ;;        (shell-mode . corfu-mode)
-  ;;        (eshell-mode . corfu-mode))
-
-  :init
-
-  ;; Recommended: Enable Corfu globally.  Recommended since many modes provide
-  ;; Capfs and Dabbrev can be used globally (M-/).  See also the customization
-  ;; variable `global-corfu-modes' to exclude certain modes.
-  (global-corfu-mode)
-
-  ;; Enable optional extension modes:
-  (corfu-history-mode)
-  (corfu-popupinfo-mode))
-
-;;; Org Mode & Note-taking
+;; ... (Keep Org Roam) ...
 (use-package org-roam
-  :ensure t
-  :bind (("C-c n l" . org-roam-buffer-toggle)
-         ("C-c n f" . consult-org-roam-file-find)
-         ("C-c n g" . org-roam-graph)
-         ("C-c n i" . org-roam-node-insert)
-         ("C-c n c" . org-roam-capture)
-         ;; Dailies
-         ("C-c n j" . org-roam-dailies-capture-today))
-  :custom (org-roam-directory (file-truename "~/Documents/org-roam"))
-  :config (org-roam-db-autosync-enable))
+  :commands (org-agenda)
+  :custom
+  (org-roam-directory (file-truename "~/.emacs.d/org-roam"))
+  (org-roam-dailies-directory "daily/")
+  (org-roam-completion-everywhere t)
+
+  :bind (("C-c n f" . org-roam-node-find)
+	 ("C-c n i" . org-roam-node-insert)
+	 ;; Dailies bindings
+	 ("C-c n d n" . org-roam-dailies-capture-today)
+	 ("C-c n d d" . org-roam-dailies-goto-today)
+	 ("C-c n d y" . org-roam-dailies-goto-yesterday)
+	 ("C-c n d t" . org-roam-dailies-goto-tomorrow))
+
+  :config (progn
+	    (with-eval-after-load "org-roam"
+	      (progn 
+		(setq org-agenda-files
+		      (-map  (lambda (path)
+			       (file-name-concat org-roam-directory path))
+			     (-filter (lambda (path)
+					(not (or (equal "." path)
+						 (equal ".." path))))
+				      (directory-files org-roam-directory))))))
+	    (org-roam-db-autosync-enable)))
 
 (use-package consult-org-roam
-  :ensure
   :after (org-roam)
-  :config (consult-org-roam-mode 1))
+  :config (progn
+	    (consult-org-roam-mode 1)))
 
-(use-package flymake-flycheck
-  :ensure t
-  :hook ((flymake-mode . flymake-flycheck-auto)))
+(use-package flymake-flycheck :hook
+  ((prog-mode . flymake-mode)
+   (flymake-mode . flymake-flycheck-auto)))
 
-;;; Programming Experience
 (use-package eglot
-  :ensure t
-  :defer t
-  :hook ((python-ts-mode . eglot-ensure)
-         (go-ts-mode . eglot-ensure)
-         (js-ts-mode . eglot-ensure)
-         (typescript-ts-mode . eglot-ensure)))
+ :commands (eglot eglot-ensure))
 
-(use-package flymake :defer t)
-
-(use-package eldoc-box
-  :ensure
-  :after eldoc
-  :bind (("C-c K" . eldoc-box-help-at-point)))
-(use-package smartparens-config
-  :ensure smartparens
-  :init (smartparens-global-mode))
-
-(use-package yasnippet :defer t :config (yas-global-mode 1))
-
+(use-package eldoc-box :after eldoc :bind (("C-c K" . eldoc-box-help-at-point)))
+(use-package yasnippet :config (yas-global-mode 1))
 (use-package yasnippet-snippets :after (yasnippet))
 
-(use-package which-key :defer t :init (which-key-mode))
+(use-package smartparens-config
+  :ensure nil
+  :init (progn
+	  (setq sp-base-key-bindings 'paredit)
+	  (smartparens-global-mode))
+  
+  :config (progn
+	    (define-key smartparens-mode-map (kbd "M-s") nil)
+	    (define-key smartparens-mode-map (kbd "M-S") #'sp-splice-sexp)
+	    (add-hook 'smartparens-mode-hook #'smartparens-strict-mode)))
 
-;;; Evil & Modal Editing
+(use-package which-key
+  :defer t
+  :config (progn
+	    (which-key-mode)))
+
 (use-package evil :init (evil-mode 1))
 (use-package evil-leader
   :after evil
   :config
-  (evil-leader/set-key
-    "k" 'kill-buffer
-    "," 'evil-execute-in-emacs-state
-    ";" 'comment-dwim
-    "w" 'save-buffer)
+  (evil-leader/set-key "w" 'save-buffer)
   (global-evil-leader-mode))
+(use-package evil-commentary :after evil :hook (prog-mode . evil-commentary-mode))
+(use-package evil-org :hook ((org-mode . evil-org-mode))
+  :config (require 'evil-org-agenda) (evil-org-agenda-set-keys))
 
-(use-package evil-commentary
-  :after evil
-  :hook (prog-mode . evil-commentary-mode))
-
-(use-package evil-org
-  :ensure t
-  :hook ((org-mode . evil-org-mode))
-  :config
-  (require 'evil-org-agenda)
-  (evil-org-agenda-set-keys))
-
-;;; Project Tools
 (use-package project :defer t)
-(use-package magit
-  :ensure
-  :defer t
-  :commands (magit-status))
+(use-package magit :commands (magit-status))
+(use-package plantuml-mode)
+(use-package jsdoc :commands (jsdoc))
 
-(use-package plantuml-mode :ensure t)
+(use-package scheme
+  :ensure nil ;; Built-in
+  :hook
+  (scheme-mode . smartparens-mode)
+  (scheme-mode . font-lock-mode))
 
-(use-package jsdoc
+(use-package emacs-guix
+  :hook 
+  (scheme-mode . guix-prettify-mode)
+  :config
+  (setq guix-directory "~/.config/guix/current"))
+
+(use-package arei
+  :disabled t
+  :ensure t)
+
+(use-package dumb-jump
   :ensure t
-  :commands (jsdoc))
+  :config (progn
+	   (add-hook 'xref-backend-functions #'dumb-jump-xref-activate)))
+
+(use-package geiser
+  :hook (scheme-mode . geiser-mode)
+  :config
+  (setq geiser-default-implementation 'guile)
+  (setq geiser-active-implementations '(guile))
+  (setq geiser-connection-timeout 30))
+
+(use-package geiser-guile
+  :after geiser
+  :config
+  (add-to-list 'geiser-guile-load-path 
+	       "~/.config/guix/current/share/guile/site/3.0")
+  
+  (add-to-list 'geiser-guile-load-path 
+	       "~/.config/guix/current/lib/guile/3.0/site-ccache"))
+
+(use-package flycheck-guile
+  :after flycheck
+  :config
+  (setq flycheck-guile-library-path 
+        '("~/.config/guix/current/share/guile/site/3.0"
+          "~/.config/guix/current/lib/guile/3.0/site-ccache")))
 
 (eval-after-load "org"
   '(progn
      (setq org-log-done 'time
 	   org-latex-compiler "xelatex")
      (org-babel-do-load-languages 'org-babel-load-languages '((plantuml . t)))
-     (setq org-plantuml-jar-path "~/Downloads/plantuml-1.2025.3.jar")))
-
-(setq js-indent-level 2)
+     
+     ;; CHANGED: Use the variable provided by guix-config.el
+     (setq org-plantuml-jar-path guix-plantuml-jar-path)))
 
 (eval-after-load "go-ts-mode"
   '(progn
-     (defun eglot-gopls-before-save-hook ()
-       (add-hook 'before-save-hook #'eglot-format-buffer -10 t)
-       (lambda ()
-	 (call-interactively 'eglot-code-action-organize-imports)))
-
      (setq go-ts-mode-indent-offset 2)
-
      (add-hook 'before-save-hook #'eglot-format-buffer-on-save)))
 
-;;; Performance Logging (optional)
-(add-hook 'emacs-startup-hook
-          (lambda ()
-	    (add-to-list 'auto-mode-alist '("Dockerfile" . dockerfile-ts-mode))
-	    (add-to-list 'auto-mode-alist '("\\.py\\'" . python-ts-mode))
-	    (add-to-list 'auto-mode-alist '("\\.sh\\'" . bash-ts-mode))
-	    (add-to-list 'auto-mode-alist '("\\.json\\'" . json-ts-mode))
-	    (add-to-list 'auto-mode-alist '("\\.toml\\'" . toml-ts-mode))
-	    (add-to-list 'auto-mode-alist '("\\.go\\'" . go-ts-mode))
-	    (add-to-list 'auto-mode-alist '("\\.js\\'" . js-ts-mode))
-	    (add-to-list 'auto-mode-alist '("\\.jsx\\'" . tsx-ts-mode))
-	    (add-to-list 'auto-mode-alist '("\\.ts\\'" . typescript-ts-mode))
-	    (add-to-list 'auto-mode-alist '("\\.tsx\\'" . tsx-ts-mode))
+(setq use-short-answers t)
+(setq js-indent-level 2)
 
-	    (fset 'yes-or-no-p 'y-or-n-p)
+(global-set-key (kbd "C-M-i") 'completion-at-point)
 
-	    (horellana/toggle-frame-transparency)))
+(menu-bar-mode -1)
+(tool-bar-mode -1)
+(scroll-bar-mode -1)
+(blink-cursor-mode -1)
+(show-paren-mode 1)
+(global-hl-line-mode 1)
+(setq inhibit-startup-message t)
+(set-fringe-mode 0)
+(set-face-attribute 'fringe nil :foreground (face-foreground 'default) :background (face-background 'default))
+(setq frame-resize-pixelwise t)
+(add-hook 'window-setup-hook #'toggle-frame-maximized)
+(add-to-list 'default-frame-alist '(undecorated . t))
+(set-frame-font "Noto Sans Mono Medium 20" nil t)
+
+(custom-set-faces
+'(flymake-note    ((t (:underline (:style line :color "#00aa00"))))) 
+ '(flymake-error ((t (:underline (:style line :color "#ff0000")))))
+ '(flymake-warning ((t (:underline (:style line :color "#ffa500"))))))
+
+(setq make-backup-files nil
+      create-lockfiles nil
+      backup-by-copying t
+      delete-old-versions t
+      kept-new-versions 1
+      kept-old-versions 2
+      version-control t
+      backup-directory-alist '((".*" . "~/.emacs.d/saves")))
+
+(defun horellana/toggle-frame-transparency ()
+  "Toggle transparency of the background (PGTK specific)."
+  (interactive)
+  (let ((alpha (frame-parameter nil 'alpha-background)))
+    ;; Toggle between 100 and 90. If it's nil, assume it's 100.
+    (set-frame-parameter
+     nil 'alpha-background
+     (if (or (not alpha) (= alpha 100))
+	 95
+       100))))
+
+(horellana/toggle-frame-transparency)
 
 (provide 'init)
-;;; init.el ends here
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(evil-undo-system nil)
- '(package-selected-packages
-   '(0blayout 0x0 all-the-icons almost-mono-themes cape cider
-	      consult-org-roam consult-project-extra corfu csproj-mode
-	      doom-modeline doom-themes ef-themes eldoc-box ellama
-	      embark-consult evil-commentary evil-god-state
-	      evil-leader evil-lisp-state evil-org flymake-eslint
-	      flymake-flycheck gcmh go-mode haskell-mode hcl-mode
-	      helpful jsdoc kaolin-themes kind-icon kotlin-mode magit
-	      marginalia no-littering orderless ox-typst plantuml-mode
-	      platformio-mode quelpa-use-package rust-mode sly
-	      tao-theme treesit-auto vertico yaml-mode
-	      yasnippet-snippets)))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
